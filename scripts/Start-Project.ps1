@@ -3,6 +3,8 @@ $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot -Parent
 $backend=Join-Path $root 'dorm-platform-backend'
 $frontend=Join-Path $root 'dorm-platform-frontend'
+$log=Join-Path $root 'log'
+New-Item -ItemType Directory -Path $log -Force | Out-Null
 if($Database -notmatch '^[a-zA-Z0-9_]+$'){throw 'Invalid database name'}
 function Port-InUse([int]$Port){$client=[Net.Sockets.TcpClient]::new();try{$client.Connect('127.0.0.1',$Port);return $true}catch{return $false}finally{$client.Dispose()}}
 if((Port-InUse $FrontendPort) -or (Port-InUse $BackendPort)){throw 'Requested ports are already in use. Stop this project or choose other ports.'}
@@ -17,10 +19,10 @@ $env:Path=$savedPath
 $java=if($env:JAVA_HOME){Join-Path $env:JAVA_HOME 'bin/java.exe'}else{(Get-Command java).Source}
 $node=(Get-Command node).Source
 $arguments=@('-jar',$jar,('--server.port='+$BackendPort),('--app.frontend-origin=http://localhost:'+$FrontendPort),('--spring.datasource.url=jdbc:mysql://localhost:3306/'+$Database+'?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false'),('--backup.database='+$Database))
-$api=Start-Process -FilePath $java -ArgumentList $arguments -WorkingDirectory $backend -WindowStyle Hidden -RedirectStandardOutput (Join-Path $backend ('backend-'+$BackendPort+'.log')) -RedirectStandardError (Join-Path $backend ('backend-'+$BackendPort+'-error.log')) -PassThru
+$api=Start-Process -FilePath $java -ArgumentList $arguments -WorkingDirectory $backend -WindowStyle Hidden -RedirectStandardOutput (Join-Path $log ('backend-'+$BackendPort+'.log')) -RedirectStandardError (Join-Path $log ('backend-'+$BackendPort+'-error.log')) -PassThru
 $env:PORT=[string]$FrontendPort
 $env:API_TARGET='http://127.0.0.1:'+$BackendPort
-$web=Start-Process -FilePath $node -ArgumentList 'server.mjs' -WorkingDirectory $frontend -WindowStyle Hidden -RedirectStandardOutput (Join-Path $frontend ('frontend-'+$FrontendPort+'.log')) -RedirectStandardError (Join-Path $frontend ('frontend-'+$FrontendPort+'-error.log')) -PassThru
+$web=Start-Process -FilePath $node -ArgumentList 'server.mjs' -WorkingDirectory $frontend -WindowStyle Hidden -RedirectStandardOutput (Join-Path $log ('frontend-'+$FrontendPort+'.log')) -RedirectStandardError (Join-Path $log ('frontend-'+$FrontendPort+'-error.log')) -PassThru
 $runtime=Join-Path $root ('.runtime-'+$FrontendPort+'.json')
 @{backendPid=$api.Id;frontendPid=$web.Id;backendStartedUtc=$api.StartTime.ToUniversalTime().ToString('o');frontendStartedUtc=$web.StartTime.ToUniversalTime().ToString('o');backendPort=$BackendPort;frontendPort=$FrontendPort;database=$Database}|ConvertTo-Json|Set-Content -LiteralPath $runtime -Encoding UTF8
 $ready=$false

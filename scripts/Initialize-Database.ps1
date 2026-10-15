@@ -2,7 +2,7 @@ param([string]$Database = 'dorm_platform', [string]$Password = '123456')
 $ErrorActionPreference = 'Stop'
 if ($Database -notmatch '^[a-zA-Z0-9_]+$') { throw 'Invalid database name' }
 $root = Split-Path $PSScriptRoot -Parent
-$resources = Join-Path $root 'dorm-platform-backend/src/main/resources'
+$resources = Join-Path $root 'sql'
 $env:MYSQL_PWD = $Password
 function Query([string]$Sql) {
     $result = & mysql --user=root --default-character-set=utf8mb4 --batch --skip-column-names --execute=$Sql

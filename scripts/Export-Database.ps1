@@ -6,7 +6,7 @@ param(
 $ErrorActionPreference = 'Stop'
 if ($Database -notmatch '^[a-zA-Z0-9_]+$') { throw 'Invalid database name' }
 $root = Split-Path $PSScriptRoot -Parent
-if ([string]::IsNullOrWhiteSpace($OutputPath)) { $OutputPath = Join-Path $root 'database/dorm_platform.sql' }
+if ([string]::IsNullOrWhiteSpace($OutputPath)) { $OutputPath = Join-Path $root 'sql/dorm_platform.sql' }
 $output = [IO.Path]::GetFullPath($OutputPath)
 $outputDirectory = Split-Path $output -Parent
 New-Item -ItemType Directory -Force -Path $outputDirectory | Out-Null
