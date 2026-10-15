@@ -16,14 +16,6 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Current Database: `dorm_platform`
---
-
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `dorm_platform` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-
-USE `dorm_platform`;
-
---
 -- Table structure for table `accommodation_assignment`
 --
 
@@ -74,7 +66,7 @@ CREATE TABLE `backup_task` (
   PRIMARY KEY (`task_id`),
   KEY `initiated_by_user_id` (`initiated_by_user_id`),
   CONSTRAINT `backup_task_ibfk_1` FOREIGN KEY (`initiated_by_user_id`) REFERENCES `sys_user` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -83,6 +75,7 @@ CREATE TABLE `backup_task` (
 
 LOCK TABLES `backup_task` WRITE;
 /*!40000 ALTER TABLE `backup_task` DISABLE KEYS */;
+INSERT INTO `backup_task` VALUES (1,4,'BACKUP','RUNNING','2026-10-15 19:59:15','2026-10-15 19:59:16',NULL,NULL);
 /*!40000 ALTER TABLE `backup_task` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -334,7 +327,7 @@ CREATE TABLE `login_log` (
   `success` tinyint NOT NULL,
   `occurred_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`log_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -343,7 +336,7 @@ CREATE TABLE `login_log` (
 
 LOCK TABLES `login_log` WRITE;
 /*!40000 ALTER TABLE `login_log` DISABLE KEYS */;
-INSERT INTO `login_log` VALUES (1,1,'student1',1,'2026-10-15 11:22:04'),(2,2,'manager1',1,'2026-10-15 11:22:04'),(3,3,'repair1',1,'2026-10-15 11:22:04'),(4,4,'admin',1,'2026-10-15 11:22:04'),(5,NULL,'13800138000',0,'2026-10-15 11:23:17'),(6,1,'student1',1,'2026-10-15 11:31:20'),(7,2,'manager1',1,'2026-10-15 12:00:07'),(8,3,'repair1',1,'2026-10-15 12:01:43'),(9,4,'admin',1,'2026-10-15 12:02:38');
+INSERT INTO `login_log` VALUES (1,1,'student1',1,'2026-10-15 11:22:04'),(2,2,'manager1',1,'2026-10-15 11:22:04'),(3,3,'repair1',1,'2026-10-15 11:22:04'),(4,4,'admin',1,'2026-10-15 11:22:04'),(5,NULL,'13800138000',0,'2026-10-15 11:23:17'),(6,1,'student1',1,'2026-10-15 11:31:20'),(7,2,'manager1',1,'2026-10-15 12:00:07'),(8,3,'repair1',1,'2026-10-15 12:01:43'),(9,4,'admin',1,'2026-10-15 12:02:38'),(10,4,'admin',1,'2026-10-15 12:53:38'),(11,4,'admin',1,'2026-10-15 13:01:53'),(12,3,'repair1',1,'2026-10-15 13:10:56'),(13,3,'repair1',1,'2026-10-15 13:11:15'),(14,1,'student1',1,'2026-10-15 13:14:08'),(15,2,'manager1',1,'2026-10-15 13:14:09'),(16,NULL,'repair1',0,'2026-10-15 13:14:09'),(17,4,'admin',1,'2026-10-15 13:14:55'),(18,1,'student1',1,'2026-10-15 13:17:22'),(19,1,'student1',1,'2026-10-15 15:16:54'),(20,1,'student1',1,'2026-10-15 15:18:54'),(21,NULL,'repair1',0,'2026-10-15 16:02:48'),(22,3,'repair1',1,'2026-10-15 16:02:55'),(23,4,'admin',1,'2026-10-15 16:03:26'),(24,3,'repair1',1,'2026-10-15 16:03:54'),(25,3,'repair1',1,'2026-10-15 19:58:58'),(26,4,'admin',1,'2026-10-15 19:59:08');
 /*!40000 ALTER TABLE `login_log` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -398,7 +391,7 @@ CREATE TABLE `message_receipt` (
 
 LOCK TABLES `message_receipt` WRITE;
 /*!40000 ALTER TABLE `message_receipt` DISABLE KEYS */;
-INSERT INTO `message_receipt` VALUES (1,1,NULL),(1,2,NULL),(1,3,NULL),(1,4,NULL),(2,1,NULL),(3,2,NULL),(4,3,NULL);
+INSERT INTO `message_receipt` VALUES (1,1,NULL),(1,2,NULL),(1,3,NULL),(1,4,'2026-10-15 12:53:44'),(2,1,NULL),(3,2,NULL),(4,3,NULL),(5,2,NULL),(6,1,NULL),(7,1,NULL),(7,2,NULL),(7,3,NULL),(7,4,NULL);
 /*!40000 ALTER TABLE `message_receipt` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -425,6 +418,7 @@ CREATE TABLE `message_target` (
 
 LOCK TABLES `message_target` WRITE;
 /*!40000 ALTER TABLE `message_target` DISABLE KEYS */;
+INSERT INTO `message_target` VALUES (7,1),(5,2),(7,2),(7,3),(7,4);
 /*!40000 ALTER TABLE `message_target` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -444,7 +438,7 @@ CREATE TABLE `operation_log` (
   `result` varchar(20) NOT NULL,
   `occurred_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`log_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -453,6 +447,7 @@ CREATE TABLE `operation_log` (
 
 LOCK TABLES `operation_log` WRITE;
 /*!40000 ALTER TABLE `operation_log` DISABLE KEYS */;
+INSERT INTO `operation_log` VALUES (1,4,'notice','publish',5,'SUCCESS','2026-10-15 12:54:19'),(2,4,'stay','supplement',2,'SUCCESS','2026-10-15 12:59:04'),(3,4,'stay','review',2,'SUCCESS','2026-10-15 12:59:23'),(4,3,'auth','password',3,'SUCCESS','2026-10-15 13:11:11'),(5,4,'notice','publish',7,'SUCCESS','2026-10-15 16:03:45');
 /*!40000 ALTER TABLE `operation_log` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1014,7 +1009,7 @@ CREATE TABLE `site_message` (
   `publish_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `delivered_at` datetime DEFAULT NULL,
   PRIMARY KEY (`message_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1023,7 +1018,7 @@ CREATE TABLE `site_message` (
 
 LOCK TABLES `site_message` WRITE;
 /*!40000 ALTER TABLE `site_message` DISABLE KEYS */;
-INSERT INTO `site_message` VALUES (1,'ALL','宿舍事务通知','请在对应角色工作台查看待办与业务通知。','2026-10-15 07:58:05',NULL,'2026-10-15 09:28:07','2026-10-15 07:58:05'),(2,'STUDENT','宿舍事务通知','请在对应角色工作台查看待办与业务通知。','2026-10-15 07:58:05',NULL,'2026-10-15 09:28:07','2026-10-15 07:58:05'),(3,'DORM_MANAGER','宿舍事务通知','请在对应角色工作台查看待办与业务通知。','2026-10-15 07:58:05',NULL,'2026-10-15 09:28:07','2026-10-15 07:58:05'),(4,'REPAIRER','宿舍事务通知','请在对应角色工作台查看待办与业务通知。','2026-10-15 07:58:05',NULL,'2026-10-15 09:28:07','2026-10-15 07:58:05');
+INSERT INTO `site_message` VALUES (1,'ALL','宿舍事务通知','请在对应角色工作台查看待办与业务通知。','2026-10-15 07:58:05',NULL,'2026-10-15 09:28:07','2026-10-15 07:58:05'),(2,'STUDENT','宿舍事务通知','请在对应角色工作台查看待办与业务通知。','2026-10-15 07:58:05',NULL,'2026-10-15 09:28:07','2026-10-15 07:58:05'),(3,'DORM_MANAGER','宿舍事务通知','请在对应角色工作台查看待办与业务通知。','2026-10-15 07:58:05',NULL,'2026-10-15 09:28:07','2026-10-15 07:58:05'),(4,'REPAIRER','宿舍事务通知','请在对应角色工作台查看待办与业务通知。','2026-10-15 07:58:05',NULL,'2026-10-15 09:28:07','2026-10-15 07:58:05'),(5,'DIRECT','假期留宿','暑假','2026-10-15 12:54:19',4,'2026-10-15 12:54:00','2026-10-15 12:54:19'),(6,'DIRECT','留宿审核结果','留宿申请已通过','2026-10-15 12:59:23',NULL,'2026-10-15 12:59:23','2026-10-15 12:59:23'),(7,'DIRECT','测试','1','2026-10-15 16:03:45',4,'2026-10-15 16:03:00','2026-10-15 16:03:45');
 /*!40000 ALTER TABLE `site_message` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1055,7 +1050,7 @@ CREATE TABLE `stay_application` (
   KEY `idx_stay_building_status` (`building_id`,`current_status`),
   CONSTRAINT `stay_application_ibfk_1` FOREIGN KEY (`batch_id`) REFERENCES `stay_batch` (`batch_id`),
   CONSTRAINT `stay_application_ibfk_2` FOREIGN KEY (`student_user_id`) REFERENCES `sys_user` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1064,6 +1059,7 @@ CREATE TABLE `stay_application` (
 
 LOCK TABLES `stay_application` WRITE;
 /*!40000 ALTER TABLE `stay_application` DISABLE KEYS */;
+INSERT INTO `stay_application` VALUES (2,1,1,'APPROVED','1','2026-10-15 12:59:04','2026-10-15 12:59:23',4,'2026-10-15 12:59:23',1,'ADMIN_ADDED',NULL,NULL,NULL);
 /*!40000 ALTER TABLE `stay_application` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1144,7 +1140,7 @@ CREATE TABLE `stay_date_range` (
   KEY `version_id` (`version_id`),
   CONSTRAINT `stay_date_range_ibfk_1` FOREIGN KEY (`version_id`) REFERENCES `stay_version` (`version_id`),
   CONSTRAINT `stay_date_range_chk_1` CHECK ((`end_date` >= `start_date`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1153,6 +1149,7 @@ CREATE TABLE `stay_date_range` (
 
 LOCK TABLES `stay_date_range` WRITE;
 /*!40000 ALTER TABLE `stay_date_range` DISABLE KEYS */;
+INSERT INTO `stay_date_range` VALUES (1,1,'2027-01-22','2027-01-23'),(2,1,'2027-01-24','2027-01-25');
 /*!40000 ALTER TABLE `stay_date_range` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1178,7 +1175,7 @@ CREATE TABLE `stay_review` (
   CONSTRAINT `stay_review_ibfk_1` FOREIGN KEY (`application_id`) REFERENCES `stay_application` (`application_id`),
   CONSTRAINT `stay_review_ibfk_2` FOREIGN KEY (`version_id`) REFERENCES `stay_version` (`version_id`),
   CONSTRAINT `stay_review_ibfk_3` FOREIGN KEY (`reviewer_user_id`) REFERENCES `sys_user` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1187,6 +1184,7 @@ CREATE TABLE `stay_review` (
 
 LOCK TABLES `stay_review` WRITE;
 /*!40000 ALTER TABLE `stay_review` DISABLE KEYS */;
+INSERT INTO `stay_review` VALUES (1,2,1,4,'APPROVED','1','2026-10-15 12:59:23');
 /*!40000 ALTER TABLE `stay_review` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1206,7 +1204,7 @@ CREATE TABLE `stay_version` (
   PRIMARY KEY (`version_id`),
   KEY `application_id` (`application_id`),
   CONSTRAINT `stay_version_ibfk_1` FOREIGN KEY (`application_id`) REFERENCES `stay_application` (`application_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1215,6 +1213,7 @@ CREATE TABLE `stay_version` (
 
 LOCK TABLES `stay_version` WRITE;
 /*!40000 ALTER TABLE `stay_version` DISABLE KEYS */;
+INSERT INTO `stay_version` VALUES (1,2,'1','2026-10-15 12:59:04','2026-10-15 12:59:05');
 /*!40000 ALTER TABLE `stay_version` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1246,7 +1245,7 @@ CREATE TABLE `sys_user` (
 
 LOCK TABLES `sys_user` WRITE;
 /*!40000 ALTER TABLE `sys_user` DISABLE KEYS */;
-INSERT INTO `sys_user` VALUES (1,'student1','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','张三','13800000001','STUDENT',1,'2026-10-15 07:58:05','2026-10-15 09:45:52'),(2,'manager1','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','李老师','13800000002','DORM_MANAGER',1,'2026-10-15 07:58:05','2026-10-15 09:45:52'),(3,'repair1','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','王师傅','13800000003','REPAIRER',1,'2026-10-15 07:58:05','2026-10-15 09:45:52'),(4,'admin','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','系统管理员','13800000004','ADMIN',1,'2026-10-15 07:58:05','2026-10-15 09:45:52');
+INSERT INTO `sys_user` VALUES (1,'student1','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','张三','13800000001','STUDENT',1,'2026-10-15 07:58:05','2026-10-15 09:45:52'),(2,'manager1','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','李老师','13800000002','DORM_MANAGER',1,'2026-10-15 07:58:05','2026-10-15 09:45:52'),(3,'repair1','96cae35ce8a9b0244178bf28e4966c2ce1b8385723a96a6b838858cdd6ca0a1e','王师傅','13800000003','REPAIRER',1,'2026-10-15 07:58:05','2026-10-15 13:11:11'),(4,'admin','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','系统管理员','13800000004','ADMIN',1,'2026-10-15 07:58:05','2026-10-15 09:45:52');
 /*!40000 ALTER TABLE `sys_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1353,12 +1352,6 @@ SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = @saved_cs_client;
 
 --
--- Current Database: `dorm_platform`
---
-
-USE `dorm_platform`;
-
---
 -- Final view structure for view `v_accommodation_current`
 --
 
@@ -1370,7 +1363,7 @@ USE `dorm_platform`;
 /*!50001 SET character_set_results     = utf8mb4 */;
 /*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 SQL SECURITY INVOKER */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
 /*!50001 VIEW `v_accommodation_current` AS select `a`.`assignment_id` AS `assignment_id`,`a`.`student_user_id` AS `student_user_id`,`u`.`real_name` AS `student_name`,`u`.`phone` AS `phone`,`b`.`building_id` AS `building_id`,`b`.`building_name` AS `building_name`,`r`.`room_id` AS `room_id`,`r`.`room_no` AS `room_no`,`bd`.`bed_id` AS `bed_id`,`bd`.`bed_no` AS `bed_no`,`a`.`check_in_date` AS `check_in_date`,`a`.`check_out_date` AS `check_out_date` from ((((`accommodation_assignment` `a` join `sys_user` `u` on((`u`.`user_id` = `a`.`student_user_id`))) join `bed` `bd` on((`bd`.`bed_id` = `a`.`bed_id`))) join `dorm_room` `r` on((`r`.`room_id` = `bd`.`room_id`))) join `building` `b` on((`b`.`building_id` = `r`.`building_id`))) where ((`a`.`check_in_date` <= curdate()) and ((`a`.`check_out_date` is null) or (curdate() < `a`.`check_out_date`))) */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
@@ -1388,7 +1381,7 @@ USE `dorm_platform`;
 /*!50001 SET character_set_results     = utf8mb4 */;
 /*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 SQL SECURITY INVOKER */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
 /*!50001 VIEW `v_repair_order_dashboard` AS select `ro`.`order_id` AS `order_id`,`ro`.`order_no` AS `order_no`,`ro`.`student_user_id` AS `student_user_id`,`ro`.`room_id` AS `room_id`,`ro`.`category_id` AS `category_id`,`ro`.`title` AS `title`,`ro`.`description` AS `description`,`ro`.`urgent` AS `urgent`,`ro`.`current_status` AS `current_status`,`ro`.`abnormal` AS `abnormal`,`ro`.`reject_reason` AS `reject_reason`,`ro`.`created_at` AS `created_at`,`ro`.`updated_at` AS `updated_at`,`ro`.`parent_order_id` AS `parent_order_id`,`ro`.`rule_id` AS `rule_id`,`ro`.`archived_at` AS `archived_at`,`ro`.`archive_reason` AS `archive_reason`,`u`.`real_name` AS `student_name`,`r`.`building_id` AS `building_id`,`r`.`room_no` AS `room_no`,`b`.`building_name` AS `building_name`,`c`.`category_name` AS `category_name`,`c`.`work_type_id` AS `work_type_id`,`w`.`work_type_name` AS `work_type_name`,`rd`.`dispatch_id` AS `dispatch_id`,`rd`.`repairer_user_id` AS `repairer_user_id`,`ru`.`real_name` AS `repairer_name`,`rd`.`accept_deadline` AS `accept_deadline`,`rd`.`repair_deadline` AS `repair_deadline`,`rr`.`result_text` AS `result_text`,`ev`.`score` AS `score`,`ev`.`comment` AS `comment`,(select count(0) from `repair_dispatch` `x` where ((`x`.`order_id` = `ro`.`order_id`) and (`x`.`dispatch_status` = 'REJECTED'))) AS `reject_count`,(select count(0) from `repair_dispatch` `x` where ((`x`.`order_id` = `ro`.`order_id`) and (`x`.`dispatch_status` = 'TIMEOUT'))) AS `accept_timeout_count`,(select count(0) from `repair_exception` `x` where ((`x`.`order_id` = `ro`.`order_id`) and (`x`.`exception_type` = 'REPAIR_TIMEOUT'))) AS `repair_timeout_count` from (((((((((`repair_order` `ro` join `sys_user` `u` on((`u`.`user_id` = `ro`.`student_user_id`))) join `dorm_room` `r` on((`r`.`room_id` = `ro`.`room_id`))) join `building` `b` on((`b`.`building_id` = `r`.`building_id`))) left join `fault_category` `c` on((`c`.`category_id` = `ro`.`category_id`))) left join `repair_work_type` `w` on((`w`.`work_type_id` = `c`.`work_type_id`))) left join `repair_dispatch` `rd` on((`rd`.`dispatch_id` = (select max(`x`.`dispatch_id`) from `repair_dispatch` `x` where ((`x`.`order_id` = `ro`.`order_id`) and (`x`.`dispatch_status` in ('PENDING','ACCEPTED'))))))) left join `sys_user` `ru` on((`ru`.`user_id` = `rd`.`repairer_user_id`))) left join `repair_result` `rr` on((`rr`.`order_id` = `ro`.`order_id`))) left join `repair_evaluation` `ev` on((`ev`.`order_id` = `ro`.`order_id`))) */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
@@ -1406,7 +1399,7 @@ USE `dorm_platform`;
 /*!50001 SET character_set_results     = utf8mb4 */;
 /*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 SQL SECURITY INVOKER */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
 /*!50001 VIEW `v_stay_application` AS select `a`.`application_id` AS `application_id`,`a`.`batch_id` AS `batch_id`,`a`.`student_user_id` AS `student_user_id`,`a`.`current_status` AS `current_status`,`a`.`review_reason` AS `review_reason`,`a`.`created_at` AS `created_at`,`a`.`updated_at` AS `updated_at`,`a`.`reviewer_user_id` AS `reviewer_user_id`,`a`.`reviewed_at` AS `reviewed_at`,`a`.`building_id` AS `building_id`,`a`.`source` AS `source`,`a`.`resubmit_deadline` AS `resubmit_deadline`,`a`.`archived_at` AS `archived_at`,`a`.`archive_reason` AS `archive_reason`,`u`.`real_name` AS `student_name`,`b`.`batch_name` AS `batch_name`,`bl`.`building_name` AS `building_name`,`v`.`version_id` AS `version_id`,`v`.`reason` AS `reason`,`v`.`submitted_at` AS `submitted_at`,(select min(`d`.`start_date`) from `stay_date_range` `d` where (`d`.`version_id` = `v`.`version_id`)) AS `start_date`,(select max(`d`.`end_date`) from `stay_date_range` `d` where (`d`.`version_id` = `v`.`version_id`)) AS `end_date` from ((((`stay_application` `a` join `sys_user` `u` on((`u`.`user_id` = `a`.`student_user_id`))) join `stay_batch` `b` on((`b`.`batch_id` = `a`.`batch_id`))) left join `building` `bl` on((`bl`.`building_id` = `a`.`building_id`))) left join `stay_version` `v` on((`v`.`version_id` = (select max(`x`.`version_id`) from `stay_version` `x` where ((`x`.`application_id` = `a`.`application_id`) and (`x`.`submitted_at` is not null)))))) */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
@@ -1421,4 +1414,4 @@ USE `dorm_platform`;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-10-15 12:41:42
+-- Dump completed on 2026-10-15 19:59:16
