@@ -1,0 +1,21 @@
+-- Demo fixture setup only. Does not configure real staff accounts.
+INSERT IGNORE INTO repairer_work_type(repairer_user_id,work_type_id) SELECT u.user_id,w.work_type_id FROM sys_user u CROSS JOIN repair_work_type w WHERE u.login_account='repair1';
+INSERT IGNORE INTO repairer_building_scope(repairer_user_id,building_id) SELECT u.user_id,b.building_id FROM sys_user u CROSS JOIN building b WHERE u.login_account='repair1';
+INSERT IGNORE INTO stay_building_rule(batch_id,building_id,application_deadline,auto_lock) SELECT b.batch_id,r.building_id,b.application_deadline,1 FROM stay_batch b CROSS JOIN building r WHERE b.batch_code='WINTER-2026';
+UPDATE sys_user SET real_name='张三' WHERE user_id=1 AND login_account='student1';
+UPDATE sys_user SET real_name='李老师' WHERE user_id=2 AND login_account='manager1';
+UPDATE sys_user SET real_name='王师傅' WHERE user_id=3 AND login_account='repair1';
+UPDATE sys_user SET real_name='系统管理员' WHERE user_id=4 AND login_account='admin';
+UPDATE building SET building_name='知行一号楼',address='东区宿舍组团 1 号',gender_limit='男生' WHERE building_id=1 AND building_code='A-01';
+UPDATE building SET building_name='知行二号楼',address='东区宿舍组团 2 号',gender_limit='女生' WHERE building_id=2 AND building_code='B-02';
+UPDATE building SET building_name='明德三号楼',address='西区宿舍组团 3 号',gender_limit='混合' WHERE building_id=3 AND building_code='C-03';
+UPDATE repair_work_type SET work_type_name='水暖维修' WHERE work_type_id=1 AND work_type_code='WATER';
+UPDATE repair_work_type SET work_type_name='电气维修' WHERE work_type_id=2 AND work_type_code='ELECTRIC';
+UPDATE repair_work_type SET work_type_name='综合维修' WHERE work_type_id=3 AND work_type_code='GENERAL';
+UPDATE fault_category SET category_name=CASE category_id WHEN 1 THEN '水龙头漏水' WHEN 2 THEN '插座无电' WHEN 3 THEN '灯具故障' WHEN 4 THEN '门锁损坏' WHEN 5 THEN '家具损坏' END WHERE category_id BETWEEN 1 AND 5;
+UPDATE stay_batch SET batch_name='2026 寒假留宿',instructions='请按连续开放区间填写留宿日期，提交后等待宿管审核。' WHERE batch_id=1 AND batch_code='WINTER-2026';
+UPDATE repair_order SET title='203 室北侧插座无电',description='床位 A 左侧插座无法使用，已确认其他插座正常。' WHERE order_id=1 AND order_no='WX20261014001';
+UPDATE repair_order SET title='书桌上方灯具闪烁',description='晚间使用时频繁闪烁，存在安全隐患。',current_status='ACCEPTED' WHERE order_id=2 AND order_no='WX20261013018' AND current_status='REPAIRING';
+UPDATE repair_order SET title='衣柜门合页松动',description='衣柜门下垂，开合不顺畅。' WHERE order_id=3 AND order_no='WX20261008007';
+UPDATE repair_result SET result_text='已更换衣柜门合页，现场开合测试正常。' WHERE order_id=3;
+UPDATE site_message SET title='宿舍事务通知',content='请在对应角色工作台查看待办与业务通知。' WHERE message_id BETWEEN 1 AND 4;

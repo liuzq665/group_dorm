@@ -1,0 +1,20 @@
+{
+  "base": "http://localhost:5173",
+  "startedAt": "2026-10-15T05:14:08.795Z",
+  "passed": [
+    {
+      "account": "student1",
+      "role": "STUDENT",
+      "endpoints": 10
+    },
+    {
+      "account": "manager1",
+      "role": "DORM_MANAGER",
+      "endpoints": 12
+    }
+  ],
+  "errors": [
+    "AssertionError [ERR_ASSERTION]: repair1 login\n\n401 !== 200\n\n    at run (E:\\workspace\\group_dorm\\tools\\test-live-smoke.cjs:20:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"
+  ],
+  "finishedAt": "2026-10-15T05:14:09.279Z"
+}

@@ -1,0 +1,25 @@
+{
+  "startedAt": "2026-10-15T04:07:45.774Z",
+  "finishedAt": "2026-10-15T04:08:10.746Z",
+  "base": "http://localhost:5175",
+  "passed": [
+    "student1 role-specific login",
+    "manager1 role-specific login",
+    "repair1 role-specific login",
+    "admin role-specific login",
+    "UI: student -> manager -> repairer -> photo result -> confirmation -> evaluation",
+    "UI: admin holiday -> manager publish -> student submit -> lock -> review",
+    "UI: role-targeted announcement, student receipt/read, repairer isolation",
+    "UI: asynchronous export/download, account import, failed batch rollback",
+    "UI: database backup task succeeds and SQL download contains tables/views",
+    "UI: imported student empty state -> admin bed assignment -> student/manager visibility -> checkout/history",
+    "UI: profile update -> password change -> administrator reset -> disabled-account token revocation",
+    "UI: administrator creates and deletes an account without business history",
+    "student1 all menus and mobile layout",
+    "manager1 all menus and mobile layout",
+    "repair1 all menus and mobile layout",
+    "admin all menus and mobile layout",
+    "HTTP 403 isolation and server-side logout revocation"
+  ],
+  "errors": []
+}

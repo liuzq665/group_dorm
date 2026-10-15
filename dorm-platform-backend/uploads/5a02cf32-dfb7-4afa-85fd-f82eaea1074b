@@ -1,0 +1,37 @@
+[ {
+  "user_id" : 1,
+  "login_account" : "student1",
+  "real_name" : "张三",
+  "phone" : "13800000001",
+  "role_code" : "STUDENT",
+  "enabled" : 1,
+  "created_at" : "2026-10-15T12:02:12",
+  "buildingIds" : [ ]
+}, {
+  "user_id" : 2,
+  "login_account" : "manager1",
+  "real_name" : "李老师",
+  "phone" : "13800000002",
+  "role_code" : "DORM_MANAGER",
+  "enabled" : 1,
+  "created_at" : "2026-10-15T12:02:12",
+  "buildingIds" : [ 1, 2, 3 ]
+}, {
+  "user_id" : 3,
+  "login_account" : "repair1",
+  "real_name" : "王师傅",
+  "phone" : "13800000003",
+  "role_code" : "REPAIRER",
+  "enabled" : 1,
+  "created_at" : "2026-10-15T12:02:12",
+  "buildingIds" : [ ]
+}, {
+  "user_id" : 4,
+  "login_account" : "admin",
+  "real_name" : "系统管理员",
+  "phone" : "13800000004",
+  "role_code" : "ADMIN",
+  "enabled" : 1,
+  "created_at" : "2026-10-15T12:02:12",
+  "buildingIds" : [ ]
+} ]

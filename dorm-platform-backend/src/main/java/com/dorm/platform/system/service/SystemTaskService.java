@@ -1,0 +1,36 @@
+package com.dorm.platform.system.service;
+
+import com.dorm.platform.common.*;
+import com.dorm.platform.security.CurrentUser;
+import com.dorm.platform.file.service.FileService;
+import com.dorm.platform.repair.service.RepairService;
+import com.dorm.platform.stay.service.StayService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.*;
+import java.nio.charset.StandardCharsets;
+import static com.dorm.platform.common.Input.*;
+import static com.dorm.platform.common.BizException.require;
+
+@Service
+public class SystemTaskService {
+ private final SqlStore db; private final ManagementService management; private final RepairService repair; private final StayService stay; private final BackupService backup; private final FileService files; private final ObjectMapper json;
+ public SystemTaskService(SqlStore db,ManagementService management,RepairService repair,StayService stay,BackupService backup,FileService files,ObjectMapper json){this.db=db;this.management=management;this.repair=repair;this.stay=stay;this.backup=backup;this.files=files;this.json=json;}
+ public long upload(CurrentUser u,byte[] bytes)throws Exception{role(u,"ADMIN");require(bytes.length>0&&bytes.length<=5*1024*1024,"导入文件必须为1字节至5MB");var rows=json.readValue(bytes,new TypeReference<List<Map<String,Object>>>(){});require(!rows.isEmpty()&&rows.size()<=1000,"单次导入1到1000行");return files.data(u,"import.json","application/json",bytes);}
+ @Transactional public Map<String,Object> create(CurrentUser u,Map<String,Object>b){role(u,"ADMIN");String type=required(b,"taskType"),business=required(b,"businessType");require(Set.of("IMPORT","EXPORT").contains(type),"任务类型无效");require(Set.of("users","buildings","rooms","beds","assignments","repairs","stays").contains(business),"数据域无效");Long file=null;if(type.equals("IMPORT")){require(!Set.of("repairs","stays").contains(business),"不能导入业务状态");file=id(b.get("fileId"));var metadata=files.get(u,file);require("application/json".equals(metadata.get("content_type")),"导入文件类型无效");}long task=db.insert("INSERT INTO import_export_task(initiated_by_user_id,task_type,business_type) VALUES(?,?,?)",u.id(),type,business);if(file!=null)db.update("INSERT INTO import_export_task_file(task_id,file_id,file_purpose) VALUES(?,?,'INPUT')",task,file);return Map.of("taskId",task,"taskStatus","WAITING");}
+ public Map<String,Object> dataTask(CurrentUser u,long id){role(u,"ADMIN");var task=db.one("SELECT * FROM import_export_task WHERE task_id=?",id);task.put("files",db.rows("SELECT t.file_id,t.file_purpose,f.original_name FROM import_export_task_file t JOIN file_resource f ON f.file_id=t.file_id WHERE task_id=?",id));return task;}
+ public List<Map<String,Object>> dataTasks(CurrentUser u){role(u,"ADMIN");return db.rows("SELECT * FROM import_export_task ORDER BY task_id DESC LIMIT 100");}
+ public void cancel(CurrentUser u,long id){role(u,"ADMIN");require(db.update("UPDATE import_export_task SET task_status='CANCELLED',finished_at=NOW() WHERE task_id=? AND task_status='WAITING'",id)==1,"只能取消尚未执行的任务");}
+ public Map<String,Object> backupTask(CurrentUser u){role(u,"ADMIN");long id=db.insert("INSERT INTO backup_task(initiated_by_user_id,task_type) VALUES(?,'BACKUP')",u.id());return Map.of("taskId",id,"taskStatus","WAITING");}
+ public List<Map<String,Object>> backups(CurrentUser u){role(u,"ADMIN");return db.rows("SELECT b.*,f.file_id FROM backup_task b LEFT JOIN backup_task_file f ON f.task_id=b.task_id ORDER BY b.task_id DESC LIMIT 100");}
+ private CurrentUser actor(long id){var row=db.one("SELECT * FROM sys_user WHERE user_id=? AND enabled=1 AND role_code='ADMIN'",id);return new CurrentUser(id,text(row,"login_account"),text(row,"real_name"),"ADMIN");}
+ private Object export(CurrentUser u,String business){return switch(business){case "users"->management.users(u);case "buildings"->management.buildings(u);case "rooms"->management.rooms(u);case "beds"->management.beds(u);case "assignments"->management.homes(u,true);case "repairs"->repair.list(u).stream().map(x->repair.detail(u,id(x.get("order_id")))).toList();case "stays"->stay.list(u);default->throw new BizException(400,"数据域无效");};}
+ @Scheduled(fixedDelayString="${system-task.delay-ms:2000}",initialDelayString="${system-task.delay-ms:2000}")
+ public void runWaiting(){
+  for(var task:db.rows("SELECT * FROM import_export_task WHERE task_status='WAITING' ORDER BY task_id LIMIT 5")){long id=id(task.get("task_id"));if(db.update("UPDATE import_export_task SET task_status='RUNNING',started_at=NOW() WHERE task_id=? AND task_status='WAITING'",id)!=1)continue;try{var u=actor(id(task.get("initiated_by_user_id")));if("IMPORT".equals(task.get("task_type"))){long fid=db.count("SELECT file_id FROM import_export_task_file WHERE task_id=? AND file_purpose='INPUT'",id);List<Map<String,Object>> rows=json.readValue(files.bytes(files.get(u,fid)),new TypeReference<List<Map<String,Object>>>(){});management.importRows(u,text(task,"business_type"),rows);}else{long file=files.data(u,text(task,"business_type")+".json","application/json",json.writerWithDefaultPrettyPrinter().writeValueAsBytes(export(u,text(task,"business_type"))));db.update("INSERT INTO import_export_task_file(task_id,file_id,file_purpose) VALUES(?,?,'OUTPUT')",id,file);}db.update("UPDATE import_export_task SET task_status='SUCCESS',finished_at=NOW() WHERE task_id=?",id);db.log(u.id(),"system","data_task_success",id);}catch(Exception e){db.update("UPDATE import_export_task SET task_status='FAILED',finished_at=NOW(),result_description=? WHERE task_id=?",Objects.toString(e.getMessage(),"任务执行失败").substring(0,Math.min(1900,Objects.toString(e.getMessage(),"任务执行失败").length())),id);}}
+  for(var task:db.rows("SELECT * FROM backup_task WHERE task_status='WAITING' ORDER BY task_id LIMIT 1")){long id=id(task.get("task_id"));if(db.update("UPDATE backup_task SET task_status='RUNNING',started_at=NOW() WHERE task_id=? AND task_status='WAITING'",id)!=1)continue;try{var u=actor(id(task.get("initiated_by_user_id")));var result=backup.create(u);long file=files.data(u,"dorm-backup.sql","application/sql",result.get("sql").toString().getBytes(StandardCharsets.UTF_8));db.update("INSERT INTO backup_task_file(task_id,file_id,file_purpose) VALUES(?,?,'BACKUP_OUTPUT')",id,file);db.update("UPDATE backup_task SET task_status='SUCCESS',finished_at=NOW() WHERE task_id=?",id);}catch(Exception e){db.update("UPDATE backup_task SET task_status='FAILED',finished_at=NOW(),result_description=? WHERE task_id=?",Objects.toString(e.getMessage(),"备份失败"),id);}}
+ }
+}
