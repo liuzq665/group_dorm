@@ -1,0 +1,1425 @@
+-- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
+--
+-- Host: 127.0.0.1    Database: dorm_platform
+-- ------------------------------------------------------
+-- Server version	8.0.43
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `accommodation_assignment`
+--
+
+DROP TABLE IF EXISTS `accommodation_assignment`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `accommodation_assignment` (
+  `assignment_id` bigint NOT NULL AUTO_INCREMENT,
+  `student_user_id` bigint NOT NULL,
+  `bed_id` bigint NOT NULL,
+  `check_in_date` date NOT NULL,
+  `check_out_date` date DEFAULT NULL,
+  `assignment_type` varchar(20) NOT NULL DEFAULT 'INITIAL',
+  PRIMARY KEY (`assignment_id`),
+  KEY `student_user_id` (`student_user_id`),
+  KEY `bed_id` (`bed_id`),
+  CONSTRAINT `accommodation_assignment_ibfk_1` FOREIGN KEY (`student_user_id`) REFERENCES `sys_user` (`user_id`),
+  CONSTRAINT `accommodation_assignment_ibfk_2` FOREIGN KEY (`bed_id`) REFERENCES `bed` (`bed_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `accommodation_assignment`
+--
+
+LOCK TABLES `accommodation_assignment` WRITE;
+/*!40000 ALTER TABLE `accommodation_assignment` DISABLE KEYS */;
+INSERT INTO `accommodation_assignment` (`assignment_id`, `student_user_id`, `bed_id`, `check_in_date`, `check_out_date`, `assignment_type`) VALUES (1,1,1,'2026-09-01',NULL,'INITIAL');
+/*!40000 ALTER TABLE `accommodation_assignment` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `backup_task`
+--
+
+DROP TABLE IF EXISTS `backup_task`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `backup_task` (
+  `task_id` bigint NOT NULL AUTO_INCREMENT,
+  `initiated_by_user_id` bigint NOT NULL,
+  `task_type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `task_status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'WAITING',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `started_at` datetime DEFAULT NULL,
+  `finished_at` datetime DEFAULT NULL,
+  `result_description` varchar(2000) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`task_id`),
+  KEY `initiated_by_user_id` (`initiated_by_user_id`),
+  CONSTRAINT `backup_task_ibfk_1` FOREIGN KEY (`initiated_by_user_id`) REFERENCES `sys_user` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `backup_task`
+--
+
+LOCK TABLES `backup_task` WRITE;
+/*!40000 ALTER TABLE `backup_task` DISABLE KEYS */;
+INSERT INTO `backup_task` (`task_id`, `initiated_by_user_id`, `task_type`, `task_status`, `created_at`, `started_at`, `finished_at`, `result_description`) VALUES (1,4,'BACKUP','SUCCESS','2026-10-15 19:59:15','2026-10-15 19:59:16','2026-10-15 19:59:16',NULL),(2,4,'BACKUP','SUCCESS','2026-10-15 19:59:20','2026-10-15 19:59:22','2026-10-15 19:59:23',NULL);
+/*!40000 ALTER TABLE `backup_task` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `backup_task_file`
+--
+
+DROP TABLE IF EXISTS `backup_task_file`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `backup_task_file` (
+  `task_id` bigint NOT NULL,
+  `file_id` bigint NOT NULL,
+  `file_purpose` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`task_id`,`file_id`),
+  KEY `file_id` (`file_id`),
+  CONSTRAINT `backup_task_file_ibfk_1` FOREIGN KEY (`task_id`) REFERENCES `backup_task` (`task_id`),
+  CONSTRAINT `backup_task_file_ibfk_2` FOREIGN KEY (`file_id`) REFERENCES `file_resource` (`file_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `backup_task_file`
+--
+
+LOCK TABLES `backup_task_file` WRITE;
+/*!40000 ALTER TABLE `backup_task_file` DISABLE KEYS */;
+INSERT INTO `backup_task_file` (`task_id`, `file_id`, `file_purpose`) VALUES (1,1,'BACKUP_OUTPUT'),(2,2,'BACKUP_OUTPUT');
+/*!40000 ALTER TABLE `backup_task_file` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `bed`
+--
+
+DROP TABLE IF EXISTS `bed`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `bed` (
+  `bed_id` bigint NOT NULL AUTO_INCREMENT,
+  `room_id` bigint NOT NULL,
+  `bed_no` varchar(20) NOT NULL,
+  `management_status` varchar(20) NOT NULL DEFAULT 'AVAILABLE',
+  PRIMARY KEY (`bed_id`),
+  UNIQUE KEY `uq_bed` (`room_id`,`bed_no`),
+  CONSTRAINT `bed_ibfk_1` FOREIGN KEY (`room_id`) REFERENCES `dorm_room` (`room_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `bed`
+--
+
+LOCK TABLES `bed` WRITE;
+/*!40000 ALTER TABLE `bed` DISABLE KEYS */;
+INSERT INTO `bed` (`bed_id`, `room_id`, `bed_no`, `management_status`) VALUES (1,1,'A','AVAILABLE'),(2,1,'B','AVAILABLE'),(3,1,'C','AVAILABLE'),(4,1,'D','AVAILABLE'),(5,2,'A','AVAILABLE'),(6,2,'B','AVAILABLE'),(7,3,'A','AVAILABLE'),(8,3,'B','AVAILABLE'),(9,4,'A','AVAILABLE');
+/*!40000 ALTER TABLE `bed` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `building`
+--
+
+DROP TABLE IF EXISTS `building`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `building` (
+  `building_id` bigint NOT NULL AUTO_INCREMENT,
+  `building_code` varchar(30) NOT NULL,
+  `building_name` varchar(80) NOT NULL,
+  `address` varchar(200) NOT NULL,
+  `gender_limit` varchar(20) NOT NULL,
+  `usage_status` varchar(20) NOT NULL DEFAULT 'IN_USE',
+  PRIMARY KEY (`building_id`),
+  UNIQUE KEY `building_code` (`building_code`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `building`
+--
+
+LOCK TABLES `building` WRITE;
+/*!40000 ALTER TABLE `building` DISABLE KEYS */;
+INSERT INTO `building` (`building_id`, `building_code`, `building_name`, `address`, `gender_limit`, `usage_status`) VALUES (1,'A-01','知行一号楼','东区宿舍组团 1 号','男生','IN_USE'),(2,'B-02','知行二号楼','东区宿舍组团 2 号','女生','IN_USE'),(3,'C-03','明德三号楼','西区宿舍组团 3 号','混合','IN_USE');
+/*!40000 ALTER TABLE `building` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `dorm_room`
+--
+
+DROP TABLE IF EXISTS `dorm_room`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `dorm_room` (
+  `room_id` bigint NOT NULL AUTO_INCREMENT,
+  `building_id` bigint NOT NULL,
+  `room_no` varchar(30) NOT NULL,
+  `floor_no` int NOT NULL,
+  `design_capacity` int NOT NULL,
+  `usage_status` varchar(20) NOT NULL DEFAULT 'IN_USE',
+  PRIMARY KEY (`room_id`),
+  UNIQUE KEY `uq_room` (`building_id`,`room_no`),
+  CONSTRAINT `dorm_room_ibfk_1` FOREIGN KEY (`building_id`) REFERENCES `building` (`building_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `dorm_room`
+--
+
+LOCK TABLES `dorm_room` WRITE;
+/*!40000 ALTER TABLE `dorm_room` DISABLE KEYS */;
+INSERT INTO `dorm_room` (`room_id`, `building_id`, `room_no`, `floor_no`, `design_capacity`, `usage_status`) VALUES (1,1,'203',2,4,'IN_USE'),(2,1,'204',2,4,'IN_USE'),(3,2,'406',4,4,'IN_USE'),(4,3,'108',1,6,'IN_USE');
+/*!40000 ALTER TABLE `dorm_room` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `fault_category`
+--
+
+DROP TABLE IF EXISTS `fault_category`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `fault_category` (
+  `category_id` bigint NOT NULL AUTO_INCREMENT,
+  `work_type_id` bigint NOT NULL,
+  `category_name` varchar(80) NOT NULL,
+  `enabled` tinyint NOT NULL DEFAULT '1',
+  PRIMARY KEY (`category_id`),
+  KEY `work_type_id` (`work_type_id`),
+  CONSTRAINT `fault_category_ibfk_1` FOREIGN KEY (`work_type_id`) REFERENCES `repair_work_type` (`work_type_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `fault_category`
+--
+
+LOCK TABLES `fault_category` WRITE;
+/*!40000 ALTER TABLE `fault_category` DISABLE KEYS */;
+INSERT INTO `fault_category` (`category_id`, `work_type_id`, `category_name`, `enabled`) VALUES (1,1,'水龙头漏水',1),(2,2,'插座无电',1),(3,2,'灯具故障',1),(4,3,'门锁损坏',1),(5,3,'家具损坏',1);
+/*!40000 ALTER TABLE `fault_category` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `file_resource`
+--
+
+DROP TABLE IF EXISTS `file_resource`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `file_resource` (
+  `file_id` bigint NOT NULL AUTO_INCREMENT,
+  `uploader_user_id` bigint NOT NULL,
+  `original_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `storage_name` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content_type` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `size_bytes` bigint NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`file_id`),
+  UNIQUE KEY `storage_name` (`storage_name`),
+  KEY `uploader_user_id` (`uploader_user_id`),
+  CONSTRAINT `file_resource_ibfk_1` FOREIGN KEY (`uploader_user_id`) REFERENCES `sys_user` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `file_resource`
+--
+
+LOCK TABLES `file_resource` WRITE;
+/*!40000 ALTER TABLE `file_resource` DISABLE KEYS */;
+INSERT INTO `file_resource` (`file_id`, `uploader_user_id`, `original_name`, `storage_name`, `content_type`, `size_bytes`, `created_at`) VALUES (1,4,'dorm-backup.sql','3bc51ef5-9ea4-4c7a-b727-43771b20578b','application/sql',62055,'2026-10-15 19:59:16'),(2,4,'dorm-backup.sql','c47c45a9-2b35-47c3-b5a8-5d3695a52950','application/sql',62441,'2026-10-15 19:59:23');
+/*!40000 ALTER TABLE `file_resource` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `import_export_task`
+--
+
+DROP TABLE IF EXISTS `import_export_task`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `import_export_task` (
+  `task_id` bigint NOT NULL AUTO_INCREMENT,
+  `initiated_by_user_id` bigint NOT NULL,
+  `task_type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `business_type` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `task_status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'WAITING',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `started_at` datetime DEFAULT NULL,
+  `finished_at` datetime DEFAULT NULL,
+  `result_description` varchar(2000) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`task_id`),
+  KEY `initiated_by_user_id` (`initiated_by_user_id`),
+  CONSTRAINT `import_export_task_ibfk_1` FOREIGN KEY (`initiated_by_user_id`) REFERENCES `sys_user` (`user_id`),
+  CONSTRAINT `import_export_task_chk_1` CHECK ((`task_type` in (_utf8mb4'IMPORT',_utf8mb4'EXPORT'))),
+  CONSTRAINT `import_export_task_chk_2` CHECK ((`task_status` in (_utf8mb4'WAITING',_utf8mb4'RUNNING',_utf8mb4'SUCCESS',_utf8mb4'FAILED',_utf8mb4'CANCELLED')))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `import_export_task`
+--
+
+LOCK TABLES `import_export_task` WRITE;
+/*!40000 ALTER TABLE `import_export_task` DISABLE KEYS */;
+/*!40000 ALTER TABLE `import_export_task` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `import_export_task_file`
+--
+
+DROP TABLE IF EXISTS `import_export_task_file`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `import_export_task_file` (
+  `task_id` bigint NOT NULL,
+  `file_id` bigint NOT NULL,
+  `file_purpose` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`task_id`,`file_id`),
+  KEY `file_id` (`file_id`),
+  CONSTRAINT `import_export_task_file_ibfk_1` FOREIGN KEY (`task_id`) REFERENCES `import_export_task` (`task_id`),
+  CONSTRAINT `import_export_task_file_ibfk_2` FOREIGN KEY (`file_id`) REFERENCES `file_resource` (`file_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `import_export_task_file`
+--
+
+LOCK TABLES `import_export_task_file` WRITE;
+/*!40000 ALTER TABLE `import_export_task_file` DISABLE KEYS */;
+/*!40000 ALTER TABLE `import_export_task_file` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `login_log`
+--
+
+DROP TABLE IF EXISTS `login_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `login_log` (
+  `log_id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` bigint DEFAULT NULL,
+  `account` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `success` tinyint NOT NULL,
+  `occurred_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`log_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `login_log`
+--
+
+LOCK TABLES `login_log` WRITE;
+/*!40000 ALTER TABLE `login_log` DISABLE KEYS */;
+INSERT INTO `login_log` (`log_id`, `user_id`, `account`, `success`, `occurred_at`) VALUES (1,1,'student1',1,'2026-10-15 11:22:04'),(2,2,'manager1',1,'2026-10-15 11:22:04'),(3,3,'repair1',1,'2026-10-15 11:22:04'),(4,4,'admin',1,'2026-10-15 11:22:04'),(5,NULL,'13800138000',0,'2026-10-15 11:23:17'),(6,1,'student1',1,'2026-10-15 11:31:20'),(7,2,'manager1',1,'2026-10-15 12:00:07'),(8,3,'repair1',1,'2026-10-15 12:01:43'),(9,4,'admin',1,'2026-10-15 12:02:38'),(10,4,'admin',1,'2026-10-15 12:53:38'),(11,4,'admin',1,'2026-10-15 13:01:53'),(12,3,'repair1',1,'2026-10-15 13:10:56'),(13,3,'repair1',1,'2026-10-15 13:11:15'),(14,1,'student1',1,'2026-10-15 13:14:08'),(15,2,'manager1',1,'2026-10-15 13:14:09'),(16,NULL,'repair1',0,'2026-10-15 13:14:09'),(17,4,'admin',1,'2026-10-15 13:14:55'),(18,1,'student1',1,'2026-10-15 13:17:22'),(19,1,'student1',1,'2026-10-15 15:16:54'),(20,1,'student1',1,'2026-10-15 15:18:54'),(21,NULL,'repair1',0,'2026-10-15 16:02:48'),(22,3,'repair1',1,'2026-10-15 16:02:55'),(23,4,'admin',1,'2026-10-15 16:03:26'),(24,3,'repair1',1,'2026-10-15 16:03:54'),(25,3,'repair1',1,'2026-10-15 19:58:58'),(26,4,'admin',1,'2026-10-15 19:59:08'),(27,1,'student1',1,'2026-10-15 19:59:51'),(28,2,'manager1',1,'2026-10-15 20:01:00'),(29,3,'repair1',1,'2026-10-15 20:01:42'),(30,2,'manager1',1,'2026-10-15 20:02:24'),(31,2,'manager1',1,'2026-10-16 15:00:33'),(32,3,'repair1',1,'2026-10-16 15:17:13');
+/*!40000 ALTER TABLE `login_log` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `manager_building_scope`
+--
+
+DROP TABLE IF EXISTS `manager_building_scope`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `manager_building_scope` (
+  `manager_user_id` bigint NOT NULL,
+  `building_id` bigint NOT NULL,
+  PRIMARY KEY (`manager_user_id`,`building_id`),
+  KEY `building_id` (`building_id`),
+  CONSTRAINT `manager_building_scope_ibfk_1` FOREIGN KEY (`manager_user_id`) REFERENCES `sys_user` (`user_id`),
+  CONSTRAINT `manager_building_scope_ibfk_2` FOREIGN KEY (`building_id`) REFERENCES `building` (`building_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `manager_building_scope`
+--
+
+LOCK TABLES `manager_building_scope` WRITE;
+/*!40000 ALTER TABLE `manager_building_scope` DISABLE KEYS */;
+INSERT INTO `manager_building_scope` (`manager_user_id`, `building_id`) VALUES (2,1),(2,2),(2,3);
+/*!40000 ALTER TABLE `manager_building_scope` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `message_receipt`
+--
+
+DROP TABLE IF EXISTS `message_receipt`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `message_receipt` (
+  `message_id` bigint NOT NULL,
+  `user_id` bigint NOT NULL,
+  `read_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`message_id`,`user_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `message_receipt_ibfk_1` FOREIGN KEY (`message_id`) REFERENCES `site_message` (`message_id`),
+  CONSTRAINT `message_receipt_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `sys_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `message_receipt`
+--
+
+LOCK TABLES `message_receipt` WRITE;
+/*!40000 ALTER TABLE `message_receipt` DISABLE KEYS */;
+INSERT INTO `message_receipt` (`message_id`, `user_id`, `read_at`) VALUES (1,1,NULL),(1,2,NULL),(1,3,NULL),(1,4,'2026-10-15 12:53:44'),(2,1,NULL),(3,2,NULL),(4,3,NULL),(5,2,NULL),(6,1,NULL),(7,1,NULL),(7,2,NULL),(7,3,NULL),(7,4,NULL),(8,1,NULL),(9,3,NULL),(10,2,NULL),(11,2,NULL),(12,3,NULL);
+/*!40000 ALTER TABLE `message_receipt` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `message_target`
+--
+
+DROP TABLE IF EXISTS `message_target`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `message_target` (
+  `message_id` bigint NOT NULL,
+  `user_id` bigint NOT NULL,
+  PRIMARY KEY (`message_id`,`user_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `message_target_ibfk_1` FOREIGN KEY (`message_id`) REFERENCES `site_message` (`message_id`),
+  CONSTRAINT `message_target_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `sys_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `message_target`
+--
+
+LOCK TABLES `message_target` WRITE;
+/*!40000 ALTER TABLE `message_target` DISABLE KEYS */;
+INSERT INTO `message_target` (`message_id`, `user_id`) VALUES (7,1),(5,2),(7,2),(7,3),(7,4);
+/*!40000 ALTER TABLE `message_target` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `operation_log`
+--
+
+DROP TABLE IF EXISTS `operation_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `operation_log` (
+  `log_id` bigint NOT NULL AUTO_INCREMENT,
+  `operator_user_id` bigint DEFAULT NULL,
+  `module` varchar(40) NOT NULL,
+  `action` varchar(80) NOT NULL,
+  `business_id` bigint DEFAULT NULL,
+  `result` varchar(20) NOT NULL,
+  `occurred_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`log_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `operation_log`
+--
+
+LOCK TABLES `operation_log` WRITE;
+/*!40000 ALTER TABLE `operation_log` DISABLE KEYS */;
+INSERT INTO `operation_log` (`log_id`, `operator_user_id`, `module`, `action`, `business_id`, `result`, `occurred_at`) VALUES (1,4,'notice','publish',5,'SUCCESS','2026-10-15 12:54:19'),(2,4,'stay','supplement',2,'SUCCESS','2026-10-15 12:59:04'),(3,4,'stay','review',2,'SUCCESS','2026-10-15 12:59:23'),(4,3,'auth','password',3,'SUCCESS','2026-10-15 13:11:11'),(5,4,'notice','publish',7,'SUCCESS','2026-10-15 16:03:45'),(6,4,'system','database_backup',0,'SUCCESS','2026-10-15 19:59:16'),(7,4,'system','database_backup',0,'SUCCESS','2026-10-15 19:59:23'),(8,2,'repair','review',1,'SUCCESS','2026-10-15 20:01:27'),(9,3,'repair','reject',1,'SUCCESS','2026-10-15 20:02:14');
+/*!40000 ALTER TABLE `operation_log` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `repair_attachment`
+--
+
+DROP TABLE IF EXISTS `repair_attachment`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `repair_attachment` (
+  `order_id` bigint NOT NULL,
+  `file_id` bigint NOT NULL,
+  `purpose` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`order_id`,`file_id`),
+  KEY `file_id` (`file_id`),
+  CONSTRAINT `repair_attachment_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `repair_order` (`order_id`),
+  CONSTRAINT `repair_attachment_ibfk_2` FOREIGN KEY (`file_id`) REFERENCES `file_resource` (`file_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `repair_attachment`
+--
+
+LOCK TABLES `repair_attachment` WRITE;
+/*!40000 ALTER TABLE `repair_attachment` DISABLE KEYS */;
+/*!40000 ALTER TABLE `repair_attachment` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `repair_audit`
+--
+
+DROP TABLE IF EXISTS `repair_audit`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `repair_audit` (
+  `audit_id` bigint NOT NULL AUTO_INCREMENT,
+  `order_id` bigint NOT NULL,
+  `reviewer_user_id` bigint NOT NULL,
+  `result` varchar(20) NOT NULL,
+  `reason` varchar(500) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`audit_id`),
+  KEY `order_id` (`order_id`),
+  KEY `reviewer_user_id` (`reviewer_user_id`),
+  CONSTRAINT `repair_audit_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `repair_order` (`order_id`),
+  CONSTRAINT `repair_audit_ibfk_2` FOREIGN KEY (`reviewer_user_id`) REFERENCES `sys_user` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `repair_audit`
+--
+
+LOCK TABLES `repair_audit` WRITE;
+/*!40000 ALTER TABLE `repair_audit` DISABLE KEYS */;
+INSERT INTO `repair_audit` (`audit_id`, `order_id`, `reviewer_user_id`, `result`, `reason`, `created_at`) VALUES (1,1,2,'APPROVED','','2026-10-15 20:01:27');
+/*!40000 ALTER TABLE `repair_audit` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `repair_confirmation`
+--
+
+DROP TABLE IF EXISTS `repair_confirmation`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `repair_confirmation` (
+  `order_id` bigint NOT NULL,
+  `confirmation_mode` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `confirmed_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`order_id`),
+  CONSTRAINT `repair_confirmation_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `repair_order` (`order_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `repair_confirmation`
+--
+
+LOCK TABLES `repair_confirmation` WRITE;
+/*!40000 ALTER TABLE `repair_confirmation` DISABLE KEYS */;
+/*!40000 ALTER TABLE `repair_confirmation` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `repair_delay_attachment`
+--
+
+DROP TABLE IF EXISTS `repair_delay_attachment`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `repair_delay_attachment` (
+  `request_id` bigint NOT NULL,
+  `file_id` bigint NOT NULL,
+  PRIMARY KEY (`request_id`,`file_id`),
+  KEY `file_id` (`file_id`),
+  CONSTRAINT `repair_delay_attachment_ibfk_1` FOREIGN KEY (`request_id`) REFERENCES `repair_delay_request` (`request_id`),
+  CONSTRAINT `repair_delay_attachment_ibfk_2` FOREIGN KEY (`file_id`) REFERENCES `file_resource` (`file_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `repair_delay_attachment`
+--
+
+LOCK TABLES `repair_delay_attachment` WRITE;
+/*!40000 ALTER TABLE `repair_delay_attachment` DISABLE KEYS */;
+/*!40000 ALTER TABLE `repair_delay_attachment` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `repair_delay_request`
+--
+
+DROP TABLE IF EXISTS `repair_delay_request`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `repair_delay_request` (
+  `request_id` bigint NOT NULL AUTO_INCREMENT,
+  `order_id` bigint NOT NULL,
+  `repairer_user_id` bigint NOT NULL,
+  `reason` varchar(500) NOT NULL,
+  `expected_finish_at` datetime NOT NULL,
+  `current_status` varchar(20) NOT NULL DEFAULT 'PENDING',
+  `reviewer_user_id` bigint DEFAULT NULL,
+  `review_reason` varchar(500) DEFAULT NULL,
+  `reviewed_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`request_id`),
+  KEY `order_id` (`order_id`),
+  KEY `repairer_user_id` (`repairer_user_id`),
+  KEY `reviewer_user_id` (`reviewer_user_id`),
+  CONSTRAINT `repair_delay_request_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `repair_order` (`order_id`),
+  CONSTRAINT `repair_delay_request_ibfk_2` FOREIGN KEY (`repairer_user_id`) REFERENCES `sys_user` (`user_id`),
+  CONSTRAINT `repair_delay_request_ibfk_3` FOREIGN KEY (`reviewer_user_id`) REFERENCES `sys_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `repair_delay_request`
+--
+
+LOCK TABLES `repair_delay_request` WRITE;
+/*!40000 ALTER TABLE `repair_delay_request` DISABLE KEYS */;
+/*!40000 ALTER TABLE `repair_delay_request` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `repair_dispatch`
+--
+
+DROP TABLE IF EXISTS `repair_dispatch`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `repair_dispatch` (
+  `dispatch_id` bigint NOT NULL AUTO_INCREMENT,
+  `order_id` bigint NOT NULL,
+  `repairer_user_id` bigint NOT NULL,
+  `dispatch_mode` varchar(20) NOT NULL,
+  `dispatch_status` varchar(20) NOT NULL DEFAULT 'PENDING',
+  `decision_reason` varchar(500) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `decided_at` datetime DEFAULT NULL,
+  `accept_deadline` datetime DEFAULT NULL,
+  `repair_deadline` datetime DEFAULT NULL,
+  PRIMARY KEY (`dispatch_id`),
+  KEY `order_id` (`order_id`),
+  KEY `idx_dispatch_worker_status` (`repairer_user_id`,`dispatch_status`),
+  CONSTRAINT `repair_dispatch_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `repair_order` (`order_id`),
+  CONSTRAINT `repair_dispatch_ibfk_2` FOREIGN KEY (`repairer_user_id`) REFERENCES `sys_user` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `repair_dispatch`
+--
+
+LOCK TABLES `repair_dispatch` WRITE;
+/*!40000 ALTER TABLE `repair_dispatch` DISABLE KEYS */;
+INSERT INTO `repair_dispatch` (`dispatch_id`, `order_id`, `repairer_user_id`, `dispatch_mode`, `dispatch_status`, `decision_reason`, `created_at`, `decided_at`, `accept_deadline`, `repair_deadline`) VALUES (1,2,3,'MANUAL','REPAIR_TIMEOUT',NULL,'2026-10-15 07:58:05',NULL,'2026-10-15 09:58:05','2026-10-16 07:58:05'),(2,3,3,'AUTO','ACCEPTED',NULL,'2026-10-15 07:58:05',NULL,'2026-10-15 09:58:05','2026-10-16 07:58:05'),(3,1,3,'AUTO','REJECTED','不想干','2026-10-15 20:01:27','2026-10-15 20:02:14','2026-10-15 22:01:27',NULL);
+/*!40000 ALTER TABLE `repair_dispatch` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `repair_evaluation`
+--
+
+DROP TABLE IF EXISTS `repair_evaluation`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `repair_evaluation` (
+  `evaluation_id` bigint NOT NULL AUTO_INCREMENT,
+  `order_id` bigint NOT NULL,
+  `student_user_id` bigint NOT NULL,
+  `score` int NOT NULL,
+  `comment` varchar(1000) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`evaluation_id`),
+  UNIQUE KEY `order_id` (`order_id`),
+  KEY `student_user_id` (`student_user_id`),
+  CONSTRAINT `repair_evaluation_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `repair_order` (`order_id`),
+  CONSTRAINT `repair_evaluation_ibfk_2` FOREIGN KEY (`student_user_id`) REFERENCES `sys_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `repair_evaluation`
+--
+
+LOCK TABLES `repair_evaluation` WRITE;
+/*!40000 ALTER TABLE `repair_evaluation` DISABLE KEYS */;
+/*!40000 ALTER TABLE `repair_evaluation` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `repair_exception`
+--
+
+DROP TABLE IF EXISTS `repair_exception`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `repair_exception` (
+  `exception_id` bigint NOT NULL AUTO_INCREMENT,
+  `order_id` bigint NOT NULL,
+  `dispatch_id` bigint DEFAULT NULL,
+  `exception_type` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reason` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`exception_id`),
+  KEY `order_id` (`order_id`),
+  KEY `dispatch_id` (`dispatch_id`),
+  CONSTRAINT `repair_exception_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `repair_order` (`order_id`),
+  CONSTRAINT `repair_exception_ibfk_2` FOREIGN KEY (`dispatch_id`) REFERENCES `repair_dispatch` (`dispatch_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `repair_exception`
+--
+
+LOCK TABLES `repair_exception` WRITE;
+/*!40000 ALTER TABLE `repair_exception` DISABLE KEYS */;
+INSERT INTO `repair_exception` (`exception_id`, `order_id`, `dispatch_id`, `exception_type`, `reason`, `created_at`) VALUES (1,2,1,'REPAIR_TIMEOUT','超过维修截止时间未完工','2026-10-16 10:37:35');
+/*!40000 ALTER TABLE `repair_exception` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `repair_order`
+--
+
+DROP TABLE IF EXISTS `repair_order`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `repair_order` (
+  `order_id` bigint NOT NULL AUTO_INCREMENT,
+  `order_no` varchar(40) NOT NULL,
+  `student_user_id` bigint NOT NULL,
+  `room_id` bigint DEFAULT NULL,
+  `category_id` bigint DEFAULT NULL,
+  `title` varchar(120) NOT NULL,
+  `description` text NOT NULL,
+  `urgent` tinyint NOT NULL DEFAULT '0',
+  `current_status` varchar(30) NOT NULL,
+  `abnormal` tinyint NOT NULL DEFAULT '0',
+  `reject_reason` varchar(500) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `parent_order_id` bigint DEFAULT NULL,
+  `rule_id` bigint NOT NULL DEFAULT '1',
+  `archived_at` datetime DEFAULT NULL,
+  `archive_reason` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`order_id`),
+  UNIQUE KEY `order_no` (`order_no`),
+  KEY `room_id` (`room_id`),
+  KEY `category_id` (`category_id`),
+  KEY `rule_id` (`rule_id`),
+  KEY `idx_repair_student_status` (`student_user_id`,`current_status`),
+  CONSTRAINT `repair_order_ibfk_1` FOREIGN KEY (`student_user_id`) REFERENCES `sys_user` (`user_id`),
+  CONSTRAINT `repair_order_ibfk_2` FOREIGN KEY (`room_id`) REFERENCES `dorm_room` (`room_id`),
+  CONSTRAINT `repair_order_ibfk_3` FOREIGN KEY (`category_id`) REFERENCES `fault_category` (`category_id`),
+  CONSTRAINT `repair_order_ibfk_4` FOREIGN KEY (`rule_id`) REFERENCES `repair_rule` (`rule_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `repair_order`
+--
+
+LOCK TABLES `repair_order` WRITE;
+/*!40000 ALTER TABLE `repair_order` DISABLE KEYS */;
+INSERT INTO `repair_order` (`order_id`, `order_no`, `student_user_id`, `room_id`, `category_id`, `title`, `description`, `urgent`, `current_status`, `abnormal`, `reject_reason`, `created_at`, `updated_at`, `parent_order_id`, `rule_id`, `archived_at`, `archive_reason`) VALUES (1,'WX20261014001',1,1,2,'203 室北侧插座无电','床位 A 左侧插座无法使用，已确认其他插座正常。',0,'PENDING_MANUAL',0,'','2026-10-15 07:58:05','2026-10-15 20:02:14',NULL,1,NULL,NULL),(2,'WX20261013018',1,1,3,'书桌上方灯具闪烁','晚间使用时频繁闪烁，存在安全隐患。',1,'PENDING_MANUAL',1,NULL,'2026-10-15 07:58:05','2026-10-16 10:37:35',NULL,1,NULL,NULL),(3,'WX20261008007',1,1,5,'衣柜门合页松动','衣柜门下垂，开合不顺畅。',0,'REPAIRED',0,NULL,'2026-10-15 07:58:05','2026-10-15 09:45:52',NULL,1,NULL,NULL);
+/*!40000 ALTER TABLE `repair_order` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `repair_order_relation`
+--
+
+DROP TABLE IF EXISTS `repair_order_relation`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `repair_order_relation` (
+  `parent_order_id` bigint NOT NULL,
+  `child_order_id` bigint NOT NULL,
+  `relation_type` varchar(30) NOT NULL,
+  PRIMARY KEY (`child_order_id`),
+  KEY `parent_order_id` (`parent_order_id`),
+  CONSTRAINT `repair_order_relation_ibfk_1` FOREIGN KEY (`parent_order_id`) REFERENCES `repair_order` (`order_id`),
+  CONSTRAINT `repair_order_relation_ibfk_2` FOREIGN KEY (`child_order_id`) REFERENCES `repair_order` (`order_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `repair_order_relation`
+--
+
+LOCK TABLES `repair_order_relation` WRITE;
+/*!40000 ALTER TABLE `repair_order_relation` DISABLE KEYS */;
+/*!40000 ALTER TABLE `repair_order_relation` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `repair_result`
+--
+
+DROP TABLE IF EXISTS `repair_result`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `repair_result` (
+  `result_id` bigint NOT NULL AUTO_INCREMENT,
+  `order_id` bigint NOT NULL,
+  `repairer_user_id` bigint NOT NULL,
+  `result_text` varchar(1000) NOT NULL,
+  `expected_finish_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`result_id`),
+  UNIQUE KEY `order_id` (`order_id`),
+  KEY `repairer_user_id` (`repairer_user_id`),
+  CONSTRAINT `repair_result_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `repair_order` (`order_id`),
+  CONSTRAINT `repair_result_ibfk_2` FOREIGN KEY (`repairer_user_id`) REFERENCES `sys_user` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `repair_result`
+--
+
+LOCK TABLES `repair_result` WRITE;
+/*!40000 ALTER TABLE `repair_result` DISABLE KEYS */;
+INSERT INTO `repair_result` (`result_id`, `order_id`, `repairer_user_id`, `result_text`, `expected_finish_at`, `created_at`) VALUES (1,3,3,'已更换衣柜门合页，现场开合测试正常。',NULL,'2026-10-15 07:58:05');
+/*!40000 ALTER TABLE `repair_result` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `repair_rule`
+--
+
+DROP TABLE IF EXISTS `repair_rule`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `repair_rule` (
+  `rule_id` bigint NOT NULL AUTO_INCREMENT,
+  `accept_minutes` int NOT NULL,
+  `normal_minutes` int NOT NULL,
+  `urgent_minutes` int NOT NULL,
+  `confirm_days` int NOT NULL,
+  `edit_days` int NOT NULL,
+  `max_rework_count` int DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`rule_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `repair_rule`
+--
+
+LOCK TABLES `repair_rule` WRITE;
+/*!40000 ALTER TABLE `repair_rule` DISABLE KEYS */;
+INSERT INTO `repair_rule` (`rule_id`, `accept_minutes`, `normal_minutes`, `urgent_minutes`, `confirm_days`, `edit_days`, `max_rework_count`, `created_at`) VALUES (1,120,1440,360,7,7,NULL,'2026-10-15 09:28:07');
+/*!40000 ALTER TABLE `repair_rule` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `repair_submission_version`
+--
+
+DROP TABLE IF EXISTS `repair_submission_version`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `repair_submission_version` (
+  `version_id` bigint NOT NULL AUTO_INCREMENT,
+  `order_id` bigint NOT NULL,
+  `title` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `category_id` bigint NOT NULL,
+  `submitted_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`version_id`),
+  KEY `order_id` (`order_id`),
+  CONSTRAINT `repair_submission_version_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `repair_order` (`order_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `repair_submission_version`
+--
+
+LOCK TABLES `repair_submission_version` WRITE;
+/*!40000 ALTER TABLE `repair_submission_version` DISABLE KEYS */;
+/*!40000 ALTER TABLE `repair_submission_version` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `repair_work_type`
+--
+
+DROP TABLE IF EXISTS `repair_work_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `repair_work_type` (
+  `work_type_id` bigint NOT NULL AUTO_INCREMENT,
+  `work_type_code` varchar(30) NOT NULL,
+  `work_type_name` varchar(80) NOT NULL,
+  `enabled` tinyint NOT NULL DEFAULT '1',
+  PRIMARY KEY (`work_type_id`),
+  UNIQUE KEY `work_type_code` (`work_type_code`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `repair_work_type`
+--
+
+LOCK TABLES `repair_work_type` WRITE;
+/*!40000 ALTER TABLE `repair_work_type` DISABLE KEYS */;
+INSERT INTO `repair_work_type` (`work_type_id`, `work_type_code`, `work_type_name`, `enabled`) VALUES (1,'WATER','水暖维修',1),(2,'ELECTRIC','电气维修',1),(3,'GENERAL','综合维修',1);
+/*!40000 ALTER TABLE `repair_work_type` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `repairer_building_scope`
+--
+
+DROP TABLE IF EXISTS `repairer_building_scope`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `repairer_building_scope` (
+  `repairer_user_id` bigint NOT NULL,
+  `building_id` bigint NOT NULL,
+  PRIMARY KEY (`repairer_user_id`,`building_id`),
+  KEY `building_id` (`building_id`),
+  CONSTRAINT `repairer_building_scope_ibfk_1` FOREIGN KEY (`repairer_user_id`) REFERENCES `sys_user` (`user_id`),
+  CONSTRAINT `repairer_building_scope_ibfk_2` FOREIGN KEY (`building_id`) REFERENCES `building` (`building_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `repairer_building_scope`
+--
+
+LOCK TABLES `repairer_building_scope` WRITE;
+/*!40000 ALTER TABLE `repairer_building_scope` DISABLE KEYS */;
+INSERT INTO `repairer_building_scope` (`repairer_user_id`, `building_id`) VALUES (3,1),(3,2),(3,3);
+/*!40000 ALTER TABLE `repairer_building_scope` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `repairer_profile`
+--
+
+DROP TABLE IF EXISTS `repairer_profile`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `repairer_profile` (
+  `repairer_user_id` bigint NOT NULL,
+  `on_duty` tinyint NOT NULL DEFAULT '1',
+  `max_active_orders` int DEFAULT NULL,
+  PRIMARY KEY (`repairer_user_id`),
+  CONSTRAINT `repairer_profile_ibfk_1` FOREIGN KEY (`repairer_user_id`) REFERENCES `sys_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `repairer_profile`
+--
+
+LOCK TABLES `repairer_profile` WRITE;
+/*!40000 ALTER TABLE `repairer_profile` DISABLE KEYS */;
+INSERT INTO `repairer_profile` (`repairer_user_id`, `on_duty`, `max_active_orders`) VALUES (3,1,NULL);
+/*!40000 ALTER TABLE `repairer_profile` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `repairer_work_type`
+--
+
+DROP TABLE IF EXISTS `repairer_work_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `repairer_work_type` (
+  `repairer_user_id` bigint NOT NULL,
+  `work_type_id` bigint NOT NULL,
+  PRIMARY KEY (`repairer_user_id`,`work_type_id`),
+  KEY `work_type_id` (`work_type_id`),
+  CONSTRAINT `repairer_work_type_ibfk_1` FOREIGN KEY (`repairer_user_id`) REFERENCES `sys_user` (`user_id`),
+  CONSTRAINT `repairer_work_type_ibfk_2` FOREIGN KEY (`work_type_id`) REFERENCES `repair_work_type` (`work_type_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `repairer_work_type`
+--
+
+LOCK TABLES `repairer_work_type` WRITE;
+/*!40000 ALTER TABLE `repairer_work_type` DISABLE KEYS */;
+INSERT INTO `repairer_work_type` (`repairer_user_id`, `work_type_id`) VALUES (3,1),(3,2),(3,3);
+/*!40000 ALTER TABLE `repairer_work_type` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `schema_version`
+--
+
+DROP TABLE IF EXISTS `schema_version`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `schema_version` (
+  `version_no` int NOT NULL,
+  `installed_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`version_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `schema_version`
+--
+
+LOCK TABLES `schema_version` WRITE;
+/*!40000 ALTER TABLE `schema_version` DISABLE KEYS */;
+INSERT INTO `schema_version` (`version_no`, `installed_at`) VALUES (1,'2026-10-15 09:28:07'),(2,'2026-10-15 09:28:07'),(3,'2026-10-15 09:28:07'),(4,'2026-10-15 10:29:55');
+/*!40000 ALTER TABLE `schema_version` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `site_message`
+--
+
+DROP TABLE IF EXISTS `site_message`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `site_message` (
+  `message_id` bigint NOT NULL AUTO_INCREMENT,
+  `target_role` varchar(30) NOT NULL,
+  `title` varchar(150) NOT NULL,
+  `content` varchar(2000) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `publisher_user_id` bigint DEFAULT NULL,
+  `publish_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `delivered_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`message_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `site_message`
+--
+
+LOCK TABLES `site_message` WRITE;
+/*!40000 ALTER TABLE `site_message` DISABLE KEYS */;
+INSERT INTO `site_message` (`message_id`, `target_role`, `title`, `content`, `created_at`, `publisher_user_id`, `publish_at`, `delivered_at`) VALUES (1,'ALL','宿舍事务通知','请在对应角色工作台查看待办与业务通知。','2026-10-15 07:58:05',NULL,'2026-10-15 09:28:07','2026-10-15 07:58:05'),(2,'STUDENT','宿舍事务通知','请在对应角色工作台查看待办与业务通知。','2026-10-15 07:58:05',NULL,'2026-10-15 09:28:07','2026-10-15 07:58:05'),(3,'DORM_MANAGER','宿舍事务通知','请在对应角色工作台查看待办与业务通知。','2026-10-15 07:58:05',NULL,'2026-10-15 09:28:07','2026-10-15 07:58:05'),(4,'REPAIRER','宿舍事务通知','请在对应角色工作台查看待办与业务通知。','2026-10-15 07:58:05',NULL,'2026-10-15 09:28:07','2026-10-15 07:58:05'),(5,'DIRECT','假期留宿','暑假','2026-10-15 12:54:19',4,'2026-10-15 12:54:00','2026-10-15 12:54:19'),(6,'DIRECT','留宿审核结果','留宿申请已通过','2026-10-15 12:59:23',NULL,'2026-10-15 12:59:23','2026-10-15 12:59:23'),(7,'DIRECT','测试','1','2026-10-15 16:03:45',4,'2026-10-15 16:03:00','2026-10-15 16:03:45'),(8,'DIRECT','报修进度','WX20261014001：审核通过','2026-10-15 20:01:27',NULL,'2026-10-15 20:01:27','2026-10-15 20:01:27'),(9,'DIRECT','新的维修派单','WX20261014001','2026-10-15 20:01:27',NULL,'2026-10-15 20:01:27','2026-10-15 20:01:27'),(10,'DIRECT','暂无可派维修人员','WX20261014001','2026-10-15 20:02:14',NULL,'2026-10-15 20:02:14','2026-10-15 20:02:14'),(11,'DIRECT','维修超时待强制派单','WX20261013018','2026-10-16 10:37:35',NULL,'2026-10-16 10:37:35','2026-10-16 10:37:35'),(12,'DIRECT','维修超时','WX20261013018已解除负责关系','2026-10-16 10:37:35',NULL,'2026-10-16 10:37:35','2026-10-16 10:37:35');
+/*!40000 ALTER TABLE `site_message` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `stay_application`
+--
+
+DROP TABLE IF EXISTS `stay_application`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `stay_application` (
+  `application_id` bigint NOT NULL AUTO_INCREMENT,
+  `batch_id` bigint NOT NULL,
+  `student_user_id` bigint NOT NULL,
+  `current_status` varchar(20) NOT NULL DEFAULT 'DRAFT',
+  `review_reason` varchar(500) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `reviewer_user_id` bigint DEFAULT NULL,
+  `reviewed_at` datetime DEFAULT NULL,
+  `building_id` bigint DEFAULT NULL,
+  `source` varchar(30) NOT NULL DEFAULT 'NORMAL',
+  `resubmit_deadline` datetime DEFAULT NULL,
+  `archived_at` datetime DEFAULT NULL,
+  `archive_reason` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`application_id`),
+  UNIQUE KEY `uq_student_batch` (`batch_id`,`student_user_id`),
+  KEY `student_user_id` (`student_user_id`),
+  KEY `idx_stay_building_status` (`building_id`,`current_status`),
+  CONSTRAINT `stay_application_ibfk_1` FOREIGN KEY (`batch_id`) REFERENCES `stay_batch` (`batch_id`),
+  CONSTRAINT `stay_application_ibfk_2` FOREIGN KEY (`student_user_id`) REFERENCES `sys_user` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `stay_application`
+--
+
+LOCK TABLES `stay_application` WRITE;
+/*!40000 ALTER TABLE `stay_application` DISABLE KEYS */;
+INSERT INTO `stay_application` (`application_id`, `batch_id`, `student_user_id`, `current_status`, `review_reason`, `created_at`, `updated_at`, `reviewer_user_id`, `reviewed_at`, `building_id`, `source`, `resubmit_deadline`, `archived_at`, `archive_reason`) VALUES (2,1,1,'APPROVED','1','2026-10-15 12:59:04','2026-10-15 12:59:23',4,'2026-10-15 12:59:23',1,'ADMIN_ADDED',NULL,NULL,NULL);
+/*!40000 ALTER TABLE `stay_application` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `stay_batch`
+--
+
+DROP TABLE IF EXISTS `stay_batch`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `stay_batch` (
+  `batch_id` bigint NOT NULL AUTO_INCREMENT,
+  `batch_code` varchar(40) NOT NULL,
+  `batch_name` varchar(100) NOT NULL,
+  `open_start_date` date NOT NULL,
+  `open_end_date` date NOT NULL,
+  `application_deadline` datetime NOT NULL,
+  `instructions` varchar(1000) DEFAULT NULL,
+  `current_status` varchar(20) NOT NULL DEFAULT 'OPEN',
+  PRIMARY KEY (`batch_id`),
+  UNIQUE KEY `batch_code` (`batch_code`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `stay_batch`
+--
+
+LOCK TABLES `stay_batch` WRITE;
+/*!40000 ALTER TABLE `stay_batch` DISABLE KEYS */;
+INSERT INTO `stay_batch` (`batch_id`, `batch_code`, `batch_name`, `open_start_date`, `open_end_date`, `application_deadline`, `instructions`, `current_status`) VALUES (1,'WINTER-2026','2026 寒假留宿','2027-01-10','2027-02-20','2026-12-20 23:59:59','请按连续开放区间填写留宿日期，提交后等待宿管审核。','OPEN');
+/*!40000 ALTER TABLE `stay_batch` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `stay_building_rule`
+--
+
+DROP TABLE IF EXISTS `stay_building_rule`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `stay_building_rule` (
+  `batch_id` bigint NOT NULL,
+  `building_id` bigint NOT NULL,
+  `application_deadline` datetime NOT NULL,
+  `auto_lock` tinyint NOT NULL DEFAULT '0',
+  `published_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`batch_id`,`building_id`),
+  KEY `building_id` (`building_id`),
+  CONSTRAINT `stay_building_rule_ibfk_1` FOREIGN KEY (`batch_id`) REFERENCES `stay_batch` (`batch_id`),
+  CONSTRAINT `stay_building_rule_ibfk_2` FOREIGN KEY (`building_id`) REFERENCES `building` (`building_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `stay_building_rule`
+--
+
+LOCK TABLES `stay_building_rule` WRITE;
+/*!40000 ALTER TABLE `stay_building_rule` DISABLE KEYS */;
+INSERT INTO `stay_building_rule` (`batch_id`, `building_id`, `application_deadline`, `auto_lock`, `published_at`) VALUES (1,1,'2026-12-20 23:59:59',1,'2026-10-15 09:45:52'),(1,2,'2026-12-20 23:59:59',1,'2026-10-15 09:45:52'),(1,3,'2026-12-20 23:59:59',1,'2026-10-15 09:45:52');
+/*!40000 ALTER TABLE `stay_building_rule` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `stay_date_range`
+--
+
+DROP TABLE IF EXISTS `stay_date_range`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `stay_date_range` (
+  `range_id` bigint NOT NULL AUTO_INCREMENT,
+  `version_id` bigint NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  PRIMARY KEY (`range_id`),
+  KEY `version_id` (`version_id`),
+  CONSTRAINT `stay_date_range_ibfk_1` FOREIGN KEY (`version_id`) REFERENCES `stay_version` (`version_id`),
+  CONSTRAINT `stay_date_range_chk_1` CHECK ((`end_date` >= `start_date`))
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `stay_date_range`
+--
+
+LOCK TABLES `stay_date_range` WRITE;
+/*!40000 ALTER TABLE `stay_date_range` DISABLE KEYS */;
+INSERT INTO `stay_date_range` (`range_id`, `version_id`, `start_date`, `end_date`) VALUES (1,1,'2027-01-22','2027-01-23'),(2,1,'2027-01-24','2027-01-25');
+/*!40000 ALTER TABLE `stay_date_range` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `stay_review`
+--
+
+DROP TABLE IF EXISTS `stay_review`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `stay_review` (
+  `review_id` bigint NOT NULL AUTO_INCREMENT,
+  `application_id` bigint NOT NULL,
+  `version_id` bigint NOT NULL,
+  `reviewer_user_id` bigint NOT NULL,
+  `result` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reason` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `reviewed_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`review_id`),
+  KEY `application_id` (`application_id`),
+  KEY `version_id` (`version_id`),
+  KEY `reviewer_user_id` (`reviewer_user_id`),
+  CONSTRAINT `stay_review_ibfk_1` FOREIGN KEY (`application_id`) REFERENCES `stay_application` (`application_id`),
+  CONSTRAINT `stay_review_ibfk_2` FOREIGN KEY (`version_id`) REFERENCES `stay_version` (`version_id`),
+  CONSTRAINT `stay_review_ibfk_3` FOREIGN KEY (`reviewer_user_id`) REFERENCES `sys_user` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `stay_review`
+--
+
+LOCK TABLES `stay_review` WRITE;
+/*!40000 ALTER TABLE `stay_review` DISABLE KEYS */;
+INSERT INTO `stay_review` (`review_id`, `application_id`, `version_id`, `reviewer_user_id`, `result`, `reason`, `reviewed_at`) VALUES (1,2,1,4,'APPROVED','1','2026-10-15 12:59:23');
+/*!40000 ALTER TABLE `stay_review` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `stay_version`
+--
+
+DROP TABLE IF EXISTS `stay_version`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `stay_version` (
+  `version_id` bigint NOT NULL AUTO_INCREMENT,
+  `application_id` bigint NOT NULL,
+  `reason` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `saved_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `submitted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`version_id`),
+  KEY `application_id` (`application_id`),
+  CONSTRAINT `stay_version_ibfk_1` FOREIGN KEY (`application_id`) REFERENCES `stay_application` (`application_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `stay_version`
+--
+
+LOCK TABLES `stay_version` WRITE;
+/*!40000 ALTER TABLE `stay_version` DISABLE KEYS */;
+INSERT INTO `stay_version` (`version_id`, `application_id`, `reason`, `saved_at`, `submitted_at`) VALUES (1,2,'1','2026-10-15 12:59:04','2026-10-15 12:59:05');
+/*!40000 ALTER TABLE `stay_version` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sys_user`
+--
+
+DROP TABLE IF EXISTS `sys_user`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `sys_user` (
+  `user_id` bigint NOT NULL AUTO_INCREMENT,
+  `login_account` varchar(60) NOT NULL,
+  `password_hash` varchar(128) NOT NULL,
+  `real_name` varchar(80) NOT NULL,
+  `phone` varchar(30) DEFAULT NULL,
+  `role_code` varchar(30) NOT NULL,
+  `enabled` tinyint NOT NULL DEFAULT '1',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`user_id`),
+  UNIQUE KEY `login_account` (`login_account`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sys_user`
+--
+
+LOCK TABLES `sys_user` WRITE;
+/*!40000 ALTER TABLE `sys_user` DISABLE KEYS */;
+INSERT INTO `sys_user` (`user_id`, `login_account`, `password_hash`, `real_name`, `phone`, `role_code`, `enabled`, `created_at`, `updated_at`) VALUES (1,'student1','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','张三','13800000001','STUDENT',1,'2026-10-15 07:58:05','2026-10-15 09:45:52'),(2,'manager1','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','李老师','13800000002','DORM_MANAGER',1,'2026-10-15 07:58:05','2026-10-15 09:45:52'),(3,'repair1','96cae35ce8a9b0244178bf28e4966c2ce1b8385723a96a6b838858cdd6ca0a1e','王师傅','13800000003','REPAIRER',1,'2026-10-15 07:58:05','2026-10-15 13:11:11'),(4,'admin','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','系统管理员','13800000004','ADMIN',1,'2026-10-15 07:58:05','2026-10-15 09:45:52');
+/*!40000 ALTER TABLE `sys_user` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Temporary view structure for view `v_accommodation_current`
+--
+
+DROP TABLE IF EXISTS `v_accommodation_current`;
+/*!50001 DROP VIEW IF EXISTS `v_accommodation_current`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `v_accommodation_current` AS SELECT 
+ 1 AS `assignment_id`,
+ 1 AS `student_user_id`,
+ 1 AS `student_name`,
+ 1 AS `phone`,
+ 1 AS `building_id`,
+ 1 AS `building_name`,
+ 1 AS `room_id`,
+ 1 AS `room_no`,
+ 1 AS `bed_id`,
+ 1 AS `bed_no`,
+ 1 AS `check_in_date`,
+ 1 AS `check_out_date`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Temporary view structure for view `v_repair_order_dashboard`
+--
+
+DROP TABLE IF EXISTS `v_repair_order_dashboard`;
+/*!50001 DROP VIEW IF EXISTS `v_repair_order_dashboard`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `v_repair_order_dashboard` AS SELECT 
+ 1 AS `order_id`,
+ 1 AS `order_no`,
+ 1 AS `student_user_id`,
+ 1 AS `room_id`,
+ 1 AS `category_id`,
+ 1 AS `title`,
+ 1 AS `description`,
+ 1 AS `urgent`,
+ 1 AS `current_status`,
+ 1 AS `abnormal`,
+ 1 AS `reject_reason`,
+ 1 AS `created_at`,
+ 1 AS `updated_at`,
+ 1 AS `parent_order_id`,
+ 1 AS `rule_id`,
+ 1 AS `archived_at`,
+ 1 AS `archive_reason`,
+ 1 AS `student_name`,
+ 1 AS `building_id`,
+ 1 AS `room_no`,
+ 1 AS `building_name`,
+ 1 AS `category_name`,
+ 1 AS `work_type_id`,
+ 1 AS `work_type_name`,
+ 1 AS `dispatch_id`,
+ 1 AS `repairer_user_id`,
+ 1 AS `repairer_name`,
+ 1 AS `accept_deadline`,
+ 1 AS `repair_deadline`,
+ 1 AS `result_text`,
+ 1 AS `score`,
+ 1 AS `comment`,
+ 1 AS `reject_count`,
+ 1 AS `accept_timeout_count`,
+ 1 AS `repair_timeout_count`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Temporary view structure for view `v_stay_application`
+--
+
+DROP TABLE IF EXISTS `v_stay_application`;
+/*!50001 DROP VIEW IF EXISTS `v_stay_application`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `v_stay_application` AS SELECT 
+ 1 AS `application_id`,
+ 1 AS `batch_id`,
+ 1 AS `student_user_id`,
+ 1 AS `current_status`,
+ 1 AS `review_reason`,
+ 1 AS `created_at`,
+ 1 AS `updated_at`,
+ 1 AS `reviewer_user_id`,
+ 1 AS `reviewed_at`,
+ 1 AS `building_id`,
+ 1 AS `source`,
+ 1 AS `resubmit_deadline`,
+ 1 AS `archived_at`,
+ 1 AS `archive_reason`,
+ 1 AS `student_name`,
+ 1 AS `batch_name`,
+ 1 AS `building_name`,
+ 1 AS `version_id`,
+ 1 AS `reason`,
+ 1 AS `submitted_at`,
+ 1 AS `start_date`,
+ 1 AS `end_date`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Dumping routines for database 'dorm_platform'
+--
+
+--
+-- Final view structure for view `v_accommodation_current`
+--
+
+/*!50001 DROP VIEW IF EXISTS `v_accommodation_current`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `v_accommodation_current` AS select `a`.`assignment_id` AS `assignment_id`,`a`.`student_user_id` AS `student_user_id`,`u`.`real_name` AS `student_name`,`u`.`phone` AS `phone`,`b`.`building_id` AS `building_id`,`b`.`building_name` AS `building_name`,`r`.`room_id` AS `room_id`,`r`.`room_no` AS `room_no`,`bd`.`bed_id` AS `bed_id`,`bd`.`bed_no` AS `bed_no`,`a`.`check_in_date` AS `check_in_date`,`a`.`check_out_date` AS `check_out_date` from ((((`accommodation_assignment` `a` join `sys_user` `u` on((`u`.`user_id` = `a`.`student_user_id`))) join `bed` `bd` on((`bd`.`bed_id` = `a`.`bed_id`))) join `dorm_room` `r` on((`r`.`room_id` = `bd`.`room_id`))) join `building` `b` on((`b`.`building_id` = `r`.`building_id`))) where ((`a`.`check_in_date` <= curdate()) and ((`a`.`check_out_date` is null) or (curdate() < `a`.`check_out_date`))) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `v_repair_order_dashboard`
+--
+
+/*!50001 DROP VIEW IF EXISTS `v_repair_order_dashboard`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `v_repair_order_dashboard` AS select `ro`.`order_id` AS `order_id`,`ro`.`order_no` AS `order_no`,`ro`.`student_user_id` AS `student_user_id`,`ro`.`room_id` AS `room_id`,`ro`.`category_id` AS `category_id`,`ro`.`title` AS `title`,`ro`.`description` AS `description`,`ro`.`urgent` AS `urgent`,`ro`.`current_status` AS `current_status`,`ro`.`abnormal` AS `abnormal`,`ro`.`reject_reason` AS `reject_reason`,`ro`.`created_at` AS `created_at`,`ro`.`updated_at` AS `updated_at`,`ro`.`parent_order_id` AS `parent_order_id`,`ro`.`rule_id` AS `rule_id`,`ro`.`archived_at` AS `archived_at`,`ro`.`archive_reason` AS `archive_reason`,`u`.`real_name` AS `student_name`,`r`.`building_id` AS `building_id`,`r`.`room_no` AS `room_no`,`b`.`building_name` AS `building_name`,`c`.`category_name` AS `category_name`,`c`.`work_type_id` AS `work_type_id`,`w`.`work_type_name` AS `work_type_name`,`rd`.`dispatch_id` AS `dispatch_id`,`rd`.`repairer_user_id` AS `repairer_user_id`,`ru`.`real_name` AS `repairer_name`,`rd`.`accept_deadline` AS `accept_deadline`,`rd`.`repair_deadline` AS `repair_deadline`,`rr`.`result_text` AS `result_text`,`ev`.`score` AS `score`,`ev`.`comment` AS `comment`,(select count(0) from `repair_dispatch` `x` where ((`x`.`order_id` = `ro`.`order_id`) and (`x`.`dispatch_status` = 'REJECTED'))) AS `reject_count`,(select count(0) from `repair_dispatch` `x` where ((`x`.`order_id` = `ro`.`order_id`) and (`x`.`dispatch_status` = 'TIMEOUT'))) AS `accept_timeout_count`,(select count(0) from `repair_exception` `x` where ((`x`.`order_id` = `ro`.`order_id`) and (`x`.`exception_type` = 'REPAIR_TIMEOUT'))) AS `repair_timeout_count` from (((((((((`repair_order` `ro` join `sys_user` `u` on((`u`.`user_id` = `ro`.`student_user_id`))) join `dorm_room` `r` on((`r`.`room_id` = `ro`.`room_id`))) join `building` `b` on((`b`.`building_id` = `r`.`building_id`))) left join `fault_category` `c` on((`c`.`category_id` = `ro`.`category_id`))) left join `repair_work_type` `w` on((`w`.`work_type_id` = `c`.`work_type_id`))) left join `repair_dispatch` `rd` on((`rd`.`dispatch_id` = (select max(`x`.`dispatch_id`) from `repair_dispatch` `x` where ((`x`.`order_id` = `ro`.`order_id`) and (`x`.`dispatch_status` in ('PENDING','ACCEPTED'))))))) left join `sys_user` `ru` on((`ru`.`user_id` = `rd`.`repairer_user_id`))) left join `repair_result` `rr` on((`rr`.`order_id` = `ro`.`order_id`))) left join `repair_evaluation` `ev` on((`ev`.`order_id` = `ro`.`order_id`))) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `v_stay_application`
+--
+
+/*!50001 DROP VIEW IF EXISTS `v_stay_application`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `v_stay_application` AS select `a`.`application_id` AS `application_id`,`a`.`batch_id` AS `batch_id`,`a`.`student_user_id` AS `student_user_id`,`a`.`current_status` AS `current_status`,`a`.`review_reason` AS `review_reason`,`a`.`created_at` AS `created_at`,`a`.`updated_at` AS `updated_at`,`a`.`reviewer_user_id` AS `reviewer_user_id`,`a`.`reviewed_at` AS `reviewed_at`,`a`.`building_id` AS `building_id`,`a`.`source` AS `source`,`a`.`resubmit_deadline` AS `resubmit_deadline`,`a`.`archived_at` AS `archived_at`,`a`.`archive_reason` AS `archive_reason`,`u`.`real_name` AS `student_name`,`b`.`batch_name` AS `batch_name`,`bl`.`building_name` AS `building_name`,`v`.`version_id` AS `version_id`,`v`.`reason` AS `reason`,`v`.`submitted_at` AS `submitted_at`,(select min(`d`.`start_date`) from `stay_date_range` `d` where (`d`.`version_id` = `v`.`version_id`)) AS `start_date`,(select max(`d`.`end_date`) from `stay_date_range` `d` where (`d`.`version_id` = `v`.`version_id`)) AS `end_date` from ((((`stay_application` `a` join `sys_user` `u` on((`u`.`user_id` = `a`.`student_user_id`))) join `stay_batch` `b` on((`b`.`batch_id` = `a`.`batch_id`))) left join `building` `bl` on((`bl`.`building_id` = `a`.`building_id`))) left join `stay_version` `v` on((`v`.`version_id` = (select max(`x`.`version_id`) from `stay_version` `x` where ((`x`.`application_id` = `a`.`application_id`) and (`x`.`submitted_at` is not null)))))) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-10-16 15:37:06
