@@ -10,7 +10,9 @@ const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=
 http.createServer((req,res)=>{
  const url=new URL(req.url,'http://localhost');
  if(url.pathname.startsWith('/api/')){
-  const upstream=http.request({hostname:backend.hostname,port:backend.port||80,path:req.url,method:req.method,headers:{...req.headers,host:backend.host}},reply=>{res.writeHead(reply.statusCode,reply.headers);reply.pipe(res);});
+  const headers={...req.headers,host:backend.host};
+  delete headers.origin;
+  const upstream=http.request({hostname:backend.hostname,port:backend.port||80,path:req.url,method:req.method,headers},reply=>{res.writeHead(reply.statusCode,reply.headers);reply.pipe(res);});
   upstream.setTimeout(65000,()=>upstream.destroy());
   upstream.on('error',()=>{if(!res.headersSent)res.writeHead(502,{'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify({code:502,message:'Backend unavailable',data:null}));});
   req.pipe(upstream);return;

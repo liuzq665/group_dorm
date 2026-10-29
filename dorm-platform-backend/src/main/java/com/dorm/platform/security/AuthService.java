@@ -18,7 +18,7 @@ public class AuthService {
     public Map<String,Object> login(String account, String password) {
         if(account==null||account.isBlank()||password==null||password.isBlank())throw new com.dorm.platform.common.BizException(400,"账号和密码不能为空");
         String hash = sha256(password);
-        var users = db.query("SELECT user_id,login_account,real_name,role_code FROM sys_user WHERE login_account=? AND password_hash=? AND enabled=1", (rs,n)->new CurrentUser(rs.getLong(1),rs.getString(2),rs.getString(3),rs.getString(4)), account, hash);
+        var users = db.query("SELECT user_id,login_account,real_name,role_code FROM v_user_identity WHERE login_account=? AND password_hash=? AND enabled=1", (rs,n)->new CurrentUser(rs.getLong(1),rs.getString(2),rs.getString(3),rs.getString(4)), account, hash);
         if (users.isEmpty()) { db.update("INSERT INTO login_log(account,success) VALUES(?,0)",account); throw new com.dorm.platform.common.BizException(401,"账号、密码错误或账号已停用"); }
         CurrentUser user=users.get(0); String token=UUID.randomUUID().toString(); sessions.entrySet().removeIf(e->e.getValue().expiresAt().isBefore(java.time.Instant.now())); sessions.put(token,new Session(user,hash,java.time.Instant.now().plusSeconds(28800)));
         db.update("INSERT INTO login_log(user_id,account,success) VALUES(?,?,1)",user.id(),account);
@@ -28,8 +28,9 @@ public class AuthService {
         Session session=token==null?null:sessions.get(token);
         if(session==null)return null;
         CurrentUser user=session.user();
-        if(session.expiresAt().isBefore(java.time.Instant.now()) || db.queryForObject("SELECT COUNT(*) FROM sys_user WHERE user_id=? AND enabled=1 AND role_code=? AND password_hash=?",Integer.class,user.id(),user.role(),session.passwordHash())==0){sessions.remove(token);return null;}
-        return user;
+        if(session.expiresAt().isBefore(java.time.Instant.now()) || db.queryForObject("SELECT COUNT(*) FROM v_user_identity WHERE user_id=? AND enabled=1 AND role_code=? AND password_hash=?",Integer.class,user.id(),user.role(),session.passwordHash())==0){sessions.remove(token);return null;}
+        String name=db.queryForObject("SELECT real_name FROM v_user_identity WHERE user_id=?",String.class,user.id());
+        return new CurrentUser(user.id(),user.account(),name,user.role());
     }
     public void logout(String token) { if (token != null) sessions.remove(token); }
     public static String sha256(String text) { try { return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(text.getBytes(StandardCharsets.UTF_8))); } catch(Exception e){ throw new IllegalStateException(e); } }

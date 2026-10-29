@@ -26,7 +26,7 @@ public class SystemTaskService {
  public void cancel(CurrentUser u,long id){role(u,"ADMIN");require(db.update("UPDATE import_export_task SET task_status='CANCELLED',finished_at=NOW() WHERE task_id=? AND task_status='WAITING'",id)==1,"只能取消尚未执行的任务");}
  public Map<String,Object> backupTask(CurrentUser u){role(u,"ADMIN");long id=db.insert("INSERT INTO backup_task(initiated_by_user_id,task_type) VALUES(?,'BACKUP')",u.id());return Map.of("taskId",id,"taskStatus","WAITING");}
  public List<Map<String,Object>> backups(CurrentUser u){role(u,"ADMIN");return db.rows("SELECT b.*,f.file_id FROM backup_task b LEFT JOIN backup_task_file f ON f.task_id=b.task_id ORDER BY b.task_id DESC LIMIT 100");}
- private CurrentUser actor(long id){var row=db.one("SELECT * FROM sys_user WHERE user_id=? AND enabled=1 AND role_code='ADMIN'",id);return new CurrentUser(id,text(row,"login_account"),text(row,"real_name"),"ADMIN");}
+ private CurrentUser actor(long id){var row=db.one("SELECT login_account,real_name FROM v_user_identity WHERE user_id=? AND enabled=1 AND role_code='ADMIN'",id);return new CurrentUser(id,text(row,"login_account"),text(row,"real_name"),"ADMIN");}
  private Object export(CurrentUser u,String business){return switch(business){case "users"->management.users(u);case "buildings"->management.buildings(u);case "rooms"->management.rooms(u);case "beds"->management.beds(u);case "assignments"->management.homes(u,true);case "repairs"->repair.list(u).stream().map(x->repair.detail(u,id(x.get("order_id")))).toList();case "stays"->stay.list(u);default->throw new BizException(400,"数据域无效");};}
  @Scheduled(fixedDelayString="${system-task.delay-ms:2000}",initialDelayString="${system-task.delay-ms:2000}")
  public void runWaiting(){
