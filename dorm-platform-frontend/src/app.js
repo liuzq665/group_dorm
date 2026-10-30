@@ -70,7 +70,7 @@ export async function render(){
    try{
     const a=b.dataset.action,id=b.dataset.id;
     if(a==='read-message'){await post(`/messages/${id}/read`);await render();}
-    else if(a==='profile-edit'){const p=state.data.profile,gender=select('gender','性别',[['','未填写'],['MALE','男'],['FEMALE','女'],['OTHER','其他']],p.gender||'',false,false);const html=field('realName','姓名','text',p.real_name||'')+gender+field('birthDate','生日','date',p.birth_date||'',false)+field('phone','联系电话','tel',p.phone||'',false)+(role()==='ADMIN'?field('employeeNo','工号','text',p.employee_no||'',false)+field('hireDate','入职时间','date',p.hire_date||'',false):'');modal('编辑个人资料',html,async d=>{const updated=await put('/profile',d);state.user.name=updated.real_name;sessionStorage.setItem('dorm_user',JSON.stringify(state.user));return '个人资料已更新';});}
+    else if(a==='profile-edit'){const p=state.data.profile,gender=select('gender','性别',[['','未填写'],['MALE','男'],['FEMALE','女'],['OTHER','其他']],p.gender||'',false,false);const html=field('realName','姓名','text',p.real_name||'')+gender+field('birthDate','生日','date',p.birth_date||'',false)+field('phone','联系电话','tel',p.phone||'',false)+(role()==='ADMIN'?field('employeeNo','工号','text',p.employee_no||'').replace('<input ','<input pattern="SA[0-9]{6}" minlength="8" maxlength="8" title="格式：SA加6位数字" ')+field('hireDate','入职时间','date',p.hire_date||'',false):'');modal('编辑个人资料',html,async d=>{const updated=await put('/profile',d);state.user.name=updated.real_name;sessionStorage.setItem('dorm_user',JSON.stringify(state.user));return '个人资料已更新';});}
     else if(a==='password')modal('修改密码',field('oldPassword','原密码','password')+field('newPassword','新密码','password'),d=>put('/profile/password',d));
     else if(a==='publish-message'){
      const buildings=await api('/buildings');
@@ -96,6 +96,7 @@ export async function render(){
   const userFilter=document.querySelector('#user-filter-form');
   if(userFilter){
    userFilter.onsubmit=event=>{event.preventDefault();const filters=Object.fromEntries(new FormData(userFilter));for(const [key,value] of Object.entries(filters))if(!value)delete filters[key];state.data.userFilters??={};state.data.userFilters[state.page]=filters;render();};
+   userFilter.addEventListener('change',event=>{if(event.target.matches('[data-gender-toggle]')){userFilter.elements.gender.value=event.target.checked?'FEMALE':'MALE';userFilter.requestSubmit();}});
     userFilter.addEventListener('change',event=>{if(event.target.matches('[data-directory-filter]'))cascadeDirectoryFilters(userFilter,event.target.name);});
   }
   const search=document.querySelector('#list-search');

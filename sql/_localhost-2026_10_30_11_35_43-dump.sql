@@ -34,7 +34,7 @@ CREATE TABLE `accommodation_assignment` (
   KEY `fk_accommodation_assignment_student` (`student_id`),
   CONSTRAINT `accommodation_assignment_ibfk_2` FOREIGN KEY (`bed_id`) REFERENCES `bed` (`bed_id`),
   CONSTRAINT `fk_accommodation_assignment_student` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -43,7 +43,7 @@ CREATE TABLE `accommodation_assignment` (
 
 LOCK TABLES `accommodation_assignment` WRITE;
 /*!40000 ALTER TABLE `accommodation_assignment` DISABLE KEYS */;
-INSERT INTO `accommodation_assignment` (`assignment_id`, `student_id`, `bed_id`, `check_in_date`, `check_out_date`, `assignment_type`) VALUES (1,1,1,'2026-09-01','2026-10-29','INITIAL'),(2,5,2,'2026-10-29',NULL,'ASSIGN'),(3,6,3,'2026-10-29',NULL,'ASSIGN'),(4,1,4,'2026-10-29','2026-10-29','ASSIGN'),(5,1,1,'2026-10-29',NULL,'ASSIGN');
+INSERT INTO `accommodation_assignment` (`assignment_id`, `student_id`, `bed_id`, `check_in_date`, `check_out_date`, `assignment_type`) VALUES (1,1,1,'2026-09-01','2026-10-29','INITIAL'),(2,5,2,'2026-10-29',NULL,'ASSIGN'),(3,6,3,'2026-10-29','2026-10-30','ASSIGN'),(4,1,4,'2026-10-29','2026-10-29','ASSIGN'),(5,1,1,'2026-10-29','2026-10-30','ASSIGN'),(6,7,9,'2026-10-30',NULL,'ASSIGN'),(7,8,6,'2026-10-30',NULL,'ASSIGN'),(8,1,20,'2026-10-30',NULL,'ASSIGN'),(9,6,31,'2026-10-30',NULL,'ASSIGN');
 /*!40000 ALTER TABLE `accommodation_assignment` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -122,7 +122,7 @@ CREATE TABLE `bed` (
   PRIMARY KEY (`bed_id`),
   UNIQUE KEY `uq_bed` (`room_id`,`bed_no`),
   CONSTRAINT `bed_ibfk_1` FOREIGN KEY (`room_id`) REFERENCES `dorm_room` (`room_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -131,7 +131,7 @@ CREATE TABLE `bed` (
 
 LOCK TABLES `bed` WRITE;
 /*!40000 ALTER TABLE `bed` DISABLE KEYS */;
-INSERT INTO `bed` (`bed_id`, `room_id`, `bed_no`, `management_status`) VALUES (1,1,'A','AVAILABLE'),(2,1,'B','AVAILABLE'),(3,1,'C','AVAILABLE'),(4,1,'D','AVAILABLE'),(5,2,'A','AVAILABLE'),(6,2,'B','AVAILABLE'),(7,3,'A','AVAILABLE'),(8,3,'B','AVAILABLE'),(9,4,'A','AVAILABLE');
+INSERT INTO `bed` (`bed_id`, `room_id`, `bed_no`, `management_status`) VALUES (1,1,'A','AVAILABLE'),(2,1,'B','AVAILABLE'),(3,1,'C','AVAILABLE'),(4,1,'D','AVAILABLE'),(5,2,'A','AVAILABLE'),(6,2,'B','AVAILABLE'),(7,3,'A','AVAILABLE'),(8,3,'B','AVAILABLE'),(9,4,'A','AVAILABLE'),(10,5,'A','AVAILABLE'),(11,6,'A','AVAILABLE'),(12,7,'A','AVAILABLE'),(13,8,'A','AVAILABLE'),(14,9,'A','AVAILABLE'),(15,10,'A','AVAILABLE'),(16,11,'A','AVAILABLE'),(17,12,'A','AVAILABLE'),(18,13,'A','AVAILABLE'),(19,5,'B','AVAILABLE'),(20,6,'B','AVAILABLE'),(21,7,'B','AVAILABLE'),(22,8,'B','AVAILABLE'),(23,9,'B','AVAILABLE'),(24,10,'B','AVAILABLE'),(25,11,'B','AVAILABLE'),(26,12,'B','AVAILABLE'),(27,13,'B','AVAILABLE'),(28,5,'C','AVAILABLE'),(29,6,'C','AVAILABLE'),(30,7,'C','AVAILABLE'),(31,8,'C','AVAILABLE'),(32,9,'C','AVAILABLE'),(33,10,'C','AVAILABLE'),(34,11,'C','AVAILABLE'),(35,12,'C','AVAILABLE'),(36,13,'C','AVAILABLE'),(37,5,'D','AVAILABLE'),(38,6,'D','AVAILABLE'),(39,7,'D','AVAILABLE'),(40,8,'D','AVAILABLE'),(41,9,'D','AVAILABLE'),(42,10,'D','AVAILABLE'),(43,11,'D','AVAILABLE'),(44,12,'D','AVAILABLE'),(45,13,'D','AVAILABLE');
 /*!40000 ALTER TABLE `bed` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -151,7 +151,7 @@ CREATE TABLE `building` (
   `usage_status` varchar(20) NOT NULL DEFAULT 'IN_USE',
   PRIMARY KEY (`building_id`),
   UNIQUE KEY `building_code` (`building_code`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -160,7 +160,7 @@ CREATE TABLE `building` (
 
 LOCK TABLES `building` WRITE;
 /*!40000 ALTER TABLE `building` DISABLE KEYS */;
-INSERT INTO `building` (`building_id`, `building_code`, `building_name`, `address`, `gender_limit`, `usage_status`) VALUES (1,'A-01','知行一号楼','东区宿舍组团 1 号','男生','IN_USE'),(2,'B-02','知行二号楼','东区宿舍组团 2 号','女生','IN_USE'),(3,'C-03','明德三号楼','西区宿舍组团 3 号','混合','IN_USE');
+INSERT INTO `building` (`building_id`, `building_code`, `building_name`, `address`, `gender_limit`, `usage_status`) VALUES (1,'A-01','知行一号楼','东区宿舍组团 1 号','男生','IN_USE'),(2,'B-02','知行二号楼','东区宿舍组团 2 号','女生','IN_USE'),(3,'C-03','明德三号楼','西区宿舍组团 3 号','混合','IN_USE'),(4,'D-04','明德四号楼','西区宿舍组团 4 号','男生','IN_USE'),(5,'E-05','博雅五号楼','南区宿舍组团 5 号','女生','IN_USE'),(6,'F-06','博雅六号楼','南区宿舍组团 6 号','混合','IN_USE');
 /*!40000 ALTER TABLE `building` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -207,7 +207,7 @@ CREATE TABLE `dorm_manager_profile` (
   `password_hash` char(64) NOT NULL,
   `phone` varchar(30) DEFAULT NULL,
   `enabled` tinyint NOT NULL DEFAULT '1',
-  `employee_no` varchar(40) DEFAULT NULL,
+  `employee_no` char(8) NOT NULL,
   `manager_name` varchar(80) DEFAULT NULL,
   `gender` varchar(10) DEFAULT NULL,
   `birth_date` date DEFAULT NULL,
@@ -220,6 +220,7 @@ CREATE TABLE `dorm_manager_profile` (
   UNIQUE KEY `uk_dorm_manager_login_account` (`login_account`),
   UNIQUE KEY `uk_dorm_manager_employee_no` (`employee_no`),
   CONSTRAINT `fk_dorm_manager_person` FOREIGN KEY (`manager_user_id`) REFERENCES `person` (`person_id`),
+  CONSTRAINT `chk_dorm_manager_employee_no_format` CHECK (regexp_like(`employee_no`,_utf8mb4'^DM[0-9]{6}$')),
   CONSTRAINT `chk_dorm_manager_enabled` CHECK ((`enabled` in (0,1))),
   CONSTRAINT `chk_dorm_manager_gender` CHECK (((`gender` is null) or (`gender` in (_utf8mb4'MALE',_utf8mb4'FEMALE',_utf8mb4'OTHER')))),
   CONSTRAINT `chk_dorm_manager_on_duty` CHECK ((`on_duty` in (0,1)))
@@ -232,7 +233,7 @@ CREATE TABLE `dorm_manager_profile` (
 
 LOCK TABLES `dorm_manager_profile` WRITE;
 /*!40000 ALTER TABLE `dorm_manager_profile` DISABLE KEYS */;
-INSERT INTO `dorm_manager_profile` (`manager_user_id`, `login_account`, `password_hash`, `phone`, `enabled`, `employee_no`, `manager_name`, `gender`, `birth_date`, `hire_date`, `on_duty`, `remark`, `created_at`, `updated_at`) VALUES (2,'manager1','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000002',1,'DM000002','李老师','FEMALE','1985-05-12','2018-09-01',1,NULL,'2026-10-15 07:58:05','2026-10-29 19:53:36');
+INSERT INTO `dorm_manager_profile` (`manager_user_id`, `login_account`, `password_hash`, `phone`, `enabled`, `employee_no`, `manager_name`, `gender`, `birth_date`, `hire_date`, `on_duty`, `remark`, `created_at`, `updated_at`) VALUES (2,'manager1','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13700000001',1,'DM000001','李老师1','FEMALE','1985-05-12','2018-09-01',1,NULL,'2026-10-15 07:58:05','2026-10-30 11:20:47'),(10,'manager2','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000003',1,'DM000002','李老师2','FEMALE','1979-10-16','2025-09-30',1,NULL,'2026-10-30 09:49:32','2026-10-30 11:20:47'),(14,'manager3','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000012',1,'DM000003','周老师','FEMALE','1987-03-15','2020-09-01',1,NULL,'2026-10-30 10:41:14','2026-10-30 11:20:47'),(15,'manager4','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000013',1,'DM000004','陈老师','FEMALE','1986-07-20','2021-09-01',1,NULL,'2026-10-30 10:41:14','2026-10-30 11:20:47');
 /*!40000 ALTER TABLE `dorm_manager_profile` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -253,7 +254,7 @@ CREATE TABLE `dorm_room` (
   PRIMARY KEY (`room_id`),
   UNIQUE KEY `uq_room` (`building_id`,`room_no`),
   CONSTRAINT `dorm_room_ibfk_1` FOREIGN KEY (`building_id`) REFERENCES `building` (`building_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -262,7 +263,7 @@ CREATE TABLE `dorm_room` (
 
 LOCK TABLES `dorm_room` WRITE;
 /*!40000 ALTER TABLE `dorm_room` DISABLE KEYS */;
-INSERT INTO `dorm_room` (`room_id`, `building_id`, `room_no`, `floor_no`, `design_capacity`, `usage_status`) VALUES (1,1,'203',2,4,'IN_USE'),(2,1,'204',2,4,'IN_USE'),(3,2,'406',4,4,'IN_USE'),(4,3,'108',1,6,'IN_USE');
+INSERT INTO `dorm_room` (`room_id`, `building_id`, `room_no`, `floor_no`, `design_capacity`, `usage_status`) VALUES (1,1,'203',2,4,'IN_USE'),(2,1,'204',2,4,'IN_USE'),(3,2,'406',4,4,'IN_USE'),(4,3,'108',1,6,'IN_USE'),(5,4,'101',1,4,'IN_USE'),(6,4,'102',1,4,'IN_USE'),(7,4,'201',2,4,'IN_USE'),(8,5,'301',3,4,'IN_USE'),(9,5,'302',3,4,'IN_USE'),(10,5,'401',4,4,'IN_USE'),(11,6,'101',1,4,'IN_USE'),(12,6,'201',2,4,'IN_USE'),(13,6,'301',3,4,'IN_USE');
 /*!40000 ALTER TABLE `dorm_room` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -401,7 +402,7 @@ CREATE TABLE `login_log` (
   `success` tinyint NOT NULL,
   `occurred_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`log_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=81 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -410,7 +411,7 @@ CREATE TABLE `login_log` (
 
 LOCK TABLES `login_log` WRITE;
 /*!40000 ALTER TABLE `login_log` DISABLE KEYS */;
-INSERT INTO `login_log` (`log_id`, `user_id`, `account`, `success`, `occurred_at`) VALUES (1,1,'student1',1,'2026-10-15 11:22:04'),(2,2,'manager1',1,'2026-10-15 11:22:04'),(3,3,'repair1',1,'2026-10-15 11:22:04'),(4,4,'admin',1,'2026-10-15 11:22:04'),(5,NULL,'13800138000',0,'2026-10-15 11:23:17'),(6,1,'student1',1,'2026-10-15 11:31:20'),(7,2,'manager1',1,'2026-10-15 12:00:07'),(8,3,'repair1',1,'2026-10-15 12:01:43'),(9,4,'admin',1,'2026-10-15 12:02:38'),(10,4,'admin',1,'2026-10-15 12:53:38'),(11,4,'admin',1,'2026-10-15 13:01:53'),(12,3,'repair1',1,'2026-10-15 13:10:56'),(13,3,'repair1',1,'2026-10-15 13:11:15'),(14,1,'student1',1,'2026-10-15 13:14:08'),(15,2,'manager1',1,'2026-10-15 13:14:09'),(16,NULL,'repair1',0,'2026-10-15 13:14:09'),(17,4,'admin',1,'2026-10-15 13:14:55'),(18,1,'student1',1,'2026-10-15 13:17:22'),(19,1,'student1',1,'2026-10-15 15:16:54'),(20,1,'student1',1,'2026-10-15 15:18:54'),(21,NULL,'repair1',0,'2026-10-15 16:02:48'),(22,3,'repair1',1,'2026-10-15 16:02:55'),(23,4,'admin',1,'2026-10-15 16:03:26'),(24,3,'repair1',1,'2026-10-15 16:03:54'),(25,3,'repair1',1,'2026-10-15 19:58:58'),(26,4,'admin',1,'2026-10-15 19:59:08'),(27,1,'student1',1,'2026-10-15 19:59:51'),(28,2,'manager1',1,'2026-10-15 20:01:00'),(29,3,'repair1',1,'2026-10-15 20:01:42'),(30,2,'manager1',1,'2026-10-15 20:02:24'),(31,2,'manager1',1,'2026-10-16 15:00:33'),(32,3,'repair1',1,'2026-10-16 15:17:13'),(33,3,'repair1',1,'2026-10-29 14:47:44'),(34,NULL,'manager1',0,'2026-10-29 14:53:04'),(35,NULL,'repair1',0,'2026-10-29 14:53:20'),(36,2,'manager1',1,'2026-10-29 14:53:53'),(37,4,'admin',1,'2026-10-29 14:54:15'),(38,3,'repair1',1,'2026-10-29 15:48:29'),(39,1,'student1',1,'2026-10-29 15:48:58'),(40,2,'manager1',1,'2026-10-29 15:49:30'),(41,4,'admin',1,'2026-10-29 16:55:24'),(42,4,'admin',1,'2026-10-29 16:55:43'),(43,4,'admin',1,'2026-10-29 19:05:17'),(44,4,'admin',1,'2026-10-29 19:06:24'),(45,4,'admin',1,'2026-10-29 19:07:00'),(46,4,'admin',1,'2026-10-29 19:07:41'),(47,4,'admin',1,'2026-10-29 19:08:24'),(48,4,'admin',1,'2026-10-29 19:08:59'),(49,4,'admin',1,'2026-10-29 19:09:38'),(50,4,'admin',1,'2026-10-29 19:10:07'),(51,4,'admin',1,'2026-10-29 19:10:29'),(52,4,'admin',1,'2026-10-29 19:10:52'),(53,4,'admin',1,'2026-10-29 19:14:57'),(54,4,'admin',1,'2026-10-29 19:15:31'),(55,4,'admin',1,'2026-10-29 19:16:18'),(56,NULL,'repair1',0,'2026-10-29 19:18:13'),(57,4,'admin',1,'2026-10-29 19:18:40'),(58,4,'admin',1,'2026-10-29 20:00:06'),(59,4,'admin',1,'2026-10-29 20:00:18'),(60,1,'student1',1,'2026-10-29 20:00:32'),(61,4,'admin',1,'2026-10-29 20:01:28'),(62,1,'student1',1,'2026-10-29 20:01:28'),(63,4,'admin',1,'2026-10-29 20:02:18'),(64,1,'student1',1,'2026-10-29 20:02:19'),(65,2,'manager1',1,'2026-10-29 20:02:19'),(66,NULL,'repair1',0,'2026-10-29 20:02:19'),(67,4,'admin',1,'2026-10-29 20:03:29'),(68,1,'student1',1,'2026-10-29 20:03:29'),(69,2,'manager1',1,'2026-10-29 20:03:29'),(70,NULL,'repair1',0,'2026-10-29 20:03:29'),(71,4,'admin',1,'2026-10-29 20:05:00'),(72,4,'admin',1,'2026-10-29 20:05:01'),(73,1,'student1',1,'2026-10-29 20:05:02'),(74,2,'manager1',1,'2026-10-29 20:05:03'),(75,3,'repair1',1,'2026-10-29 20:05:04'),(76,4,'admin',1,'2026-10-29 20:09:12'),(77,1,'student1',1,'2026-10-29 20:09:12'),(78,2,'manager1',1,'2026-10-29 20:09:12'),(79,3,'repair1',1,'2026-10-29 20:09:12'),(80,4,'admin',1,'2026-10-29 20:18:56');
+INSERT INTO `login_log` (`log_id`, `user_id`, `account`, `success`, `occurred_at`) VALUES (1,1,'student1',1,'2026-10-15 11:22:04'),(2,2,'manager1',1,'2026-10-15 11:22:04'),(3,3,'repair1',1,'2026-10-15 11:22:04'),(4,4,'admin',1,'2026-10-15 11:22:04'),(5,NULL,'13800138000',0,'2026-10-15 11:23:17'),(6,1,'student1',1,'2026-10-15 11:31:20'),(7,2,'manager1',1,'2026-10-15 12:00:07'),(8,3,'repair1',1,'2026-10-15 12:01:43'),(9,4,'admin',1,'2026-10-15 12:02:38'),(10,4,'admin',1,'2026-10-15 12:53:38'),(11,4,'admin',1,'2026-10-15 13:01:53'),(12,3,'repair1',1,'2026-10-15 13:10:56'),(13,3,'repair1',1,'2026-10-15 13:11:15'),(14,1,'student1',1,'2026-10-15 13:14:08'),(15,2,'manager1',1,'2026-10-15 13:14:09'),(16,NULL,'repair1',0,'2026-10-15 13:14:09'),(17,4,'admin',1,'2026-10-15 13:14:55'),(18,1,'student1',1,'2026-10-15 13:17:22'),(19,1,'student1',1,'2026-10-15 15:16:54'),(20,1,'student1',1,'2026-10-15 15:18:54'),(21,NULL,'repair1',0,'2026-10-15 16:02:48'),(22,3,'repair1',1,'2026-10-15 16:02:55'),(23,4,'admin',1,'2026-10-15 16:03:26'),(24,3,'repair1',1,'2026-10-15 16:03:54'),(25,3,'repair1',1,'2026-10-15 19:58:58'),(26,4,'admin',1,'2026-10-15 19:59:08'),(27,1,'student1',1,'2026-10-15 19:59:51'),(28,2,'manager1',1,'2026-10-15 20:01:00'),(29,3,'repair1',1,'2026-10-15 20:01:42'),(30,2,'manager1',1,'2026-10-15 20:02:24'),(31,2,'manager1',1,'2026-10-16 15:00:33'),(32,3,'repair1',1,'2026-10-16 15:17:13'),(33,3,'repair1',1,'2026-10-29 14:47:44'),(34,NULL,'manager1',0,'2026-10-29 14:53:04'),(35,NULL,'repair1',0,'2026-10-29 14:53:20'),(36,2,'manager1',1,'2026-10-29 14:53:53'),(37,4,'admin',1,'2026-10-29 14:54:15'),(38,3,'repair1',1,'2026-10-29 15:48:29'),(39,1,'student1',1,'2026-10-29 15:48:58'),(40,2,'manager1',1,'2026-10-29 15:49:30'),(41,4,'admin',1,'2026-10-29 16:55:24'),(42,4,'admin',1,'2026-10-29 16:55:43'),(43,4,'admin',1,'2026-10-29 19:05:17'),(44,4,'admin',1,'2026-10-29 19:06:24'),(45,4,'admin',1,'2026-10-29 19:07:00'),(46,4,'admin',1,'2026-10-29 19:07:41'),(47,4,'admin',1,'2026-10-29 19:08:24'),(48,4,'admin',1,'2026-10-29 19:08:59'),(49,4,'admin',1,'2026-10-29 19:09:38'),(50,4,'admin',1,'2026-10-29 19:10:07'),(51,4,'admin',1,'2026-10-29 19:10:29'),(52,4,'admin',1,'2026-10-29 19:10:52'),(53,4,'admin',1,'2026-10-29 19:14:57'),(54,4,'admin',1,'2026-10-29 19:15:31'),(55,4,'admin',1,'2026-10-29 19:16:18'),(56,NULL,'repair1',0,'2026-10-29 19:18:13'),(57,4,'admin',1,'2026-10-29 19:18:40'),(58,4,'admin',1,'2026-10-29 20:00:06'),(59,4,'admin',1,'2026-10-29 20:00:18'),(60,1,'student1',1,'2026-10-29 20:00:32'),(61,4,'admin',1,'2026-10-29 20:01:28'),(62,1,'student1',1,'2026-10-29 20:01:28'),(63,4,'admin',1,'2026-10-29 20:02:18'),(64,1,'student1',1,'2026-10-29 20:02:19'),(65,2,'manager1',1,'2026-10-29 20:02:19'),(66,NULL,'repair1',0,'2026-10-29 20:02:19'),(67,4,'admin',1,'2026-10-29 20:03:29'),(68,1,'student1',1,'2026-10-29 20:03:29'),(69,2,'manager1',1,'2026-10-29 20:03:29'),(70,NULL,'repair1',0,'2026-10-29 20:03:29'),(71,4,'admin',1,'2026-10-29 20:05:00'),(72,4,'admin',1,'2026-10-29 20:05:01'),(73,1,'student1',1,'2026-10-29 20:05:02'),(74,2,'manager1',1,'2026-10-29 20:05:03'),(75,3,'repair1',1,'2026-10-29 20:05:04'),(76,4,'admin',1,'2026-10-29 20:09:12'),(77,1,'student1',1,'2026-10-29 20:09:12'),(78,2,'manager1',1,'2026-10-29 20:09:12'),(79,3,'repair1',1,'2026-10-29 20:09:12'),(80,4,'admin',1,'2026-10-29 20:18:56'),(81,NULL,'2024000007',0,'2026-10-30 09:15:37'),(82,NULL,'2024000007',0,'2026-10-30 09:15:37'),(83,NULL,'2024000006',0,'2026-10-30 09:15:41'),(84,NULL,'2024000007',0,'2026-10-30 09:15:42'),(85,NULL,'2024000007',0,'2026-10-30 09:15:45'),(86,4,'admin',1,'2026-10-30 09:22:23'),(87,4,'admin',1,'2026-10-30 10:21:41'),(88,4,'admin',1,'2026-10-30 10:24:35'),(89,4,'admin',1,'2026-10-30 10:25:37'),(90,4,'admin',1,'2026-10-30 10:26:19'),(91,4,'admin',1,'2026-10-30 10:26:44'),(92,4,'admin',1,'2026-10-30 10:29:50'),(93,4,'admin',1,'2026-10-30 10:29:52'),(94,NULL,'RP000001',0,'2026-10-30 10:31:12'),(95,4,'admin',1,'2026-10-30 10:31:20'),(96,4,'admin',1,'2026-10-30 10:43:53'),(97,18,'student9',1,'2026-10-30 10:45:57'),(98,14,'manager3',1,'2026-10-30 10:45:57'),(99,16,'repair3',1,'2026-10-30 10:45:57'),(100,4,'admin',1,'2026-10-30 10:45:59'),(101,4,'admin',1,'2026-10-30 11:12:58');
 /*!40000 ALTER TABLE `login_log` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -457,8 +458,8 @@ DROP TABLE IF EXISTS `manager_building_scope`;
 CREATE TABLE `manager_building_scope` (
   `manager_user_id` bigint NOT NULL,
   `building_id` bigint NOT NULL,
-  PRIMARY KEY (`manager_user_id`,`building_id`),
-  KEY `building_id` (`building_id`),
+  PRIMARY KEY (`manager_user_id`),
+  UNIQUE KEY `uq_manager_building_scope_building` (`building_id`),
   CONSTRAINT `fk_manager_scope_profile` FOREIGN KEY (`manager_user_id`) REFERENCES `dorm_manager_profile` (`manager_user_id`),
   CONSTRAINT `manager_building_scope_ibfk_2` FOREIGN KEY (`building_id`) REFERENCES `building` (`building_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -470,7 +471,7 @@ CREATE TABLE `manager_building_scope` (
 
 LOCK TABLES `manager_building_scope` WRITE;
 /*!40000 ALTER TABLE `manager_building_scope` DISABLE KEYS */;
-INSERT INTO `manager_building_scope` (`manager_user_id`, `building_id`) VALUES (2,1);
+INSERT INTO `manager_building_scope` (`manager_user_id`, `building_id`) VALUES (2,1),(10,2),(14,4),(15,5);
 /*!40000 ALTER TABLE `manager_building_scope` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -545,7 +546,7 @@ CREATE TABLE `operation_log` (
   `result` varchar(20) NOT NULL,
   `occurred_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`log_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -554,7 +555,7 @@ CREATE TABLE `operation_log` (
 
 LOCK TABLES `operation_log` WRITE;
 /*!40000 ALTER TABLE `operation_log` DISABLE KEYS */;
-INSERT INTO `operation_log` (`log_id`, `operator_user_id`, `module`, `action`, `business_id`, `result`, `occurred_at`) VALUES (1,4,'notice','publish',5,'SUCCESS','2026-10-15 12:54:19'),(2,4,'stay','supplement',2,'SUCCESS','2026-10-15 12:59:04'),(3,4,'stay','review',2,'SUCCESS','2026-10-15 12:59:23'),(4,3,'auth','password',3,'SUCCESS','2026-10-15 13:11:11'),(5,4,'notice','publish',7,'SUCCESS','2026-10-15 16:03:45'),(6,4,'system','database_backup',0,'SUCCESS','2026-10-15 19:59:16'),(7,4,'system','database_backup',0,'SUCCESS','2026-10-15 19:59:23'),(8,2,'repair','review',1,'SUCCESS','2026-10-15 20:01:27'),(9,3,'repair','reject',1,'SUCCESS','2026-10-15 20:02:14'),(10,4,'auth','disable',1,'SUCCESS','2026-10-29 14:58:40'),(11,4,'auth','enable',1,'SUCCESS','2026-10-29 14:58:41'),(12,4,'auth','create',5,'SUCCESS','2026-10-29 15:02:32'),(13,4,'auth','update',5,'SUCCESS','2026-10-29 15:02:48'),(14,4,'auth','create',6,'SUCCESS','2026-10-29 15:14:48'),(15,4,'dorm','assign',2,'SUCCESS','2026-10-29 15:29:44'),(16,4,'dorm','assign',3,'SUCCESS','2026-10-29 15:29:54'),(17,4,'dorm','assign',4,'SUCCESS','2026-10-29 15:59:37'),(18,4,'dorm','assign',5,'SUCCESS','2026-10-29 15:59:56'),(19,4,'auth','disable',1,'SUCCESS','2026-10-29 20:57:19'),(20,4,'auth','disable',5,'SUCCESS','2026-10-29 20:57:23'),(21,4,'dorm','manager_scope',2,'SUCCESS','2026-10-29 21:11:11'),(22,4,'repair','worker_scope',3,'SUCCESS','2026-10-29 21:14:26'),(23,4,'repair','worker_scope',3,'SUCCESS','2026-10-29 21:14:31'),(24,4,'auth','create',7,'SUCCESS','2026-10-29 22:37:49'),(25,4,'auth','enable',1,'SUCCESS','2026-10-29 22:46:40'),(26,4,'auth','update',3,'SUCCESS','2026-10-29 22:50:29'),(27,4,'repair','worker_scope',3,'SUCCESS','2026-10-29 22:50:46'),(28,4,'repair','worker_scope',3,'SUCCESS','2026-10-29 22:50:56'),(29,4,'repair','worker_scope',3,'SUCCESS','2026-10-29 22:51:04'),(30,4,'auth','update',3,'SUCCESS','2026-10-29 22:51:27'),(31,4,'auth','update',3,'SUCCESS','2026-10-29 22:51:32'),(32,4,'auth','update',2,'SUCCESS','2026-10-29 22:53:26'),(33,4,'auth','update',2,'SUCCESS','2026-10-29 22:53:34');
+INSERT INTO `operation_log` (`log_id`, `operator_user_id`, `module`, `action`, `business_id`, `result`, `occurred_at`) VALUES (1,4,'notice','publish',5,'SUCCESS','2026-10-15 12:54:19'),(2,4,'stay','supplement',2,'SUCCESS','2026-10-15 12:59:04'),(3,4,'stay','review',2,'SUCCESS','2026-10-15 12:59:23'),(4,3,'auth','password',3,'SUCCESS','2026-10-15 13:11:11'),(5,4,'notice','publish',7,'SUCCESS','2026-10-15 16:03:45'),(6,4,'system','database_backup',0,'SUCCESS','2026-10-15 19:59:16'),(7,4,'system','database_backup',0,'SUCCESS','2026-10-15 19:59:23'),(8,2,'repair','review',1,'SUCCESS','2026-10-15 20:01:27'),(9,3,'repair','reject',1,'SUCCESS','2026-10-15 20:02:14'),(10,4,'auth','disable',1,'SUCCESS','2026-10-29 14:58:40'),(11,4,'auth','enable',1,'SUCCESS','2026-10-29 14:58:41'),(12,4,'auth','create',5,'SUCCESS','2026-10-29 15:02:32'),(13,4,'auth','update',5,'SUCCESS','2026-10-29 15:02:48'),(14,4,'auth','create',6,'SUCCESS','2026-10-29 15:14:48'),(15,4,'dorm','assign',2,'SUCCESS','2026-10-29 15:29:44'),(16,4,'dorm','assign',3,'SUCCESS','2026-10-29 15:29:54'),(17,4,'dorm','assign',4,'SUCCESS','2026-10-29 15:59:37'),(18,4,'dorm','assign',5,'SUCCESS','2026-10-29 15:59:56'),(19,4,'auth','disable',1,'SUCCESS','2026-10-29 20:57:19'),(20,4,'auth','disable',5,'SUCCESS','2026-10-29 20:57:23'),(21,4,'dorm','manager_scope',2,'SUCCESS','2026-10-29 21:11:11'),(22,4,'repair','worker_scope',3,'SUCCESS','2026-10-29 21:14:26'),(23,4,'repair','worker_scope',3,'SUCCESS','2026-10-29 21:14:31'),(24,4,'auth','create',7,'SUCCESS','2026-10-29 22:37:49'),(25,4,'auth','enable',1,'SUCCESS','2026-10-29 22:46:40'),(26,4,'auth','update',3,'SUCCESS','2026-10-29 22:50:29'),(27,4,'repair','worker_scope',3,'SUCCESS','2026-10-29 22:50:46'),(28,4,'repair','worker_scope',3,'SUCCESS','2026-10-29 22:50:56'),(29,4,'repair','worker_scope',3,'SUCCESS','2026-10-29 22:51:04'),(30,4,'auth','update',3,'SUCCESS','2026-10-29 22:51:27'),(31,4,'auth','update',3,'SUCCESS','2026-10-29 22:51:32'),(32,4,'auth','update',2,'SUCCESS','2026-10-29 22:53:26'),(33,4,'auth','update',2,'SUCCESS','2026-10-29 22:53:34'),(34,4,'auth','update',1,'SUCCESS','2026-10-30 09:27:11'),(35,4,'auth','update',5,'SUCCESS','2026-10-30 09:27:31'),(36,4,'auth','update',6,'SUCCESS','2026-10-30 09:27:57'),(37,4,'dorm','assign',6,'SUCCESS','2026-10-30 09:28:52'),(38,4,'auth','update',7,'SUCCESS','2026-10-30 09:29:05'),(39,4,'auth','update',7,'SUCCESS','2026-10-30 09:35:14'),(40,4,'auth','create',8,'SUCCESS','2026-10-30 09:35:44'),(41,4,'auth','create',9,'SUCCESS','2026-10-30 09:36:20'),(42,4,'auth','update',8,'SUCCESS','2026-10-30 09:36:37'),(43,4,'dorm','assign',7,'SUCCESS','2026-10-30 09:37:14'),(44,4,'dorm','manager_scope',2,'SUCCESS','2026-10-30 09:48:43'),(45,4,'auth','update',2,'SUCCESS','2026-10-30 09:48:43'),(46,4,'dorm','manager_scope',10,'SUCCESS','2026-10-30 09:49:32'),(47,4,'auth','create',10,'SUCCESS','2026-10-30 09:49:32'),(48,4,'dorm','manager_scope',10,'SUCCESS','2026-10-30 09:50:24'),(49,4,'auth','update',10,'SUCCESS','2026-10-30 09:50:24'),(50,4,'dorm','manager_scope',2,'SUCCESS','2026-10-30 09:50:47'),(51,4,'repair','worker_scope',3,'SUCCESS','2026-10-30 09:56:09'),(52,4,'auth','update',3,'SUCCESS','2026-10-30 09:56:09'),(53,4,'repair','worker_scope',11,'SUCCESS','2026-10-30 09:58:38'),(54,4,'auth','create',11,'SUCCESS','2026-10-30 09:58:38'),(55,4,'repair','worker_scope',3,'SUCCESS','2026-10-30 09:58:46'),(56,4,'auth','update',3,'SUCCESS','2026-10-30 09:58:46'),(57,4,'auth','create',12,'SUCCESS','2026-10-30 10:33:51'),(58,4,'auth','create',13,'SUCCESS','2026-10-30 10:36:20'),(59,4,'dorm','assign',8,'SUCCESS','2026-10-30 10:44:54'),(60,4,'dorm','buildings',1,'SUCCESS','2026-10-30 11:00:09'),(61,4,'dorm','buildings',1,'SUCCESS','2026-10-30 11:00:13'),(62,4,'dorm','assign',9,'SUCCESS','2026-10-30 11:27:28'),(63,4,'repair','worker_scope',17,'SUCCESS','2026-10-30 11:34:08');
 /*!40000 ALTER TABLE `operation_log` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -568,7 +569,7 @@ DROP TABLE IF EXISTS `person`;
 CREATE TABLE `person` (
   `person_id` bigint NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`person_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -577,7 +578,7 @@ CREATE TABLE `person` (
 
 LOCK TABLES `person` WRITE;
 /*!40000 ALTER TABLE `person` DISABLE KEYS */;
-INSERT INTO `person` (`person_id`) VALUES (1),(2),(3),(4),(5),(6),(7);
+INSERT INTO `person` (`person_id`) VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14),(15),(16),(17),(18),(19);
 /*!40000 ALTER TABLE `person` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1041,7 +1042,7 @@ CREATE TABLE `repairer_building_scope` (
 
 LOCK TABLES `repairer_building_scope` WRITE;
 /*!40000 ALTER TABLE `repairer_building_scope` DISABLE KEYS */;
-INSERT INTO `repairer_building_scope` (`repairer_user_id`, `building_id`) VALUES (3,1),(3,2);
+INSERT INTO `repairer_building_scope` (`repairer_user_id`, `building_id`) VALUES (17,3),(16,4),(17,5),(16,6);
 /*!40000 ALTER TABLE `repairer_building_scope` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1058,7 +1059,7 @@ CREATE TABLE `repairer_profile` (
   `password_hash` char(64) COLLATE utf8mb4_unicode_ci NOT NULL,
   `phone` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `enabled` tinyint NOT NULL DEFAULT '1',
-  `employee_no` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `employee_no` char(8) COLLATE utf8mb4_unicode_ci NOT NULL,
   `repairer_name` varchar(80) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `gender` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `birth_date` date DEFAULT NULL,
@@ -1072,6 +1073,7 @@ CREATE TABLE `repairer_profile` (
   UNIQUE KEY `uk_repairer_login_account` (`login_account`),
   UNIQUE KEY `uk_repairer_employee_no` (`employee_no`),
   CONSTRAINT `fk_repairer_person` FOREIGN KEY (`repairer_user_id`) REFERENCES `person` (`person_id`),
+  CONSTRAINT `chk_repairer_employee_no_format` CHECK (regexp_like(`employee_no`,_utf8mb4'^RP[0-9]{6}$')),
   CONSTRAINT `chk_repairer_enabled` CHECK ((`enabled` in (0,1))),
   CONSTRAINT `chk_repairer_gender` CHECK (((`gender` is null) or (`gender` in (_utf8mb4'MALE',_utf8mb4'FEMALE',_utf8mb4'OTHER'))))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1083,7 +1085,7 @@ CREATE TABLE `repairer_profile` (
 
 LOCK TABLES `repairer_profile` WRITE;
 /*!40000 ALTER TABLE `repairer_profile` DISABLE KEYS */;
-INSERT INTO `repairer_profile` (`repairer_user_id`, `login_account`, `password_hash`, `phone`, `enabled`, `employee_no`, `repairer_name`, `gender`, `birth_date`, `hire_date`, `on_duty`, `max_active_orders`, `remark`, `created_at`, `updated_at`) VALUES (3,'repair1','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000003',1,'RP000003','王师傅','MALE','1990-03-18','2019-04-01',1,NULL,NULL,'2026-10-15 07:58:05','2026-10-29 20:04:32');
+INSERT INTO `repairer_profile` (`repairer_user_id`, `login_account`, `password_hash`, `phone`, `enabled`, `employee_no`, `repairer_name`, `gender`, `birth_date`, `hire_date`, `on_duty`, `max_active_orders`, `remark`, `created_at`, `updated_at`) VALUES (3,'repair1','96cae35ce8a9b0244178bf28e4966c2ce1b8385723a96a6b838858cdd6ca0a1e','13800000001',1,'RP000001','王师傅1','MALE','1990-03-18','2019-04-01',1,NULL,NULL,'2026-10-15 07:58:05','2026-10-30 11:20:47'),(11,'repair2','96cae35ce8a9b0244178bf28e4966c2ce1b8385723a96a6b838858cdd6ca0a1e','13600000002',1,'RP000002','王师傅2','MALE','1979-10-16','2025-09-30',1,NULL,NULL,'2026-10-30 09:58:38','2026-10-30 11:20:47'),(16,'repair3','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13900000012',1,'RP000003','赵师傅','MALE','1988-02-11','2019-04-01',1,5,NULL,'2026-10-30 10:41:14','2026-10-30 11:20:47'),(17,'repair4','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13900000013',1,'RP000004','孙师傅','MALE','1989-10-08','2020-04-01',1,5,NULL,'2026-10-30 10:41:14','2026-10-30 11:20:47');
 /*!40000 ALTER TABLE `repairer_profile` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1110,7 +1112,7 @@ CREATE TABLE `repairer_work_type` (
 
 LOCK TABLES `repairer_work_type` WRITE;
 /*!40000 ALTER TABLE `repairer_work_type` DISABLE KEYS */;
-INSERT INTO `repairer_work_type` (`repairer_user_id`, `work_type_id`) VALUES (3,3);
+INSERT INTO `repairer_work_type` (`repairer_user_id`, `work_type_id`) VALUES (16,1),(16,2),(17,2),(3,3),(17,3);
 /*!40000 ALTER TABLE `repairer_work_type` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1376,7 +1378,7 @@ CREATE TABLE `student` (
   `password_hash` char(64) NOT NULL,
   `phone` varchar(30) DEFAULT NULL,
   `enabled` tinyint NOT NULL DEFAULT '1',
-  `student_no` varchar(30) DEFAULT NULL,
+  `student_no` char(10) NOT NULL,
   `student_name` varchar(80) NOT NULL,
   `gender` varchar(10) DEFAULT NULL,
   `birth_date` date DEFAULT NULL,
@@ -1392,7 +1394,8 @@ CREATE TABLE `student` (
   CONSTRAINT `fk_student_person` FOREIGN KEY (`student_id`) REFERENCES `person` (`person_id`),
   CONSTRAINT `chk_student_enabled` CHECK ((`enabled` in (0,1))),
   CONSTRAINT `chk_student_enrollment_status` CHECK ((`enrollment_status` in (_utf8mb4'ENROLLED',_utf8mb4'SUSPENDED',_utf8mb4'GRADUATED',_utf8mb4'WITHDRAWN',_utf8mb4'UNKNOWN'))),
-  CONSTRAINT `chk_student_gender` CHECK (((`gender` is null) or (`gender` in (_utf8mb4'MALE',_utf8mb4'FEMALE',_utf8mb4'OTHER'))))
+  CONSTRAINT `chk_student_gender` CHECK (((`gender` is null) or (`gender` in (_utf8mb4'MALE',_utf8mb4'FEMALE',_utf8mb4'OTHER')))),
+  CONSTRAINT `chk_student_no_format` CHECK (regexp_like(`student_no`,_utf8mb4'^[0-9]{10}$'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1402,7 +1405,7 @@ CREATE TABLE `student` (
 
 LOCK TABLES `student` WRITE;
 /*!40000 ALTER TABLE `student` DISABLE KEYS */;
-INSERT INTO `student` (`student_id`, `login_account`, `password_hash`, `phone`, `enabled`, `student_no`, `student_name`, `gender`, `birth_date`, `class_id`, `enrollment_status`, `created_at`, `updated_at`) VALUES (1,'student1','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000001',1,'2024000001','张三','MALE','2004-03-14',5,'ENROLLED','2026-10-15 07:58:05','2026-10-29 22:46:40'),(5,'student2','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000005',0,'2024000005','张四','MALE','2004-12-31',5,'ENROLLED','2026-10-29 15:02:32','2026-10-29 20:57:23'),(6,'student3','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000006',1,'2024000006','张五','FEMALE','2005-03-14',5,'ENROLLED','2026-10-29 15:14:48','2026-10-29 19:53:36'),(7,'student4','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000007',1,'2024000007','张六','MALE',NULL,NULL,'ENROLLED','2026-10-29 22:37:49','2026-10-29 22:37:49');
+INSERT INTO `student` (`student_id`, `login_account`, `password_hash`, `phone`, `enabled`, `student_no`, `student_name`, `gender`, `birth_date`, `class_id`, `enrollment_status`, `created_at`, `updated_at`) VALUES (1,'student1','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000001',1,'2024000001','张一','MALE','2004-03-14',5,'ENROLLED','2026-10-15 07:58:05','2026-10-30 09:27:11'),(5,'student2','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000002',0,'2024000002','张二','MALE','2004-12-31',5,'ENROLLED','2026-10-29 15:02:32','2026-10-30 09:27:31'),(6,'student3','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000003',1,'2024000003','张三','FEMALE','2005-03-14',5,'ENROLLED','2026-10-29 15:14:48','2026-10-30 09:27:57'),(7,'student4','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000004',1,'2024000004','张四','MALE',NULL,NULL,'ENROLLED','2026-10-29 22:37:49','2026-10-30 09:35:14'),(8,'student5','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000005',1,'2024000005','张五','MALE',NULL,2,'ENROLLED','2026-10-30 09:35:44','2026-10-30 09:36:37'),(9,'student6','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000006',1,'2024000006','张六','MALE',NULL,2,'ENROLLED','2026-10-30 09:36:20','2026-10-30 11:04:44'),(12,'student7','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000006',1,'2024000007','张七','FEMALE',NULL,NULL,'ENROLLED','2026-10-30 10:33:51','2026-10-30 11:04:44'),(13,'student8','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000008',1,'2024000008','张八','FEMALE',NULL,NULL,'ENROLLED','2026-10-30 10:36:20','2026-10-30 10:36:20'),(18,'student9','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13700000009',1,'2026000009','周宇航','MALE','2006-11-03',3,'ENROLLED','2026-10-30 10:41:14','2026-10-30 11:04:44'),(19,'student10','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13700000010',1,'2026000010','陈思远','FEMALE','2006-06-19',6,'ENROLLED','2026-10-30 10:41:14','2026-10-30 11:04:44');
 /*!40000 ALTER TABLE `student` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1454,7 +1457,7 @@ CREATE TABLE `system_admin_profile` (
   `password_hash` char(64) NOT NULL,
   `phone` varchar(30) DEFAULT NULL,
   `enabled` tinyint NOT NULL DEFAULT '1',
-  `employee_no` varchar(40) DEFAULT NULL,
+  `employee_no` char(8) NOT NULL,
   `admin_name` varchar(80) DEFAULT NULL,
   `gender` varchar(10) DEFAULT NULL,
   `birth_date` date DEFAULT NULL,
@@ -1465,6 +1468,7 @@ CREATE TABLE `system_admin_profile` (
   UNIQUE KEY `uk_system_admin_login_account` (`login_account`),
   UNIQUE KEY `uk_system_admin_employee_no` (`employee_no`),
   CONSTRAINT `fk_system_admin_person` FOREIGN KEY (`admin_user_id`) REFERENCES `person` (`person_id`),
+  CONSTRAINT `chk_system_admin_employee_no_format` CHECK (regexp_like(`employee_no`,_utf8mb4'^SA[0-9]{6}$')),
   CONSTRAINT `chk_system_admin_enabled` CHECK ((`enabled` in (0,1))),
   CONSTRAINT `chk_system_admin_gender` CHECK (((`gender` is null) or (`gender` in (_utf8mb4'MALE',_utf8mb4'FEMALE',_utf8mb4'OTHER'))))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -1476,7 +1480,7 @@ CREATE TABLE `system_admin_profile` (
 
 LOCK TABLES `system_admin_profile` WRITE;
 /*!40000 ALTER TABLE `system_admin_profile` DISABLE KEYS */;
-INSERT INTO `system_admin_profile` (`admin_user_id`, `login_account`, `password_hash`, `phone`, `enabled`, `employee_no`, `admin_name`, `gender`, `birth_date`, `hire_date`, `created_at`, `updated_at`) VALUES (4,'admin','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000004',1,'SA000004','系统管理员','OTHER','1988-08-08','2017-07-01','2026-10-15 07:58:05','2026-10-29 19:53:36');
+INSERT INTO `system_admin_profile` (`admin_user_id`, `login_account`, `password_hash`, `phone`, `enabled`, `employee_no`, `admin_name`, `gender`, `birth_date`, `hire_date`, `created_at`, `updated_at`) VALUES (4,'admin','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000004',1,'SA000001','系统管理员','OTHER','1988-08-08','2017-07-01','2026-10-15 07:58:05','2026-10-30 11:20:47');
 /*!40000 ALTER TABLE `system_admin_profile` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1879,4 +1883,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-10-29 23:11:43
+-- Dump completed on 2026-10-30 11:35:43

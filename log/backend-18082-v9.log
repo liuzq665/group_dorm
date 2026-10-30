@@ -69,3 +69,4 @@ org.springframework.web.servlet.resource.NoResourceFoundException: No static res
 	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63) ~[tomcat-embed-core-10.1.31.jar!/:na]
 	at java.base/java.lang.Thread.run(Thread.java:842) ~[na:na]
 
+2026-10-30T09:15:12.549+08:00  WARN 6988 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=9h52m18s990ms471?s400ns).

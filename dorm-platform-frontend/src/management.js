@@ -13,13 +13,15 @@ export const adminPages={
 const roleLabels={STUDENT:'学生',DORM_MANAGER:'宿管',REPAIRER:'维修人员',ADMIN:'系统管理员'};
 async function userDirectory(page,title,roleCode=null){
  const filters=state.data.userFilters?.[page]||{};
- const params=new URLSearchParams(Object.entries({...filters,...(roleCode?{roleCode}:{})}).filter(([,value])=>value!==''&&value!=null));
- const rows=await api(`/admin/users?${params}`);state.data.users=rows;
- const academic=state.data.academic||{departments:[],majors:[],classes:[]};
- const buildings=state.data.buildings||[];
  const managers=page==='managers';
  const repairers=page==='repairers';
  const students=page==='students';
+ const defaultGender=repairers?'MALE':'FEMALE';
+ const gender=filters.gender||defaultGender;
+ const params=new URLSearchParams(Object.entries({...filters,gender,...(roleCode?{roleCode}:{})}).filter(([,value])=>value!==''&&value!=null));
+ const rows=await api(`/admin/users?${params}`);state.data.users=rows;
+ const academic=state.data.academic||{departments:[],majors:[],classes:[]};
+ const buildings=state.data.buildings||[];
  const selectedDept=academic.departments.find(x=>String(x.department_id)===String(filters.departmentId));
  const majorsForFilter=academic.majors.filter(x=>!selectedDept||Number(x.department_id)===Number(selectedDept.department_id));
  const selectedMajor=majorsForFilter.find(x=>String(x.major_id)===String(filters.majorId));
@@ -35,7 +37,7 @@ async function userDirectory(page,title,roleCode=null){
  const tools=button(students?'新增学生':managers?'新增宿管':'新增维修人员','user-new')+(students?button('分配/调整宿舍','assign'):managers?button('配置负责楼栋','manager-scope-select'):button('配置维修范围','worker-scope-select'));
  const rowsForTable=rows.map(row=>({...row,current_room_label:row.current_building?`${row.current_building} · ${row.current_room} · ${row.current_bed}`:'未分配',manager_buildings:row.manager_buildings?.replace(/,\s*/g,'\n'),work_types:row.work_types?.replace(/,\s*/g,'\n'),repairer_buildings:row.repairer_buildings?.replace(/,\s*/g,'\n')}));
   const directoryTable=selectableTable(rowsForTable,columns,actions,page);
- return `<section class="panel"><div class="toolbar"><h3>${title}</h3><div class="actions">${tools}</div></div><form id="user-filter-form" class="filter-grid ${students?'student-filter-grid':managers?'manager-filter-grid':'repairer-filter-grid'}" data-page="${page}">${filterFields}<div class="filter-actions"><button class="primary" type="submit">查询</button>${button('清空筛选','user-filter-reset')}</div></form>${directoryTable}</section>`;
+ return `<section class="panel"><div class="toolbar"><h3>${title}</h3><div class="actions">${tools}</div></div><form id="user-filter-form" class="filter-grid ${students?'student-filter-grid':managers?'manager-filter-grid':'repairer-filter-grid'}" data-page="${page}">${filterFields}<div class="filter-actions"><button class="primary" type="submit">查询</button>${button('清空筛选','user-filter-reset')}<label class="gender-switch"><span>男</span><input type="checkbox" role="switch" data-gender-toggle ${gender==='FEMALE'?'checked':''} aria-label="切换显示性别"><span>女</span><input type="hidden" name="gender" value="${gender}"></label></div></form>${directoryTable}</section>`;
 }
 function selectableTable(rows,columns,actions,page){
  return table(rows,columns,actions,'user_id')
@@ -45,23 +47,28 @@ function selectableTable(rows,columns,actions,page){
 }
 function combo(name,label,items,value=''){const listId=`filter-${name}`;return `<label class="field"><span>${label}</span><input name="${name}" type="search" list="${listId}" value="${esc(value)}" autocomplete="off"><datalist id="${listId}">${unique(items).map(item=>`<option value="${esc(item)}"></option>`).join('')}</datalist></label>`;}
 function unique(items){return [...new Set(items.filter(x=>x!=null&&String(x).trim()!=='' ).map(String))].sort((a,b)=>a.localeCompare(b,'zh-CN'));}
-function checkboxChoices(name,items,selected=[]){const chosen=new Set([...selected].map(String)),title=name==='buildingIds'?'负责楼栋':'维修工种';return `<fieldset class="choice-group"><legend>${title}</legend><details class="checkbox-dropdown"><summary><span class="checkbox-dropdown-value">${chosen.size?`已选择 ${chosen.size} 项`:'请选择'+title}</span></summary><div class="checkbox-dropdown-menu">${items.map(([id,label])=>`<label><span>${esc(label)}</span><input type="checkbox" name="${name}" value="${esc(id)}" ${chosen.has(String(id))?'checked':''}></label>`).join('')||'<span class="muted">暂无可选项</span>'}</div></details></fieldset>`;}
-function bindChoiceDropdown(dialog){dialog.querySelectorAll('.checkbox-dropdown').forEach(dropdown=>dropdown.addEventListener('change',()=>{const count=dropdown.querySelectorAll('input[type="checkbox"]:checked').length;dropdown.querySelector('.checkbox-dropdown-value').textContent=count?`已选择 ${count} 项`:'请选择'+dropdown.closest('.choice-group').querySelector('legend').textContent;}));}
+function checkboxChoices(name,items,selected=[]){const chosen=new Set([...selected].map(String)),title=name==='buildingIds'?'负责楼栋':'维修工种';return `<fieldset class="choice-group"><legend>${title}</legend><details class="checkbox-dropdown"><summary><span class="checkbox-dropdown-value">${[...chosen].map(id=>items.find(([value])=>String(value)===id)?.[1]).filter(Boolean).map(esc).join('、')||'请选择'+title}</span></summary><div class="checkbox-dropdown-menu">${items.map(([id,label])=>`<label><span>${esc(label)}</span><input type="checkbox" name="${name}" value="${esc(id)}" ${chosen.has(String(id))?'checked':''}></label>`).join('')||'<span class="muted">暂无可选项</span>'}</div></details></fieldset>`;}
+function bindChoiceDropdown(dialog){dialog.querySelectorAll('.checkbox-dropdown').forEach(dropdown=>dropdown.addEventListener('change',()=>{const labels=[...dropdown.querySelectorAll('input[type="checkbox"]:checked')].map(input=>input.closest('label').querySelector('span').textContent);dropdown.querySelector('.checkbox-dropdown-value').textContent=labels.join('、')||'请选择'+dropdown.closest('.choice-group').querySelector('legend').textContent;}));}
 function checkedValues(form,name){return [...form.querySelectorAll(`input[name="${name}"]:checked`)].map(input=>Number(input.value));}
 function selectedUserIds(){return [...document.querySelectorAll('.role-table [data-select-row]:checked')].map(input=>Number(input.value));}
 function genderMatches(gender,limit){return limit==='混合'||(gender==='MALE'&&limit==='男生')||(gender==='FEMALE'&&limit==='女生');}
 function refillSelect(element,placeholder,items,selected=''){element.innerHTML=`<option value="">${placeholder}</option>`+items.map(([value,label])=>`<option value="${esc(value)}" ${String(value)===String(selected)?'selected':''}>${esc(label)}</option>`).join('');}
-async function assignmentDialog(targetStudentId=null){
- const selected=targetStudentId==null?selectedUserIds():[Number(targetStudentId)];
- if(state.page==='students'&&!selected.length){notify('请先勾选要分配住宿的学生',true);return;}
+async function assignmentDialog(targetStudentId=null,onCancel=null,staging=null){
+ const selected=staging?[]:targetStudentId==null?selectedUserIds():[Number(targetStudentId)];
+ if(!staging&&state.page==='students'&&!selected.length){notify('请先勾选要分配住宿的学生',true);return;}
  const [allStudents,beds]=await Promise.all([api('/admin/users?roleCode=STUDENT&enabled=true'),api('/beds')]);
- const students=selected.length?allStudents.filter(x=>selected.includes(Number(x.user_id))):allStudents;
+ const students=staging?[{...staging.student,user_id:staging.userId??'draft'}]:selected.length?allStudents.filter(x=>selected.includes(Number(x.user_id))):allStudents;
  if(!students.length){notify('没有可分配住宿的启用学生',true);return;}
- const initial=students.length===1?students[0].user_id:'';
+ const initial=staging?String(staging.userId??'draft'):students.length===1?students[0].user_id:'';
+ const buildingField=select('buildingFilter','楼栋',[['','全部楼栋']],'',false,false);
  const html=select('studentId','学生',students.map(x=>[x.user_id,`${x.student_no||'无学号'} · ${x.real_name}`]),initial)+
-  select('buildingFilter','楼栋',[['','全部楼栋']],'',false,false)+select('roomFilter','房间',[['','全部房间']],'',false,false)+
-  select('bedNoFilter','床位',[['','全部床位']],'',false,false)+select('bedId','可分配床位',[],'',false,true);
- const dialog=modal('分配或调整住宿',`<div class="assignment-form">${html}</div>`,(data)=>post('/admin/assignments',data));
+  buildingField+select('roomFilter','房间',[['','全部房间']],'',false,false)+
+  select('bedNoFilter','床位',[['','全部床位']],'',false,false)+`<div class="bed-choice-list" role="listbox" aria-label="可分配床位"></div><input type="hidden" name="bedId">`;
+ let selectedBedId=String(staging?.bedId||'');
+ let submitted=false;
+ const dialog=modal('分配或调整住宿',`<div class="assignment-form">${html}</div>`,staging?null:data=>{if(!selectedBedId)throw new Error('请从可分配床位列表中选择床位');data.bedId=selectedBedId;return post('/admin/assignments',data).then(result=>{submitted=true;return result;});});
+ if(onCancel)dialog.addEventListener('close',()=>{if(!submitted)onCancel();},{once:true});
+ if(staging){const footer=dialog.querySelector('.dialog-footer');footer.insertAdjacentHTML('afterbegin','<button type="button" class="primary" data-stage-bed>保存选择</button>');footer.querySelector('[data-stage-bed]').onclick=()=>{const chosen=beds.find(x=>String(x.bed_id)===selectedBedId);if(!chosen){notify('请从可分配床位列表中选择床位',true);return;}submitted=true;dialog.close();staging.onSave(chosen);};}
  const form=dialog.querySelector('form'),student=form.elements.studentId,building=form.elements.buildingFilter,room=form.elements.roomFilter,bedNo=form.elements.bedNoFilter,bed=form.elements.bedId;
  const available=()=>{const person=students.find(x=>String(x.user_id)===student.value);if(!person)return[];return beds.filter(x=>x.management_status==='AVAILABLE'&&(!x.student_id||Number(x.student_id)===Number(person.user_id))&&genderMatches(person.gender,x.gender_limit));};
  const refresh=()=>{
@@ -75,16 +82,20 @@ async function assignmentDialog(targetStudentId=null){
   const selectedNo=bedNos.includes(bedNo.value)?bedNo.value:'';
   refillSelect(bedNo,'全部床位',bedNos.map(value=>[value,value]),selectedNo);
   const choices=bedRows.filter(x=>!bedNo.value||x.bed_no===bedNo.value);
-  refillSelect(bed,'选择床位',choices.map(x=>[x.bed_id,`${x.building_name} · ${x.room_no} · ${x.bed_no}`]),choices.some(x=>String(x.bed_id)===bed.value)?bed.value:'');
+   if(!choices.some(x=>String(x.bed_id)===selectedBedId))selectedBedId='';
+   form.elements.bedId.value=selectedBedId;
+   dialog.querySelector('.bed-choice-list').innerHTML=choices.length?choices.map(x=>`<button type="button" role="option" aria-selected="${String(x.bed_id)===selectedBedId}" class="bed-choice ${String(x.bed_id)===selectedBedId?'selected':''}" data-bed-id="${x.bed_id}"><span>${esc(x.building_name)}</span><span>${esc(x.room_no)} 室</span><strong>${esc(x.bed_no)} 号床</strong></button>`).join(''):'<div class="empty">暂无符合条件的可分配床位</div>';
  };
  student.onchange=()=>{building.value='';room.value='';bedNo.value='';refresh();};
  building.onchange=()=>{room.value='';bedNo.value='';refresh();};room.onchange=()=>{bedNo.value='';refresh();};bedNo.onchange=refresh;
- student.addEventListener('change',()=>{if(!students.some(x=>String(x.user_id)===student.value))bed.value='';});
+ dialog.querySelector('.bed-choice-list').addEventListener('click',event=>{const choice=event.target.closest('[data-bed-id]');if(!choice)return;selectedBedId=choice.dataset.bedId;refresh();});
  refresh();
 }
 async function managerScopeDialog(managerId){
- const [person,buildings]=await Promise.all([api(`/admin/users/${managerId}`),api('/buildings')]);
- const dialog=modal('配置宿管负责楼栋',checkboxChoices('buildingIds',buildings.map(x=>[x.building_id,x.building_name]),person.buildingIds||[]),(data,form)=>put(`/admin/managers/${managerId}/buildings`,{buildingIds:checkedValues(form,'buildingIds')}));bindChoiceDropdown(dialog);
+ const [person,buildings,managers]=await Promise.all([api(`/admin/users/${managerId}`),api('/buildings'),api('/admin/users?roleCode=DORM_MANAGER')]);
+ const occupied=new Set(managers.filter(x=>Number(x.user_id)!==Number(managerId)).flatMap(x=>(x.manager_buildings||'').split(',').map(name=>name.trim())));
+ const choices=buildings.filter(x=>!occupied.has(x.building_name)||person.buildingIds?.map(Number).includes(Number(x.building_id)));
+ modal('配置宿管负责楼栋',select('buildingId','负责楼栋',[['','暂不分配'],...choices.map(x=>[x.building_id,x.building_name])],person.buildingIds?.[0]||'',false,false),(data)=>put(`/admin/managers/${managerId}/buildings`,data));
 }
 async function repairerScopeDialog(repairerId){
  const [person,buildings]=await Promise.all([api(`/admin/users/${repairerId}`),state.data.buildings?.length?Promise.resolve(state.data.buildings):api('/buildings')]),types=state.data.config?.workTypes||[];
@@ -134,17 +145,21 @@ function bindDetailRecords(dialog,data,homeHtml){
   body.querySelector('[data-record-back]').onclick=()=>{body.innerHTML=`<div class="user-detail-content">${homeHtml}</div>`;bindDetailRecords(dialog,data,homeHtml);};
  });
 }
-function bindAcademicEditor(dialog,academic,row){
+function bindAcademicEditor(dialog,academic,row,selected={}){
  const form=dialog.querySelector('form'),department=form.elements.departmentId,major=form.elements.majorId,grade=form.elements.grade,classId=form.elements.classId;
  const refill=(selectEl,items,placeholder,value='')=>{selectEl.innerHTML=`<option value="">${placeholder}</option>`+items.map(([id,label])=>`<option value="${esc(id)}" ${String(id)===String(value)?'selected':''}>${esc(label)}</option>`).join('');};
- const majors=()=>academic.majors.filter(x=>(x.enabled||String(x.major_id)===String(row?.major_id))&&(!department.value||Number(x.department_id)===Number(department.value)));
- const classes=()=>academic.classes.filter(x=>(x.enabled||String(x.class_id)===String(row?.class_id))&&(!major.value||Number(x.major_id)===Number(major.value))&&(!grade.value||Number(x.enrollment_year)===Number(grade.value)));
+ const majors=()=>academic.majors.filter(x=>(x.enabled||[row?.major_id,selected.majorId].map(String).includes(String(x.major_id)))&&(!department.value||Number(x.department_id)===Number(department.value)));
+ const classes=()=>academic.classes.filter(x=>(x.enabled||[row?.class_id,selected.classId].map(String).includes(String(x.class_id)))&&(!major.value||Number(x.major_id)===Number(major.value))&&(!grade.value||Number(x.enrollment_year)===Number(grade.value)));
  department.onchange=()=>{if(!majors().some(x=>String(x.major_id)===major.value))major.value='';refresh();};
  major.onchange=()=>{grade.value='';classId.value='';refresh();};
  grade.onchange=()=>{classId.value='';refresh();};
- classId.onchange=()=>{const item=academic.classes.find(x=>String(x.class_id)===classId.value);if(item){department.value=String(item.department_id);major.value=String(item.major_id);grade.value=item.enrollment_year?String(item.enrollment_year):'';refresh(classId.value);}};
+  classId.onchange=()=>{const item=academic.classes.find(x=>String(x.class_id)===classId.value);if(item){major.value=String(item.major_id);department.value=String(academic.majors.find(x=>String(x.major_id)===String(item.major_id))?.department_id||'');grade.value=item.enrollment_year?String(item.enrollment_year):'';refresh(classId.value);}};
  function refresh(selectedClass=classId.value){refill(major,majors().map(x=>[x.major_id,x.major_name]),'请选择专业',major.value);const options=classes();refill(grade,unique(options.map(x=>x.enrollment_year).filter(Boolean)).map(x=>[x,`${x}级`]),'请选择年级',grade.value);refill(classId,options.map(x=>[x.class_id,x.class_name]),'请选择班级',selectedClass);}
- refresh(row?.class_id||'');
+ if(selected.departmentId)department.value=String(selected.departmentId);
+ if(selected.majorId)major.value=String(selected.majorId);
+ if(selected.grade)grade.value=String(selected.grade);
+ if(selected.classId)classId.value=String(selected.classId);
+ refresh(selected.classId||row?.class_id||'');
 }
 export async function adminAction(action,id,b){
  if(action==='export-homes'){download('accommodation.json',state.data.homeHistory);return;}
@@ -160,10 +175,13 @@ export async function adminAction(action,id,b){
  if(action==='assign'){await assignmentDialog();return;}
  if(action==='checkout'){modal('确认退宿','',()=>post(`/admin/assignments/${id}/checkout`),'确认');return;}
  if(action==='user-new'||action==='user-edit'){
+  const draft=state.data.studentEditDraft?.userId===id?state.data.studentEditDraft.data:null;
+  if(draft)delete state.data.studentEditDraft;
   const row=state.data.users?.find(u=>String(u.user_id)===id),roleCode=state.page==='students'?'STUDENT':state.page==='managers'?'DORM_MANAGER':'REPAIRER',person=row?await api(`/admin/users/${id}`):null;
-  const account=field('account','登录账号','text',row?.login_account||'');
-  const password=field('password',row?'重置密码':'初始密码','password','',!row);
-  const personal=field('realName','姓名','text',row?.real_name||'')+select('gender','性别',[['','请选择'],['MALE','男'],['FEMALE','女'],['OTHER','其他']],row?.gender||'',false,true)+field('birthDate','生日','date',row?.birth_date||'',false)+field('phone','联系电话','tel',row?.phone||'',false);
+  const value=(key,fallback='')=>draft?.[key]??fallback;
+  const account=field('account','登录账号','text',value('account',row?.login_account||''));
+  const password=field('password',row?'重置密码':'初始密码','password',value('password',''),!row);
+  const personal=field('realName','姓名','text',value('realName',row?.real_name||''))+select('gender','性别',[['','请选择'],['MALE','男'],['FEMALE','女'],['OTHER','其他']],value('gender',row?.gender||''),false,true)+field('birthDate','生日','date',value('birthDate',row?.birth_date||''),false)+field('phone','联系电话','tel',value('phone',row?.phone||''),false);
   let roleFields='';
   if(roleCode==='STUDENT'){
    const academic=state.data.academic, departments=academic.departments.filter(x=>x.enabled||String(x.department_id)===String(row?.department_id));
@@ -175,11 +193,22 @@ export async function adminAction(action,id,b){
    if(roleCode==='DORM_MANAGER')roleFields+=check('onDuty','在岗',row?!!row.manager_on_duty:true)+checkboxChoices('buildingIds',(state.data.buildings||[]).map(x=>[x.building_id,x.building_name]),person?.buildingIds||[]);
    if(roleCode==='REPAIRER')roleFields+=check('onDuty','在岗',person?!!person.profile.on_duty:true)+field('maxActiveOrders','最大在办工单（空值为不限）','number',person?.profile.max_active_orders??'',false)+checkboxChoices('workTypeIds',(state.data.config?.workTypes||[]).map(x=>[x.work_type_id,x.work_type_name]),person?.workTypes?.map(x=>x.work_type_id)||[])+checkboxChoices('buildingIds',(state.data.buildings||[]).map(x=>[x.building_id,x.building_name]),person?.buildingIds||[]);
   }
-  const accommodationAction=roleCode==='STUDENT'&&row?'<div class="edit-extra-action"><span>住宿分配</span><button type="button" class="secondary" data-student-assign>分配/调整宿舍</button></div>':'';
-  const dialog=modal(row?'编辑人员资料':`新增${roleCode==='STUDENT'?'学生':roleCode==='DORM_MANAGER'?'宿管':'维修人员'}`,`<div class="edit-grid">${account}${personal}${roleFields}${accommodationAction}${password}</div>`,(d,form)=>{d.roleCode=roleCode;d.onDuty=!!d.onDuty;if(roleCode==='DORM_MANAGER')d.buildingIds=checkedValues(form,'buildingIds');if(roleCode==='REPAIRER'){d.workTypeIds=checkedValues(form,'workTypeIds');d.buildingIds=checkedValues(form,'buildingIds');}return row?put('/admin/users/'+id,d):post('/admin/users',d);});
+  const accommodation=person?.currentAccommodation?.[0],stagedHome=draft?.stagedAccommodation,currentHome=stagedHome?`${stagedHome.building_name} · ${stagedHome.room_no} · ${stagedHome.bed_no}（待保存）`:accommodation?`${accommodation.building_name} · ${accommodation.room_no} · ${accommodation.bed_no}`:'尚未分配';
+  const accommodationAction=roleCode==='STUDENT'?`<input type="hidden" name="bedId" value="${esc(value('bedId',''))}"><div class="edit-extra-action"><span>当前住宿：${esc(currentHome)}</span><button type="button" class="secondary" data-student-assign>分配/调整宿舍</button></div>`:'';
+  if(roleCode==='DORM_MANAGER'){
+   const assigned=await api('/admin/users?roleCode=DORM_MANAGER');
+   const occupied=new Set(assigned.filter(x=>!row||Number(x.user_id)!==Number(row.user_id)).flatMap(x=>(x.manager_buildings||'').split(',').map(name=>name.trim())));
+   const availableBuildings=(state.data.buildings||[]).filter(x=>!occupied.has(x.building_name)||person?.buildingIds?.map(Number).includes(Number(x.building_id)));
+   roleFields=field('employeeNo','工号','text',row?.employee_no||'')+field('hireDate','入职时间','date',row?.hire_date||'',false)+check('onDuty','在岗',row?!!row.manager_on_duty:true)+select('buildingId','负责楼栋',[['','暂不分配'],...availableBuildings.map(x=>[x.building_id,x.building_name])],person?.buildingIds?.[0]||'',false,false);
+  }
+  const editGridClass=roleCode==='STUDENT'?'edit-grid student-edit-grid':'edit-grid';
+  const dialog=modal(row?'编辑人员资料':`新增${roleCode==='STUDENT'?'学生':roleCode==='DORM_MANAGER'?'宿管':'维修人员'}`,`<div class="${editGridClass}">${account}${password}${personal}${roleFields}${accommodationAction}</div>`,(d,form)=>{d.roleCode=roleCode;d.onDuty=!!d.onDuty;if(roleCode==='REPAIRER'){d.workTypeIds=checkedValues(form,'workTypeIds');d.buildingIds=checkedValues(form,'buildingIds');}return row?put('/admin/users/'+id,d):post('/admin/users',d);});
   bindChoiceDropdown(dialog);
-  const assignButton=dialog.querySelector('[data-student-assign]');if(assignButton)assignButton.onclick=async()=>{dialog.close();await assignmentDialog(Number(id));};
-  if(roleCode==='STUDENT')bindAcademicEditor(dialog,state.data.academic,row);
+  const assignButton=dialog.querySelector('[data-student-assign]');if(assignButton)assignButton.onclick=async()=>{const form=dialog.querySelector('form');if(!form.reportValidity())return;const draftData={...Object.fromEntries(new FormData(form)),stagedAccommodation:draft?.stagedAccommodation||null};state.data.studentEditDraft={userId:id,data:draftData};dialog.close();await assignmentDialog(row?Number(id):null,()=>adminAction('user-edit',id,{dataset:{}}),{userId:row?Number(id):'draft',bedId:draftData.bedId,student:{student_no:draftData.studentNo,real_name:draftData.realName,gender:draftData.gender},onSave:chosen=>{state.data.studentEditDraft={userId:id,data:{...draftData,bedId:String(chosen.bed_id),stagedAccommodation:chosen}};adminAction('user-edit',id,{dataset:{}});}});};
+  if(roleCode==='STUDENT')bindAcademicEditor(dialog,state.data.academic,row,{departmentId:draft?.departmentId,majorId:draft?.majorId,grade:draft?.grade,classId:draft?.classId});
+  if(draft){for(const [key,val] of Object.entries(draft)){const input=dialog.querySelector(`[name="${key}"]`);if(input&&input.type!=='checkbox')input.value=val;}}
+  const numberField=dialog.querySelector('[name="studentNo"]');if(numberField){numberField.inputMode='numeric';numberField.pattern='[0-9]{10}';numberField.minLength=10;numberField.maxLength=10;numberField.title='固定为10位数字';}
+  const employeeField=dialog.querySelector('[name="employeeNo"]');if(employeeField){const prefix=roleCode==='DORM_MANAGER'?'DM':roleCode==='REPAIRER'?'RP':'SA';employeeField.pattern=`${prefix}[0-9]{6}`;employeeField.minLength=8;employeeField.maxLength=8;employeeField.title=`格式：${prefix}加6位数字`;}
   return;
  }
  if(action==='user-detail'){const d=await api(`/admin/users/${id}`);let html=factGrid([['登录账号',d.login_account],['姓名',d.real_name],['角色',roleLabels[d.role_code]],['联系电话',d.phone],['性别',({MALE:'男',FEMALE:'女',OTHER:'其他'})[d.gender]||'未填写'],['生日',d.birth_date],...(d.role_code==='STUDENT'?[['学号',d.student_no],['学院',d.department_name],['专业',d.major_name],['年级',d.grade],['班级',d.class_name],['入学年份',d.enrollment_year],['学籍状态',({ENROLLED:'在读',SUSPENDED:'休学',GRADUATED:'毕业',WITHDRAWN:'退学',UNKNOWN:'未登记'})[d.enrollment_status]||'未登记']]:[['工号',d.employee_no],['入职时间',d.hire_date]]),['账号状态',Number(d.enabled)?'启用':'停用'],['账号创建时间',d.account_created_at||d.created_at],['资料更新时间',d.updated_at]]);

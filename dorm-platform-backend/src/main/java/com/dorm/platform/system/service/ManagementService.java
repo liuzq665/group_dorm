@@ -143,7 +143,7 @@ public class ManagementService {
    case "ADMIN"->{
     String employeeNo=b.containsKey("employeeNo")?text(b,"employeeNo"):Objects.toString(current.get("employee_no"),"");
     Object hireDate=b.containsKey("hireDate")?nullableDate(b,"hireDate"):current.get("hire_date");
-    require(employeeNo.length()<=40,"工号最多40位");
+    require(employeeNo.matches("SA\\d{6}"),"管理员工号格式为SA加6位数字");
     require(employeeNo.isBlank()||employeeNumberAvailable("ADMIN",employeeNo,u.id()),"工号已存在");
     db.update("UPDATE system_admin_profile SET phone=?,admin_name=?,gender=?,birth_date=?,employee_no=?,hire_date=? WHERE admin_user_id=?",phone.isBlank()?null:phone,name,emptyNull(gender),birthDate,emptyNull(employeeNo),hireDate,u.id());
    }
@@ -159,8 +159,9 @@ public class ManagementService {
    String name=required(b,"realName"),studentNo=roleCode.equals("STUDENT")?text(b,"studentNo"):null;
    String employeeNo=roleCode.equals("STUDENT")?"":text(b,"employeeNo"),gender=text(b,"gender");
    require(gender.isBlank()||Set.of("MALE","FEMALE","OTHER").contains(gender),"性别无效");
-   require(studentNo==null||studentNo.length()<=30,"学号最多30位");
-   require(employeeNo.length()<=40,"工号最多40位");
+   require(studentNo==null||studentNo.isBlank()||studentNo.matches("\\d{10}"),"学号必须为10位数字");
+   String employeePattern=switch(roleCode){case "DORM_MANAGER"->"DM\\d{6}";case "REPAIRER"->"RP\\d{6}";case "ADMIN"->"SA\\d{6}";default->"";};
+   require(employeeNo.isBlank()||employeePattern.isEmpty()||employeeNo.matches(employeePattern),roleCode.equals("DORM_MANAGER")?"宿管工号格式为DM加6位数字":roleCode.equals("REPAIRER")?"维修人员工号格式为RP加6位数字":"管理员工号格式为SA加6位数字");
    String enrollmentStatus=text(b,"enrollmentStatus");
    if(roleCode.equals("STUDENT")){
     require(!studentNo.isBlank(),"学号不能为空");
@@ -213,7 +214,7 @@ public class ManagementService {
     }
    }
    if(roleCode.equals("STUDENT")&&!text(b,"bedId").isBlank())assign(u,Map.of("studentId",user,"bedId",id(b.get("bedId"))));
-   if(roleCode.equals("DORM_MANAGER")&&b.containsKey("buildingIds"))managerScope(u,user,Map.of("buildingIds",b.get("buildingIds")));
+   if(roleCode.equals("DORM_MANAGER")&&b.containsKey("buildingId"))managerScope(u,user,Map.of("buildingId",b.get("buildingId")));
    if(roleCode.equals("REPAIRER")&&(b.containsKey("buildingIds")||b.containsKey("workTypeIds"))){var settings=new HashMap<String,Object>(b);if(!settings.containsKey("onDuty"))settings.put("onDuty",true);worker(u,user,settings);}
    db.log(u.id(),"auth",userId==null?"create":"update",user);
    return user;
@@ -303,12 +304,17 @@ public class ManagementService {
  }
  public Map<String,Object> config(CurrentUser u){role(u,"ADMIN");var workers=db.rows("SELECT repairer_user_id,employee_no,repairer_name real_name,on_duty,max_active_orders FROM v_repairer_profile ORDER BY repairer_user_id");for(var w:workers){w.put("workTypeIds",db.rows("SELECT work_type_id FROM repairer_work_type WHERE repairer_user_id=?",w.get("repairer_user_id")).stream().map(x->x.get("work_type_id")).toList());w.put("buildingIds",db.rows("SELECT building_id FROM repairer_building_scope WHERE repairer_user_id=?",w.get("repairer_user_id")).stream().map(x->x.get("building_id")).toList());}return Map.of("rule",db.one("SELECT * FROM repair_rule ORDER BY rule_id DESC LIMIT 1"),"workers",workers,"categories",db.rows("SELECT * FROM fault_category"),"workTypes",db.rows("SELECT * FROM repair_work_type"));}
  @Transactional public void saveRule(CurrentUser u,Map<String,Object>b){role(u,"ADMIN");for(String key:List.of("accept_minutes","normal_minutes","urgent_minutes","confirm_days","edit_days"))require(id(b.get(key))>0,"时限必须大于0");Object max=text(b,"max_rework_count").isBlank()?null:id(b.get("max_rework_count"));require(max==null||id(max)>=0,"重修次数不能小于0");long n=db.insert("INSERT INTO repair_rule(accept_minutes,normal_minutes,urgent_minutes,confirm_days,edit_days,max_rework_count) VALUES(?,?,?,?,?,?)",id(b.get("accept_minutes")),id(b.get("normal_minutes")),id(b.get("urgent_minutes")),id(b.get("confirm_days")),id(b.get("edit_days")),max);db.log(u.id(),"repair","rule_version",n);}
- @Transactional public void managerScope(CurrentUser u,long manager,Map<String,Object>b){
-  role(u,"ADMIN");db.one("SELECT manager_user_id FROM dorm_manager_profile WHERE manager_user_id=? FOR UPDATE",manager);
-  db.update("DELETE FROM manager_building_scope WHERE manager_user_id=?",manager);
-  for(Object v:(b.get("buildingIds") instanceof List<?> a?a:List.of()))db.update("INSERT INTO manager_building_scope(manager_user_id,building_id) VALUES(?,?)",manager,id(v));
-  db.log(u.id(),"dorm","manager_scope",manager);
- }
+  @Transactional public void managerScope(CurrentUser u,long manager,Map<String,Object>b){
+   role(u,"ADMIN");db.one("SELECT manager_user_id FROM dorm_manager_profile WHERE manager_user_id=? FOR UPDATE",manager);
+   String raw=text(b,"buildingId").trim();Long building=raw.isEmpty()?null:id(raw);
+   if(building!=null){
+    require(db.count("SELECT COUNT(*) FROM building WHERE building_id=?",building)==1,"楼栋不存在");
+    require(db.count("SELECT COUNT(*) FROM manager_building_scope WHERE building_id=? AND manager_user_id<>?",building,manager)==0,"该楼栋已由其他宿管负责");
+   }
+   db.update("DELETE FROM manager_building_scope WHERE manager_user_id=?",manager);
+   if(building!=null)db.update("INSERT INTO manager_building_scope(manager_user_id,building_id) VALUES(?,?)",manager,building);
+   db.log(u.id(),"dorm","manager_scope",manager);
+  }
  @Transactional public void worker(CurrentUser u,long worker,Map<String,Object>b){role(u,"ADMIN");db.one("SELECT repairer_user_id FROM repairer_profile WHERE repairer_user_id=? FOR UPDATE",worker);Object max=text(b,"maxActiveOrders").isBlank()?null:id(b.get("maxActiveOrders"));require(max==null||id(max)>0,"最大在办数必须大于0");db.update("UPDATE repairer_profile SET on_duty=?,max_active_orders=? WHERE repairer_user_id=?",flag(b,"onDuty"),max,worker);db.update("DELETE FROM repairer_work_type WHERE repairer_user_id=?",worker);db.update("DELETE FROM repairer_building_scope WHERE repairer_user_id=?",worker);for(Object v:(b.get("workTypeIds") instanceof List<?> a?a:List.of()))db.update("INSERT INTO repairer_work_type(repairer_user_id,work_type_id) VALUES(?,?)",worker,id(v));for(Object v:(b.get("buildingIds") instanceof List<?> a?a:List.of()))db.update("INSERT INTO repairer_building_scope(repairer_user_id,building_id) VALUES(?,?)",worker,id(v));db.log(u.id(),"repair","worker_scope",worker);}
  @Transactional public void dictionary(CurrentUser u,String type,Long n,Map<String,Object>b){role(u,"ADMIN");if(type.equals("work-types")){if(n==null)db.update("INSERT INTO repair_work_type(work_type_code,work_type_name) VALUES(?,?)",required(b,"code"),required(b,"name"));else db.update("UPDATE repair_work_type SET work_type_name=?,enabled=? WHERE work_type_id=?",required(b,"name"),flag(b,"enabled"),n);}else if(type.equals("categories")){if(n==null)db.update("INSERT INTO fault_category(work_type_id,category_name) VALUES(?,?)",id(b.get("workTypeId")),required(b,"name"));else db.update("UPDATE fault_category SET category_name=?,work_type_id=?,enabled=? WHERE category_id=?",required(b,"name"),id(b.get("workTypeId")),flag(b,"enabled"),n);}else throw new BizException(404,"未知字典");db.log(u.id(),"repair",type,n==null?0:n);}
  public List<Map<String,Object>> logs(CurrentUser u){role(u,"ADMIN");return db.rows("SELECT l.*,u.real_name FROM operation_log l LEFT JOIN v_user_identity u ON u.user_id=l.operator_user_id ORDER BY log_id DESC LIMIT 500");}
