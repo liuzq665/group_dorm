@@ -221,7 +221,7 @@ CREATE TABLE `dorm_manager_profile` (
   UNIQUE KEY `uk_dorm_manager_employee_no` (`employee_no`),
   CONSTRAINT `fk_dorm_manager_person` FOREIGN KEY (`manager_user_id`) REFERENCES `person` (`person_id`),
   CONSTRAINT `chk_dorm_manager_enabled` CHECK ((`enabled` in (0,1))),
-  CONSTRAINT `chk_dorm_manager_gender` CHECK (((`gender` is null) or (`gender` in (_utf8mb4'MALE',_utf8mb4'FEMALE',_utf8mb4'OTHER')))),
+  CONSTRAINT `chk_dorm_manager_gender` CHECK (((`gender` is null) or (`gender` in (_utf8mb4'MALE',_utf8mb4'FEMALE')))),
   CONSTRAINT `chk_dorm_manager_on_duty` CHECK ((`on_duty` in (0,1)))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1073,7 +1073,7 @@ CREATE TABLE `repairer_profile` (
   UNIQUE KEY `uk_repairer_employee_no` (`employee_no`),
   CONSTRAINT `fk_repairer_person` FOREIGN KEY (`repairer_user_id`) REFERENCES `person` (`person_id`),
   CONSTRAINT `chk_repairer_enabled` CHECK ((`enabled` in (0,1))),
-  CONSTRAINT `chk_repairer_gender` CHECK (((`gender` is null) or (`gender` in (_utf8mb4'MALE',_utf8mb4'FEMALE',_utf8mb4'OTHER'))))
+  CONSTRAINT `chk_repairer_gender` CHECK (((`gender` is null) or (`gender` in (_utf8mb4'MALE',_utf8mb4'FEMALE'))))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1134,7 +1134,7 @@ CREATE TABLE `schema_version` (
 
 LOCK TABLES `schema_version` WRITE;
 /*!40000 ALTER TABLE `schema_version` DISABLE KEYS */;
-INSERT INTO `schema_version` (`version_no`, `installed_at`) VALUES (1,'2026-10-15 09:28:07'),(2,'2026-10-15 09:28:07'),(3,'2026-10-15 09:28:07'),(4,'2026-10-15 10:29:55'),(5,'2026-10-29 16:41:39'),(6,'2026-10-29 17:40:57'),(7,'2026-10-29 18:53:11'),(8,'2026-10-29 19:53:27'),(9,'2026-10-29 19:53:36');
+INSERT INTO `schema_version` (`version_no`, `installed_at`) VALUES (1,'2026-10-15 09:28:07'),(2,'2026-10-15 09:28:07'),(3,'2026-10-15 09:28:07'),(4,'2026-10-15 10:29:55'),(5,'2026-10-29 16:41:39'),(6,'2026-10-29 17:40:57'),(7,'2026-10-29 18:53:11'),(8,'2026-10-29 19:53:27'),(9,'2026-10-29 19:53:36'),(10,'2026-10-30 15:50:00');
 /*!40000 ALTER TABLE `schema_version` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1392,7 +1392,7 @@ CREATE TABLE `student` (
   CONSTRAINT `fk_student_person` FOREIGN KEY (`student_id`) REFERENCES `person` (`person_id`),
   CONSTRAINT `chk_student_enabled` CHECK ((`enabled` in (0,1))),
   CONSTRAINT `chk_student_enrollment_status` CHECK ((`enrollment_status` in (_utf8mb4'ENROLLED',_utf8mb4'SUSPENDED',_utf8mb4'GRADUATED',_utf8mb4'WITHDRAWN',_utf8mb4'UNKNOWN'))),
-  CONSTRAINT `chk_student_gender` CHECK (((`gender` is null) or (`gender` in (_utf8mb4'MALE',_utf8mb4'FEMALE',_utf8mb4'OTHER'))))
+  CONSTRAINT `chk_student_gender` CHECK (((`gender` is null) or (`gender` in (_utf8mb4'MALE',_utf8mb4'FEMALE'))))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1466,7 +1466,7 @@ CREATE TABLE `system_admin_profile` (
   UNIQUE KEY `uk_system_admin_employee_no` (`employee_no`),
   CONSTRAINT `fk_system_admin_person` FOREIGN KEY (`admin_user_id`) REFERENCES `person` (`person_id`),
   CONSTRAINT `chk_system_admin_enabled` CHECK ((`enabled` in (0,1))),
-  CONSTRAINT `chk_system_admin_gender` CHECK (((`gender` is null) or (`gender` in (_utf8mb4'MALE',_utf8mb4'FEMALE',_utf8mb4'OTHER'))))
+  CONSTRAINT `chk_system_admin_gender` CHECK (((`gender` is null) or (`gender` in (_utf8mb4'MALE',_utf8mb4'FEMALE'))))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1476,7 +1476,7 @@ CREATE TABLE `system_admin_profile` (
 
 LOCK TABLES `system_admin_profile` WRITE;
 /*!40000 ALTER TABLE `system_admin_profile` DISABLE KEYS */;
-INSERT INTO `system_admin_profile` (`admin_user_id`, `login_account`, `password_hash`, `phone`, `enabled`, `employee_no`, `admin_name`, `gender`, `birth_date`, `hire_date`, `created_at`, `updated_at`) VALUES (4,'admin','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000004',1,'SA000004','系统管理员','OTHER','1988-08-08','2017-07-01','2026-10-15 07:58:05','2026-10-29 19:53:36');
+INSERT INTO `system_admin_profile` (`admin_user_id`, `login_account`, `password_hash`, `phone`, `enabled`, `employee_no`, `admin_name`, `gender`, `birth_date`, `hire_date`, `created_at`, `updated_at`) VALUES (4,'admin','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','13800000004',1,'SA000004','系统管理员',NULL,'1988-08-08','2017-07-01','2026-10-15 07:58:05','2026-10-29 19:53:36');
 /*!40000 ALTER TABLE `system_admin_profile` ENABLE KEYS */;
 UNLOCK TABLES;
 

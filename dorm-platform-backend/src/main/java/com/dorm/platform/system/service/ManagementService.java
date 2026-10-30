@@ -131,21 +131,18 @@ public class ManagementService {
  }
  @Transactional public void profile(CurrentUser u,Map<String,Object>b){
   Map<String,Object> current=profile(u);
-  String phone=text(b,"phone");require(phone.isBlank()||phone.matches("[+0-9 -]{5,30}"),"联系方式格式不正确");
+  String phone=contact(b,"phone");
   String name=text(b,"realName");if(name.isBlank())name=Objects.toString(current.get("real_name"),"");
   String gender=b.containsKey("gender")?text(b,"gender"):Objects.toString(current.get("gender"),"");
-  require(gender.isBlank()||Set.of("MALE","FEMALE","OTHER").contains(gender),"性别无效");
+  require(gender.isBlank()||Set.of("MALE","FEMALE").contains(gender),"性别无效");
   Object birthDate=b.containsKey("birthDate")?nullableDate(b,"birthDate"):current.get("birth_date");
   switch(u.role()){
    case "STUDENT"->db.update("UPDATE student SET phone=?,student_name=?,gender=?,birth_date=? WHERE student_id=?",phone.isBlank()?null:phone,name,emptyNull(gender),birthDate,u.id());
    case "DORM_MANAGER"->db.update("UPDATE dorm_manager_profile SET phone=?,manager_name=?,gender=?,birth_date=? WHERE manager_user_id=?",phone.isBlank()?null:phone,name,emptyNull(gender),birthDate,u.id());
    case "REPAIRER"->db.update("UPDATE repairer_profile SET phone=?,repairer_name=?,gender=?,birth_date=? WHERE repairer_user_id=?",phone.isBlank()?null:phone,name,emptyNull(gender),birthDate,u.id());
    case "ADMIN"->{
-    String employeeNo=b.containsKey("employeeNo")?text(b,"employeeNo"):Objects.toString(current.get("employee_no"),"");
     Object hireDate=b.containsKey("hireDate")?nullableDate(b,"hireDate"):current.get("hire_date");
-    require(employeeNo.length()<=40,"工号最多40位");
-    require(employeeNo.isBlank()||employeeNumberAvailable("ADMIN",employeeNo,u.id()),"工号已存在");
-    db.update("UPDATE system_admin_profile SET phone=?,admin_name=?,gender=?,birth_date=?,employee_no=?,hire_date=? WHERE admin_user_id=?",phone.isBlank()?null:phone,name,emptyNull(gender),birthDate,emptyNull(employeeNo),hireDate,u.id());
+    db.update("UPDATE system_admin_profile SET phone=?,admin_name=?,gender=?,birth_date=?,hire_date=? WHERE admin_user_id=?",phone.isBlank()?null:phone,name,emptyNull(gender),birthDate,hireDate,u.id());
    }
    default->throw BizException.forbidden();
   }
@@ -156,56 +153,49 @@ public class ManagementService {
    role(u,"ADMIN");
    String roleCode=required(b,"roleCode");
    require(Set.of("STUDENT","DORM_MANAGER","REPAIRER","ADMIN").contains(roleCode),"角色无效");
-   String name=required(b,"realName"),studentNo=roleCode.equals("STUDENT")?text(b,"studentNo"):null;
-   String employeeNo=roleCode.equals("STUDENT")?"":text(b,"employeeNo"),gender=text(b,"gender");
-   require(gender.isBlank()||Set.of("MALE","FEMALE","OTHER").contains(gender),"性别无效");
-   require(studentNo==null||studentNo.length()<=30,"学号最多30位");
-   require(employeeNo.length()<=40,"工号最多40位");
+   String name=required(b,"realName"),gender=text(b,"gender");
+   require(gender.isBlank()||Set.of("MALE","FEMALE").contains(gender),"性别无效");
    String enrollmentStatus=text(b,"enrollmentStatus");
    if(roleCode.equals("STUDENT")){
-    require(!studentNo.isBlank(),"学号不能为空");
     if(enrollmentStatus.isBlank())enrollmentStatus="ENROLLED";
     require(Set.of("ENROLLED","SUSPENDED","GRADUATED","WITHDRAWN","UNKNOWN").contains(enrollmentStatus),"学籍状态无效");
    }
-   String phone=text(b,"phone"),account=required(b,"account");
-   require(phone.isBlank()||phone.matches("[+0-9 -]{5,30}"),"联系方式格式不正确");
+   String phone=contact(b,"phone"),account=required(b,"account");
    require(account.length()<=60,"账号最多60位");
    Object birthDate=nullableDate(b,"birthDate");
    long user;
    if(userId==null){
     String password=required(b,"password");
     require(password.length()>=6&&password.length()<=100,"密码长度必须为6到100位");
-    if(!roleCode.equals("STUDENT"))require(!employeeNo.isBlank(),"工号不能为空");
     require(db.count("SELECT COUNT(*) FROM v_user_identity WHERE login_account=?",account)==0,"账号已存在");
-    if(studentNo!=null)require(db.count("SELECT COUNT(*) FROM student WHERE student_no=?",studentNo)==0,"学号已存在");
-    require(employeeNo.isBlank()||employeeNumberAvailable(roleCode,employeeNo,null),"工号已存在");
     user=db.insert("INSERT INTO person() VALUES ()");
-    createRoleProfile(roleCode,user,b,name,studentNo,employeeNo,gender,birthDate,enrollmentStatus,account,AuthService.sha256(password),emptyNull(phone));
+    String identityNo=generatedIdentityNumber(roleCode,user,b.get("classId"));
+    require(identityNumberAvailable(roleCode,identityNo),"编号生成冲突，请重试");
+    createRoleProfile(roleCode,user,b,name,identityNo,gender,birthDate,enrollmentStatus,account,AuthService.sha256(password),emptyNull(phone));
    }else{
     user=userId;
     db.one("SELECT person_id FROM person WHERE person_id=? FOR UPDATE",user);
     var old=db.one("SELECT * FROM v_user_identity WHERE user_id=?",user);
     require(roleCode.equals(old.get("role_code")),"不能通过角色资料修改人员角色");
     Map<String,Object> oldProfile=profileByRole(roleCode,user);
+    String identityNo=Objects.toString(roleCode.equals("STUDENT")?oldProfile.get("student_no"):oldProfile.get("employee_no"),"").trim();
+    require(!identityNo.isBlank(),"编号缺失，请联系系统维护人员");
+    requireIdentityUnchanged(b,roleCode,identityNo);
     if(account.isBlank())account=text(old,"login_account");
     require(db.count("SELECT COUNT(*) FROM v_user_identity WHERE login_account=? AND user_id<>?",account,user)==0,"账号已存在");
-    require(studentNo==null||studentNo.isBlank()||db.count("SELECT COUNT(*) FROM student WHERE student_no=? AND student_id<>?",studentNo,user)==0,"学号已存在");
-    require(employeeNo.isBlank()||employeeNumberAvailable(roleCode,employeeNo,user),"工号已存在");
     String profileGender=b.containsKey("gender")?gender:Objects.toString(oldProfile.get("gender"),"");
     Object profileBirthDate=b.containsKey("birthDate")?birthDate:oldProfile.get("birth_date");
     switch(roleCode){
      case "STUDENT"->{
-      String number=studentNo.isBlank()?Objects.toString(oldProfile.get("student_no"),""):studentNo;
-      require(!number.isBlank(),"学号不能为空");
       Object classId=b.containsKey("classId")?nullableId(b,"classId"):oldProfile.get("class_id");
       validateClass(classId,oldProfile.get("class_id"));
       if(enrollmentStatus.isBlank())enrollmentStatus=Objects.toString(oldProfile.get("enrollment_status"),"UNKNOWN");
       require(Set.of("ENROLLED","SUSPENDED","GRADUATED","WITHDRAWN","UNKNOWN").contains(enrollmentStatus),"学籍状态无效");
-      db.update("UPDATE student SET login_account=?,phone=?,student_no=?,student_name=?,gender=?,birth_date=?,class_id=?,enrollment_status=? WHERE student_id=?",account,emptyNull(phone),number,name,emptyNull(profileGender),profileBirthDate,classId,enrollmentStatus,user);
+      db.update("UPDATE student SET login_account=?,phone=?,student_no=?,student_name=?,gender=?,birth_date=?,class_id=?,enrollment_status=? WHERE student_id=?",account,emptyNull(phone),identityNo,name,emptyNull(profileGender),profileBirthDate,classId,enrollmentStatus,user);
      }
-     case "DORM_MANAGER"->db.update("UPDATE dorm_manager_profile SET login_account=?,phone=?,employee_no=?,manager_name=?,gender=?,birth_date=?,hire_date=?,on_duty=? WHERE manager_user_id=?",account,emptyNull(phone),employeeNo.isBlank()?oldProfile.get("employee_no"):employeeNo,name,emptyNull(profileGender),profileBirthDate,b.containsKey("hireDate")?nullableDate(b,"hireDate"):oldProfile.get("hire_date"),b.containsKey("onDuty")?flag(b,"onDuty"):oldProfile.get("on_duty"),user);
-     case "REPAIRER"->db.update("UPDATE repairer_profile SET login_account=?,phone=?,employee_no=?,repairer_name=?,gender=?,birth_date=?,hire_date=? WHERE repairer_user_id=?",account,emptyNull(phone),employeeNo.isBlank()?oldProfile.get("employee_no"):employeeNo,name,emptyNull(profileGender),profileBirthDate,b.containsKey("hireDate")?nullableDate(b,"hireDate"):oldProfile.get("hire_date"),user);
-     case "ADMIN"->db.update("UPDATE system_admin_profile SET login_account=?,phone=?,employee_no=?,admin_name=?,gender=?,birth_date=?,hire_date=? WHERE admin_user_id=?",account,emptyNull(phone),employeeNo.isBlank()?oldProfile.get("employee_no"):employeeNo,name,emptyNull(profileGender),profileBirthDate,b.containsKey("hireDate")?nullableDate(b,"hireDate"):oldProfile.get("hire_date"),user);
+     case "DORM_MANAGER"->db.update("UPDATE dorm_manager_profile SET login_account=?,phone=?,employee_no=?,manager_name=?,gender=?,birth_date=?,hire_date=?,on_duty=? WHERE manager_user_id=?",account,emptyNull(phone),identityNo,name,emptyNull(profileGender),profileBirthDate,b.containsKey("hireDate")?nullableDate(b,"hireDate"):oldProfile.get("hire_date"),b.containsKey("onDuty")?flag(b,"onDuty"):oldProfile.get("on_duty"),user);
+     case "REPAIRER"->db.update("UPDATE repairer_profile SET login_account=?,phone=?,employee_no=?,repairer_name=?,gender=?,birth_date=?,hire_date=? WHERE repairer_user_id=?",account,emptyNull(phone),identityNo,name,emptyNull(profileGender),profileBirthDate,b.containsKey("hireDate")?nullableDate(b,"hireDate"):oldProfile.get("hire_date"),user);
+     case "ADMIN"->db.update("UPDATE system_admin_profile SET login_account=?,phone=?,employee_no=?,admin_name=?,gender=?,birth_date=?,hire_date=? WHERE admin_user_id=?",account,emptyNull(phone),identityNo,name,emptyNull(profileGender),profileBirthDate,b.containsKey("hireDate")?nullableDate(b,"hireDate"):oldProfile.get("hire_date"),user);
     }
     if(!text(b,"password").isBlank()){
      require(text(b,"password").length()>=6&&text(b,"password").length()<=100,"密码长度必须为6到100位");
@@ -218,21 +208,47 @@ public class ManagementService {
    db.log(u.id(),"auth",userId==null?"create":"update",user);
    return user;
   }
-  private void createRoleProfile(String roleCode,long user,Map<String,Object>b,String name,String studentNo,String employeeNo,String gender,Object birthDate,String enrollmentStatus,String account,String passwordHash,Object phone){
+  private void createRoleProfile(String roleCode,long user,Map<String,Object>b,String name,String identityNo,String gender,Object birthDate,String enrollmentStatus,String account,String passwordHash,Object phone){
    switch(roleCode){
-    case "STUDENT"->{Object classId=nullableId(b,"classId");validateClass(classId);db.update("INSERT INTO student(student_id,login_account,password_hash,phone,enabled,student_no,student_name,gender,birth_date,class_id,enrollment_status) VALUES(?,?,?,?,1,?,?,?,?,?,?)",user,account,passwordHash,phone,studentNo,name,emptyNull(gender),birthDate,classId,enrollmentStatus);}
-    case "DORM_MANAGER"->db.update("INSERT INTO dorm_manager_profile(manager_user_id,login_account,password_hash,phone,enabled,employee_no,manager_name,gender,birth_date,hire_date,on_duty) VALUES(?,?,?,?,1,?,?,?,?,?,?)",user,account,passwordHash,phone,emptyNull(employeeNo),name,emptyNull(gender),nullableDate(b,"birthDate"),nullableDate(b,"hireDate"),b.containsKey("onDuty")?flag(b,"onDuty"):true);
-    case "REPAIRER"->db.update("INSERT INTO repairer_profile(repairer_user_id,login_account,password_hash,phone,enabled,employee_no,repairer_name,gender,birth_date,hire_date,on_duty) VALUES(?,?,?,?,1,?,?,?,?,?,?)",user,account,passwordHash,phone,emptyNull(employeeNo),name,emptyNull(gender),nullableDate(b,"birthDate"),nullableDate(b,"hireDate"),b.containsKey("onDuty")?flag(b,"onDuty"):true);
-    case "ADMIN"->db.update("INSERT INTO system_admin_profile(admin_user_id,login_account,password_hash,phone,enabled,employee_no,admin_name,gender,birth_date,hire_date) VALUES(?,?,?,?,1,?,?,?,?,?)",user,account,passwordHash,phone,emptyNull(employeeNo),name,emptyNull(gender),nullableDate(b,"birthDate"),nullableDate(b,"hireDate"));
+    case "STUDENT"->{Object classId=nullableId(b,"classId");validateClass(classId);db.update("INSERT INTO student(student_id,login_account,password_hash,phone,enabled,student_no,student_name,gender,birth_date,class_id,enrollment_status) VALUES(?,?,?,?,1,?,?,?,?,?,?)",user,account,passwordHash,phone,identityNo,name,emptyNull(gender),birthDate,classId,enrollmentStatus);}
+    case "DORM_MANAGER"->db.update("INSERT INTO dorm_manager_profile(manager_user_id,login_account,password_hash,phone,enabled,employee_no,manager_name,gender,birth_date,hire_date,on_duty) VALUES(?,?,?,?,1,?,?,?,?,?,?)",user,account,passwordHash,phone,identityNo,name,emptyNull(gender),nullableDate(b,"birthDate"),nullableDate(b,"hireDate"),b.containsKey("onDuty")?flag(b,"onDuty"):true);
+    case "REPAIRER"->db.update("INSERT INTO repairer_profile(repairer_user_id,login_account,password_hash,phone,enabled,employee_no,repairer_name,gender,birth_date,hire_date,on_duty) VALUES(?,?,?,?,1,?,?,?,?,?,?)",user,account,passwordHash,phone,identityNo,name,emptyNull(gender),nullableDate(b,"birthDate"),nullableDate(b,"hireDate"),b.containsKey("onDuty")?flag(b,"onDuty"):true);
+    case "ADMIN"->db.update("INSERT INTO system_admin_profile(admin_user_id,login_account,password_hash,phone,enabled,employee_no,admin_name,gender,birth_date,hire_date) VALUES(?,?,?,?,1,?,?,?,?,?)",user,account,passwordHash,phone,identityNo,name,emptyNull(gender),nullableDate(b,"birthDate"),nullableDate(b,"hireDate"));
    }
   }
  private Map<String,Object> profileByRole(String roleCode,long user){return switch(roleCode){case "STUDENT"->db.one("SELECT * FROM student WHERE student_id=?",user);case "DORM_MANAGER"->db.one("SELECT * FROM dorm_manager_profile WHERE manager_user_id=?",user);case "REPAIRER"->db.one("SELECT * FROM repairer_profile WHERE repairer_user_id=?",user);case "ADMIN"->db.one("SELECT * FROM system_admin_profile WHERE admin_user_id=?",user);default->throw BizException.forbidden();};}
- private boolean employeeNumberAvailable(String roleCode,String employeeNo,Long user){
-  long excluded=user==null?0:user;
-  long managerExcluded=roleCode.equals("DORM_MANAGER")?excluded:-1;
-  long repairerExcluded=roleCode.equals("REPAIRER")?excluded:-1;
-  long adminExcluded=roleCode.equals("ADMIN")?excluded:-1;
-  return db.count("SELECT (SELECT COUNT(*) FROM dorm_manager_profile WHERE employee_no=? AND manager_user_id<>?)+(SELECT COUNT(*) FROM repairer_profile WHERE employee_no=? AND repairer_user_id<>?)+(SELECT COUNT(*) FROM system_admin_profile WHERE employee_no=? AND admin_user_id<>?)",employeeNo,managerExcluded,employeeNo,repairerExcluded,employeeNo,adminExcluded)==0;
+ /** 学号/工号预览：按库内人员主键自增值生成固定格式编号，供新增页面只读展示。 */
+ public Map<String,Object> nextIdentityNumber(CurrentUser u,String roleCode,String classId){
+  role(u,"ADMIN");
+  require(Set.of("STUDENT","DORM_MANAGER","REPAIRER","ADMIN").contains(roleCode),"角色无效");
+  long next=nextPersonId();
+  String number=generatedIdentityNumber(roleCode,next,classId);
+  return Map.of("roleCode",roleCode,"number",number,"label",roleCode.equals("STUDENT")?"学号":"工号");
+ }
+ private long nextPersonId(){
+  var rows=db.rows("SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='person'");
+  Object auto=rows.isEmpty()?null:rows.get(0).get("AUTO_INCREMENT");
+  if(auto instanceof Number number&&number.longValue()>0)return number.longValue();
+  return db.count("SELECT COALESCE(MAX(person_id),0)+1 FROM person");
+ }
+ /** 硬格式：学生为“入学年份+6位人员序号”，教职工为“角色前缀(DM/RP/SA)+6位人员序号”。 */
+ private String generatedIdentityNumber(String roleCode,long user,Object classId){
+  if(roleCode.equals("STUDENT"))return String.format("%d%06d",enrollmentYear(classId),user);
+  return employeePrefix(roleCode)+String.format("%06d",user);
+ }
+ private String employeePrefix(String roleCode){return switch(roleCode){case "DORM_MANAGER"->"DM";case "REPAIRER"->"RP";case "ADMIN"->"SA";default->throw new BizException(400,"角色无效");};}
+ private int enrollmentYear(Object classId){
+  if(classId==null||Objects.toString(classId,"").isBlank())return Year.now().getValue();
+  var rows=db.rows("SELECT enrollment_year FROM student_class WHERE class_id=?",id(classId));
+  Object year=rows.isEmpty()?null:rows.get(0).get("enrollment_year");
+  return year instanceof Number number?number.intValue():Year.now().getValue();
+ }
+ private boolean identityNumberAvailable(String roleCode,String number){
+  return db.count(roleCode.equals("STUDENT")?"SELECT COUNT(*) FROM student WHERE student_no=?":"SELECT COUNT(*) FROM "+identityTable(roleCode)+" WHERE employee_no=?",number)==0;
+ }
+ private void requireIdentityUnchanged(Map<String,Object>b,String roleCode,String current){
+  String submitted=text(b,roleCode.equals("STUDENT")?"studentNo":"employeeNo");
+  require(submitted.isBlank()||submitted.equals(current),"学号/工号由系统自动生成，不可修改");
  }
   private String identityTable(String roleCode){return switch(roleCode){case "STUDENT"->"student";case "DORM_MANAGER"->"dorm_manager_profile";case "REPAIRER"->"repairer_profile";case "ADMIN"->"system_admin_profile";default->throw BizException.forbidden();};}
   private String identityKey(String roleCode){return switch(roleCode){case "STUDENT"->"student_id";case "DORM_MANAGER"->"manager_user_id";case "REPAIRER"->"repairer_user_id";case "ADMIN"->"admin_user_id";default->throw BizException.forbidden();};}
@@ -276,7 +292,7 @@ public class ManagementService {
   var studentRecord=db.one("SELECT s.student_id,s.gender FROM student s WHERE s.student_id=? AND s.enabled=1 FOR UPDATE",student);
   var target=db.one("SELECT bd.*,b.gender_limit FROM bed bd JOIN dorm_room r ON r.room_id=bd.room_id JOIN building b ON b.building_id=r.building_id WHERE bd.bed_id=? FOR UPDATE",bed);
   require("AVAILABLE".equals(target.get("management_status")),"床位已停用");
-  String gender=Objects.toString(studentRecord.get("gender"),"OTHER");
+  String gender=Objects.toString(studentRecord.get("gender"),"");
   String genderLimit=Objects.toString(target.get("gender_limit"),"");
   require("混合".equals(genderLimit)||("MALE".equals(gender)&&"男生".equals(genderLimit))||("FEMALE".equals(gender)&&"女生".equals(genderLimit)),"学生性别与宿舍楼栋性别限制不匹配");
   var current=db.rows("SELECT assignment_id,bed_id FROM accommodation_assignment WHERE student_id=? AND check_in_date<=CURRENT_DATE() AND (check_out_date IS NULL OR check_out_date>CURRENT_DATE()) ORDER BY assignment_id DESC LIMIT 1 FOR UPDATE",student);
