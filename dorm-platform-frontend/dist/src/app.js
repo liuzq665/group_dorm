@@ -45,8 +45,8 @@ export const photoField=(required=false)=>`<label class="field"><span>现场照�
 export async function upload(form){const ids=[];for(const file of form.elements.photos?.files||[]){const body=new FormData();body.set('file',file);ids.push((await api('/files',{method:'POST',body})).fileId);}return ids;}
 export async function photos(dialog,items){for(const file of items){const response=await fetch(`${API}/files/${file.file_id}`,{headers:{Authorization:`Bearer ${state.token}`}});if(!response.ok)continue;const image=new Image();image.alt=file.original_name;image.src=URL.createObjectURL(await response.blob());dialog.querySelector('.photo-list')?.append(image);}}
 export function download(name,data,type='application/json'){const url=URL.createObjectURL(new Blob([typeof data==='string'?data:JSON.stringify(data,null,2)],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
-const titles={dashboard:'工作台',repairs:'报修工单',stay:'假期留宿',accommodation:'住宿信息',messages:'消息中心',buildings:'基础资料',students:'学生管理',managers:'宿管管理',repairers:'维修人员管理',logs:'操作日志',profile:'个人信息',rules:'报修规则',data:'导入导出与备份'};
-function menus(){const common=[['dashboard','工作台'],['messages','消息中心'],['profile','个人信息']];switch(role()){case 'STUDENT':return [...common,['accommodation','我的住宿'],['repairs','我的报修'],['stay','假期留宿']];case 'DORM_MANAGER':return [...common,['repairs','报修审核与派单'],['stay','留宿审核'],['accommodation','楼栋住宿'],['buildings','楼栋床位']];case 'REPAIRER':return [...common,['repairs','我的维修任务']];default:return [...common,['repairs','全校报修'],['stay','留宿管理'],['accommodation','住宿分配'],['buildings','基础资料'],{label:'角色管理',children:[['students','学生管理'],['managers','宿管管理'],['repairers','维修人员管理']]},['rules','报修规则'],['logs','操作日志'],['data','导入导出与备份']];}}
+const titles={dashboard:'工作台',repairs:'报修工单',stay:'假期留宿',accommodation:'住宿信息',messages:'消息中心',buildings:'楼栋',rooms:'宿舍',beds:'床位',students:'学生管理',managers:'宿管管理',repairers:'维修人员管理',logs:'操作日志',profile:'个人信息',rules:'报修规则',data:'导入导出与备份'};
+function menus(){const common=[['dashboard','工作台'],['messages','消息中心'],['profile','个人信息']];switch(role()){case 'STUDENT':return [...common,['accommodation','我的住宿'],['repairs','我的报修'],['stay','假期留宿']];case 'DORM_MANAGER':return [...common,['repairs','报修审核与派单'],['stay','留宿审核'],['accommodation','楼栋住宿'],['buildings','楼栋床位']];case 'REPAIRER':return [...common,['repairs','我的维修任务']];default:return [...common,['repairs','全校报修'],['stay','留宿管理'],['accommodation','住宿分配'],{label:'基本资料',children:[['buildings','楼栋'],['rooms','宿舍'],['beds','床位']]},{label:'角色管理',children:[['students','学生管理'],['managers','宿管管理'],['repairers','维修人员管理']]},['rules','报修规则'],['logs','操作日志'],['data','导入导出与备份']];}}
 function layout(content){const menu=menus().map(item=>Array.isArray(item)?`<button data-page="${item[0]}" class="${state.page===item[0]?'active':''}">${item[1]}</button>`:`<details class="nav-group" open><summary class="${item.children.some(([key])=>state.page===key)?'active':''}">${item.label}</summary><div class="nav-children">${item.children.map(([key,label])=>`<button data-page="${key}" class="${state.page===key?'active':''}">${label}</button>`).join('')}</div></details>`).join('');document.querySelector('#app').innerHTML=`<div class="shell"><aside class="sidebar"><h2>宿舍事务平台</h2><div class="role-tag">${roles[role()]}</div><nav class="nav">${menu}</nav><button class="logout" id="logout">退出登录</button></aside><main class="content"><div class="topbar"><div><div class="muted">${roles[role()]}</div><h1>${titles[state.page]}</h1></div><span>${esc(state.user.name)}</span></div>${content}</main></div><div id="toast" class="toast" role="status" hidden></div>`;
  document.querySelectorAll('button[data-page]').forEach(b=>b.onclick=()=>{state.page=b.dataset.page;render();});document.querySelector('#logout').onclick=async()=>{try{await post('/auth/logout');}finally{clearSession();login();}};
 }
@@ -93,6 +93,16 @@ export async function render(){
     if(all){const count=rows.filter(input=>input.checked).length;all.checked=rows.length>0&&count===rows.length;all.indeterminate=count>0&&count<rows.length;}
    });
   }
+  document.querySelectorAll('.resource-table').forEach(resourceTable=>resourceTable.addEventListener('change',event=>{
+   const rows=[...resourceTable.querySelectorAll('[data-resource-select-row]')],all=resourceTable.querySelector('[data-resource-select-all]');
+   if(event.target.matches('[data-resource-select-all]'))rows.forEach(input=>input.checked=event.target.checked);
+   if(all){const count=rows.filter(input=>input.checked).length;all.checked=rows.length>0&&count===rows.length;all.indeterminate=count>0&&count<rows.length;}
+  }));
+  document.querySelectorAll('[data-resource-filter]').forEach(form=>form.onsubmit=event=>{
+   event.preventDefault();const filters=Object.fromEntries(new FormData(form));
+   for(const [key,value] of Object.entries(filters))if(value==='')delete filters[key];
+   state.data.resourceFilters??={};state.data.resourceFilters[form.dataset.resourceFilter]=filters;render();
+  });
   const userFilter=document.querySelector('#user-filter-form');
   if(userFilter){
    userFilter.onsubmit=event=>{event.preventDefault();const filters=Object.fromEntries(new FormData(userFilter));for(const [key,value] of Object.entries(filters))if(!value)delete filters[key];state.data.userFilters??={};state.data.userFilters[state.page]=filters;render();};

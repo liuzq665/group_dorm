@@ -63,6 +63,16 @@ button:disabled { cursor:wait; opacity:.6; }
 .manager-filter-grid { grid-template-columns:repeat(5,minmax(0,1fr)); }
 .repairer-filter-grid { grid-template-columns:repeat(6,minmax(0,1fr)); }
 .filter-grid .field { margin-top:12px; }
+.resource-filter-grid { grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr)); }
+.resource-filter-grid .field { margin-top:8px; }
+.resource-result-count { margin:0 0 8px; color:#697684; font-size:13px; }
+.resource-table .table { min-width:900px; }
+.resource-table .select-col { width:38px; text-align:center; }
+.resource-table .select-col input { margin:0; }
+.resource-detail-list { display:grid; gap:8px; margin:0; padding-left:24px; }
+.resource-detail-list li { padding:8px 10px; border-bottom:1px solid #edf0f2; overflow-wrap:anywhere; }
+.room-occupant-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 16px; }
+.room-occupant-grid .field { margin-top:12px; }
 .filter-actions { grid-column:1/-1; display:flex; gap:8px; align-items:center; margin-top:14px; }
 .gender-switch { display:inline-flex; align-items:center; gap:8px; margin-left:auto; color:#44515d; white-space:nowrap; }
 .gender-switch input[type=checkbox] { appearance:none; position:relative; width:42px; height:24px; margin:0; border:1px solid #c6cfd7; border-radius:14px; background:#dbe1e6; cursor:pointer; transition:background .15s,border-color .15s; }
@@ -171,3 +181,4 @@ button:disabled { cursor:wait; opacity:.6; }
 @media(max-width:1200px) { .student-filter-grid { grid-template-columns:repeat(4,minmax(0,1fr)); } }
 @media(max-width:850px) { .shell { grid-template-columns:1fr; } .sidebar { padding:18px; } .nav { display:flex; overflow:auto; } .nav button { white-space:nowrap; flex:none; } .nav-group { display:flex; align-items:flex-start; flex:none; gap:3px; } .nav-group summary { white-space:nowrap; } .nav-children { display:flex; padding:0; gap:3px; } .nav-children button { white-space:nowrap; flex:none; } .logout { margin-top:15px; } .content { padding:24px 16px; } .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .filter-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .detail-summary { grid-template-columns:repeat(2,minmax(0,1fr)); } .detail-summary div:nth-child(2) { border-right:0; } .dialog { padding:18px; } .bed-choice-list { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:520px) { .filter-grid,.detail-grid,.profile-grid,.edit-grid,.assignment-form { grid-template-columns:minmax(0,1fr); } .detail-grid div,.profile-grid div { grid-template-columns:minmax(100px,1fr) minmax(0,1.5fr); } .filter-actions { flex-wrap:wrap; } .gender-switch { margin-left:0; } .bed-choice-list { grid-template-columns:minmax(0,1fr); } .table th,.table td { padding:8px 5px; font-size:12px; } .table td:last-child .actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); } .table td:last-child .actions button { padding:7px 5px; white-space:normal; } .role-table th:last-child { width:170px; } .role-table td:last-child .actions { display:flex; flex-wrap:nowrap; width:max-content; } .role-table td:last-child .actions button { padding:5px 6px; white-space:nowrap; } .student-filter-grid,.manager-filter-grid,.repairer-filter-grid { grid-template-columns:minmax(0,1fr); } }
+@media(max-width:520px) { .room-occupant-grid { grid-template-columns:minmax(0,1fr); } }

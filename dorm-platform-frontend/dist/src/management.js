@@ -3,6 +3,9 @@ import {API,api,post,put,role,state,esc,button,field,select,check,table,modal,re
 export const adminPages={
  async accommodation(){const [rows,history]=await Promise.all([api('/accommodations/current'),api('/accommodations/history')]);state.data.homes=rows;state.data.homeHistory=history;let roommates='';if(role()==='STUDENT')roommates=`<section class="panel"><h3>舍友</h3>${table(await api('/accommodations/roommates'),[['student_name','姓名'],['bed_no','床位']])}</section>`;return `<section class="panel"><div class="toolbar"><h3>当前住宿</h3><div class="actions">${role()==='ADMIN'?button('分配或调整床位','assign'):''}${button('导出住宿','export-homes')}</div></div>${table(rows,[['student_name','学生'],['building_name','楼栋'],['room_no','房间'],['bed_no','床位'],['check_in_date','入住日期']],r=>role()==='ADMIN'?button('退宿','checkout',r.assignment_id):'','assignment_id')}</section>${roommates}<section class="panel"><h3>住宿历史</h3>${table(history,[['student_name','学生'],['building_name','楼栋'],['room_no','房间'],['bed_no','床位'],['check_in_date','入住'],['check_out_date','退宿']])}</section>`;},
  async buildings(){const [buildings,rooms,beds]=await Promise.all([api('/buildings'),api('/rooms'),api('/beds')]);Object.assign(state.data,{buildings,rooms,beds});return [['buildings','楼栋',buildings,[['building_code','编号'],['building_name','名称'],['address','地址'],['gender_limit','性别'],['bed_count','床位'],['occupied_count','入住']],'building_id'],['rooms','宿舍',rooms,[['building_name','楼栋'],['room_no','房间'],['floor_no','楼层'],['design_capacity','容量']],'room_id'],['beds','床位',beds,[['building_name','楼栋'],['room_no','房间'],['bed_no','床位'],['management_status','管理状态'],['student_name','学生']],'bed_id']].map(([key,title,rows,columns,idKey])=>`<section class="panel"><div class="toolbar"><h3>${title}</h3><div class="actions">${role()==='ADMIN'?button('新增'+title,'resource-new',key):''}${button('导出','resource-export',key)}</div></div>${table(rows,columns,r=>role()==='ADMIN'?button('编辑','resource-edit',r[idKey],`data-type="${key}"`):'',idKey)}</section>`).join('');},
+ async buildings(){if(role()==='ADMIN')return basicResourcePage('buildings');const rows=await api('/buildings');state.data.buildings=rows;return `<section class="panel"><h3>负责楼栋</h3>${table(rows,[['building_code','编号'],['building_name','名称'],['address','地址'],['gender_limit','性别限制'],['room_count','宿舍数'],['bed_count','总床位'],['available_bed_count','空闲床位']])}</section>`;},
+ async rooms(){return basicResourcePage('rooms');},
+ async beds(){return basicResourcePage('beds');},
  async students(){[state.data.academic,state.data.buildings,state.data.beds,state.data.rooms]=await Promise.all([api('/admin/academic-structure'),api('/buildings'),api('/beds'),api('/rooms')]);return userDirectory('students','学生管理','STUDENT');},
  async managers(){state.data.buildings=await api('/buildings');return userDirectory('managers','宿管管理','DORM_MANAGER');},
  async repairers(){[state.data.config,state.data.buildings]=await Promise.all([api('/admin/repair-config'),api('/buildings')]);return userDirectory('repairers','维修人员管理','REPAIRER');},
@@ -10,6 +13,65 @@ export const adminPages={
  async rules(){const config=await api('/admin/repair-config');state.data.config=config;return `<section class="panel"><div class="toolbar"><h3>工单规则</h3>${button('发布规则版本','rule-edit')}</div>${table([config.rule],[['accept_minutes','接单时限/分钟'],['normal_minutes','普通维修/分钟'],['urgent_minutes','紧急维修/分钟'],['confirm_days','自动确认/天'],['edit_days','修改期限/天'],['max_rework_count','重修上限']])}</section><section class="panel"><h3>维修资质与负责范围</h3>${table(config.workers,[['real_name','维修人员'],['on_duty','在岗'],['max_active_orders','最大在办'],['workTypeIds','工种编号'],['buildingIds','楼栋编号']],r=>button('配置','worker-edit',r.repairer_user_id),'repairer_user_id')}</section><section class="panel"><div class="toolbar"><h3>维修工种</h3>${button('新增工种','dictionary-new','work-types')}</div>${table(config.workTypes,[['work_type_code','编号'],['work_type_name','名称'],['enabled','启用']],r=>button('编辑','dictionary-edit',r.work_type_id,'data-type="work-types"'))}</section><section class="panel"><div class="toolbar"><h3>故障分类</h3>${button('新增分类','dictionary-new','categories')}</div>${table(config.categories,[['category_name','名称'],['work_type_id','工种编号'],['enabled','启用']],r=>button('编辑','dictionary-edit',r.category_id,'data-type="categories"'))}</section>`;},
  async data(){const [tasks,backups]=await Promise.all([api('/admin/data-tasks'),api('/admin/backup-tasks')]);return `<section class="panel"><div class="toolbar"><h3>批量数据</h3>${button('刷新任务状态','refresh-tasks')}</div><div class="actions section-gap">${['users','buildings','rooms','beds','assignments'].map((type,i)=>button(['角色资料','楼栋','宿舍','床位','住宿分配'][i]+'导入','import',type)).join('')}</div><div class="actions section-gap">${[['users','角色资料'],['buildings','楼栋'],['rooms','宿舍'],['beds','床位'],['repairs','报修记录'],['stays','留宿记录']].map(([type,label])=>button('导出'+label,'data-export',type)).join('')}</div>${table(tasks,[['task_id','任务'],['task_type','类型'],['business_type','数据域'],['task_status','状态'],['result_description','结果'],['finished_at','完成时间']],r=>button('详情','task-detail',r.task_id)+(r.task_status==='WAITING'?button('取消','task-cancel',r.task_id):''))}</section><section class="panel"><div class="toolbar"><h3>数据库备份</h3>${button('创建备份任务','backup')}</div>${table(backups,[['task_id','任务'],['task_status','状态'],['result_description','结果'],['finished_at','完成时间']],r=>r.file_id?button('下载备份','task-download',r.file_id,'data-name="dorm-backup.sql"'):'')}</section>`;}
 };
+const resourceConfig={
+ buildings:{title:'楼栋',id:'building_id',columns:[['building_code','编号'],['building_name','名称'],['address','地址'],['gender_limit','性别限制'],['room_count','宿舍数'],['bed_count','总床位'],['available_bed_count','空闲床位']],filterNames:['keyword','genderLimit','minBeds','maxBeds','minFreeBeds','maxFreeBeds']},
+ rooms:{title:'宿舍',id:'room_id',columns:[['building_name','楼栋'],['room_no','宿舍号'],['floor_no','楼层'],['gender_limit','性别'],['design_capacity','容量'],['bed_count','床位数'],['available_bed_count','空闲床位']],filterNames:['buildingId','keyword','floorNo','minBeds','maxBeds','minFreeBeds','maxFreeBeds']},
+ beds:{title:'床位',id:'bed_id',columns:[['building_name','楼栋'],['room_no','宿舍号'],['bed_no','床位号'],['management_status','管理状态'],['student_name','入住学生']],filterNames:['buildingId','roomId','keyword','managementStatus','occupied']}
+};
+async function basicResourcePage(type){
+ const [buildings,rooms,beds]=await Promise.all([api('/buildings'),api('/rooms'),api('/beds')]);Object.assign(state.data,{buildings,rooms,beds});
+ const config=resourceConfig[type],filters=state.data.resourceFilters?.[type]||{},rows=filterResourceRows(type,state.data[type],filters);
+ const filterForm=resourceFilterForm(type,filters,buildings,rooms);
+ const actions=row=>button('详情','resource-detail',row[config.id],`data-type="${type}"`)+button('编辑','resource-edit',row[config.id],`data-type="${type}"`)+button('删除','resource-delete',row[config.id],`data-type="${type}"`);
+ const tools=button('新增'+config.title,'resource-new',type)+button('删除所选','resource-delete-selected',type)+button('导出','resource-export',type);
+ return `<section class="panel"><div class="toolbar"><h3>${config.title}管理</h3><div class="actions">${tools}</div></div>${filterForm}<div class="resource-result-count">共 ${rows.length} 条</div>${resourceSelectableTable(rows,config.columns,actions,type,config.id)}</section>`;
+}
+function resourceFilterForm(type,filters,buildings,rooms){
+ const pick=(name,label,items)=>select(name,label,items,filters[name]||'',false,false),number=(name,label)=>field(name,label,'number',filters[name]||'',false);
+ const keyword=field('keyword',type==='buildings'?'名称或编号':type==='rooms'?'宿舍号':'床位号或学生姓名','search',filters.keyword||'',false);
+ let fields=keyword;
+ if(type==='buildings')fields+=pick('genderLimit','性别限制',[['','全部'],['男生','男生'],['女生','女生'],['混合','混合']])+number('minBeds','总床位从')+number('maxBeds','总床位至')+number('minFreeBeds','空闲床位从')+number('maxFreeBeds','空闲床位至');
+ if(type==='rooms')fields=pick('buildingId','楼栋',[['','全部楼栋'],...buildings.map(x=>[x.building_id,x.building_name])])+fields+number('floorNo','楼层')+number('minBeds','容量从')+number('maxBeds','容量至')+number('minFreeBeds','空闲床位从')+number('maxFreeBeds','空闲床位至');
+ if(type==='beds')fields=pick('buildingId','楼栋',[['','全部楼栋'],...buildings.map(x=>[x.building_id,x.building_name])])+pick('roomId','宿舍',[['','全部宿舍'],...rooms.filter(x=>!filters.buildingId||String(x.building_id)===String(filters.buildingId)).map(x=>[x.room_id,`${x.building_name} ${x.room_no}`])])+keyword+pick('managementStatus','床位状态',[['','全部状态'],['AVAILABLE','可分配'],['DISABLED','停用']])+pick('occupied','入住情况',[['','全部'],['yes','已入住'],['no','空闲']]);
+ return `<form class="filter-grid resource-filter-grid" data-resource-filter="${type}">${fields}<div class="filter-actions"><button class="primary" type="submit">查询</button>${button('清空筛选','resource-filter-reset',type)}</div></form>`;
+}
+function filterResourceRows(type,rows,filters){
+ const text=(...values)=>values.some(value=>String(value||'').toLowerCase().includes(String(filters.keyword||'').trim().toLowerCase()));
+ const within=(value,min,max)=>(!min||Number(value)>=Number(min))&&(!max||Number(value)<=Number(max));
+ return rows.filter(row=>{
+  if(filters.keyword&&!text(type==='buildings'?[row.building_code,row.building_name,row.address]:type==='rooms'?[row.room_no,row.building_name]:[row.bed_no,row.student_name]))return false;
+  if(type==='buildings')return(!filters.genderLimit||row.gender_limit===filters.genderLimit)&&within(row.bed_count,filters.minBeds,filters.maxBeds)&&within(row.available_bed_count,filters.minFreeBeds,filters.maxFreeBeds);
+  if(type==='rooms')return(!filters.buildingId||String(row.building_id)===String(filters.buildingId))&&(!filters.floorNo||Number(row.floor_no)===Number(filters.floorNo))&&within(row.design_capacity,filters.minBeds,filters.maxBeds)&&within(row.available_bed_count,filters.minFreeBeds,filters.maxFreeBeds);
+  return(!filters.buildingId||String(row.building_id)===String(filters.buildingId))&&(!filters.roomId||String(row.room_id)===String(filters.roomId))&&(!filters.managementStatus||row.management_status===filters.managementStatus)&&(!filters.occupied||(filters.occupied==='yes'?!!row.student_id:!row.student_id));
+ });
+}
+function resourceSelectableTable(rows,columns,actions,type,idKey){
+ return table(rows,columns,actions,idKey).replace('<thead><tr>','<thead><tr><th class="select-col"><input type="checkbox" data-resource-select-all aria-label="全选"></th>')
+  .replace(/<tr data-row-id="([^"]*)">/g,(_,id)=>`<tr data-row-id="${id}"><td class="select-col"><input type="checkbox" data-resource-select-row value="${id}" aria-label="选择记录"></td>`)
+  .replace('<div class="table-wrap">',`<div class="table-wrap resource-table" data-resource-type="${type}">`);
+}
+function resourceDetail(type,id){
+ const config=resourceConfig[type],row=state.data[type].find(x=>String(x[config.id])===String(id));if(!row)return;
+ let facts=[];let extra='';
+ if(type==='buildings'){
+  facts=[['编号',row.building_code],['名称',row.building_name],['地址',row.address],['性别限制',row.gender_limit],['总床位',row.bed_count],['空闲床位',row.available_bed_count]];
+  const rooms=state.data.rooms.filter(x=>Number(x.building_id)===Number(id));extra=`<section class="detail-section"><h3>楼栋宿舍</h3>${rooms.length?`<ol class="resource-detail-list">${rooms.map(x=>`<li>${esc(x.room_no)} · ${esc(x.floor_no)}层 · ${esc(x.gender_limit)} · 容量 ${esc(x.design_capacity)} · 空闲 ${esc(x.available_bed_count)}</li>`).join('')}</ol>`:'<p class="muted">暂无宿舍</p>'}</section>`;
+ }
+ if(type==='rooms'){
+  facts=[['楼栋',row.building_name],['宿舍号',row.room_no],['楼层',row.floor_no],['性别',row.gender_limit],['容量',row.design_capacity],['空闲床位',row.available_bed_count]];
+  const beds=state.data.beds.filter(x=>Number(x.room_id)===Number(id));extra=`<section class="detail-section"><div class="toolbar"><h3>床位与入住学生</h3><button type="button" class="secondary" data-room-occupants>调整入住学生</button></div>${beds.length?`<ol class="resource-detail-list">${beds.map(x=>`<li>${esc(x.bed_no)}号床 · ${x.student_name?`入住：${esc(x.student_name)}`:'空闲'}</li>`).join('')}</ol>`:'<p class="muted">暂无床位</p>'}</section>`;
+ }
+ if(type==='beds')facts=[['楼栋',row.building_name],['宿舍号',row.room_no],['床位号',row.bed_no],['床位状态',row.management_status==='AVAILABLE'?'可分配':'停用'],['入住学生',row.student_name||'空闲'],['宿舍性别',row.room_gender_limit]];
+ const dialog=modal(`${config.title}详情`,`<div class="user-detail-content">${factGrid(facts)}${extra}</div>`,null);
+ if(type==='rooms')dialog.querySelector('[data-room-occupants]')?.addEventListener('click',()=>roomOccupantsDialog(row));
+}
+async function roomOccupantsDialog(room){
+ const [allStudents,beds]=await Promise.all([api('/admin/users?roleCode=STUDENT'),api('/beds')]);
+ const roomBeds=beds.filter(x=>Number(x.room_id)===Number(room.room_id));
+ const eligible=allStudents.filter(x=>{const resident=x.current_building===room.building_name&&String(x.current_room)===String(room.room_no);const assignable=!x.current_building&&Number(x.enabled)===1&&x.enrollment_status==='ENROLLED';return(resident||assignable)&&((room.gender_limit==='男生'&&x.gender==='MALE')||(room.gender_limit==='女生'&&x.gender==='FEMALE'));});
+ const html=roomBeds.map(bed=>{const options=eligible.filter(student=>bed.management_status==='AVAILABLE'||Number(student.user_id)===Number(bed.student_id));return select(`bed_${bed.bed_id}`,`${bed.bed_no}号床`,[['','空床'],...options.map(x=>[x.user_id,`${x.student_no} · ${x.real_name}`])],bed.student_id||'',false,false);}).join('');
+ modal(`调整 ${room.room_no} 宿舍入住学生`,`<div class="room-occupant-grid">${html}</div>`,(data,form)=>{const ids=roomBeds.map(bed=>({bedId:bed.bed_id,studentId:form.elements[`bed_${bed.bed_id}`].value||null}));const chosen=ids.map(x=>x.studentId).filter(Boolean);if(new Set(chosen).size!==chosen.length)throw new Error('同一学生不能选择多个床位');return put(`/admin/rooms/${room.room_id}/occupants`,{occupants:ids});});
+}
 const roleLabels={STUDENT:'学生',DORM_MANAGER:'宿管',REPAIRER:'维修人员',ADMIN:'系统管理员'};
 async function userDirectory(page,title,roleCode=null){
  const filters=state.data.userFilters?.[page]||{};
@@ -70,7 +132,7 @@ async function assignmentDialog(targetStudentId=null,onCancel=null,staging=null)
  if(onCancel)dialog.addEventListener('close',()=>{if(!submitted)onCancel();},{once:true});
  if(staging){const footer=dialog.querySelector('.dialog-footer');footer.insertAdjacentHTML('afterbegin','<button type="button" class="primary" data-stage-bed>保存选择</button>');footer.querySelector('[data-stage-bed]').onclick=()=>{const chosen=beds.find(x=>String(x.bed_id)===selectedBedId);if(!chosen){notify('请从可分配床位列表中选择床位',true);return;}submitted=true;dialog.close();staging.onSave(chosen);};}
  const form=dialog.querySelector('form'),student=form.elements.studentId,building=form.elements.buildingFilter,room=form.elements.roomFilter,bedNo=form.elements.bedNoFilter,bed=form.elements.bedId;
- const available=()=>{const person=students.find(x=>String(x.user_id)===student.value);if(!person)return[];return beds.filter(x=>x.management_status==='AVAILABLE'&&(!x.student_id||Number(x.student_id)===Number(person.user_id))&&genderMatches(person.gender,x.gender_limit));};
+ const available=()=>{const person=students.find(x=>String(x.user_id)===student.value);if(!person)return[];return beds.filter(x=>x.management_status==='AVAILABLE'&&(!x.student_id||Number(x.student_id)===Number(person.user_id))&&genderMatches(person.gender,x.room_gender_limit||x.gender_limit));};
  const refresh=()=>{
   const candidates=available(),buildingIds=unique(candidates.map(x=>x.building_id));
   const selectedBuilding=buildingIds.includes(String(building.value))?building.value:'';
@@ -164,6 +226,14 @@ function bindAcademicEditor(dialog,academic,row,selected={}){
 export async function adminAction(action,id,b){
  if(action==='export-homes'){download('accommodation.json',state.data.homeHistory);return;}
  if(action==='resource-export'){download(id+'.json',state.data[id]);return;}
+ if(action==='resource-filter-reset'){if(state.data.resourceFilters)delete state.data.resourceFilters[id];await render();return;}
+ if(action==='resource-detail'){resourceDetail(b.dataset.type,id);return;}
+ if(action==='resource-delete'||action==='resource-delete-selected'){
+  const type=action==='resource-delete'?b.dataset.type:id;
+  const ids=action==='resource-delete'?[Number(id)]:[...document.querySelectorAll(`.resource-table[data-resource-type="${type}"] [data-resource-select-row]:checked`)].map(input=>Number(input.value));
+  if(!ids.length){notify('请先选择要删除的记录',true);return;}
+  modal(`删除${resourceConfig[type].title}`,`确定删除选中的 ${ids.length} 条${resourceConfig[type].title}记录？存在关联业务数据的记录无法删除。`,async()=>{await api(`/admin/resources/${type}`,{method:'DELETE',body:JSON.stringify({ids})});return '删除成功';},'确认删除');return;
+ }
  if(action==='data-export'){await post('/admin/data-tasks',{taskType:'EXPORT',businessType:id});await render();notify('导出任务已受理');return;}
  if(action==='user-filter-reset'){if(state.data.userFilters)delete state.data.userFilters[state.page];await render();return;}
  if(action==='manager-scope-select'){
@@ -219,7 +289,7 @@ export async function adminAction(action,id,b){
  if(action==='user-toggle'){const row=state.data.users.find(x=>String(x.user_id)===id);await put(`/admin/users/${id}/enabled`,{enabled:!row.enabled});await render();notify('账号状态已更新');return;}
  if(action==='user-delete'){modal('删除或停用账号','有业务历史的账号将停用并保留记录；没有业务记录的账号会被删除。',async()=>{const deleted=await api(`/admin/users/${id}`,{method:'DELETE'});return deleted?'账号已删除':'账号存在业务记录，已停用并保留历史';},'确认');return;}
  if(action==='manager-scope'){await managerScopeDialog(id);return;}
- if(action==='resource-new'||action==='resource-edit'){const type=action==='resource-new'?id:b.dataset.type;const row=action==='resource-edit'?state.data[type].find(x=>String(x[{buildings:'building_id',rooms:'room_id',beds:'bed_id'}[type]])===id):{};let html='';if(type==='buildings')html=field('buildingCode','楼栋编号','text',row.building_code||'')+field('buildingName','楼栋名称','text',row.building_name||'')+field('address','地址','text',row.address||'')+select('genderLimit','性别限制',[['男生','男生'],['女生','女生'],['混合','混合']],row.gender_limit);if(type==='rooms')html=select('buildingId','楼栋',state.data.buildings.map(x=>[x.building_id,x.building_name]),row.building_id)+field('roomNo','房间号','text',row.room_no||'')+field('floorNo','楼层','number',row.floor_no||1)+field('designCapacity','容量','number',row.design_capacity||4);if(type==='beds')html=select('roomId','房间',state.data.rooms.map(x=>[x.room_id,`${x.building_name} ${x.room_no}`]),row.room_id)+field('bedNo','床位编号','text',row.bed_no||'')+select('managementStatus','管理状态',[['AVAILABLE','可分配'],['DISABLED','停用']],row.management_status);modal('维护基础资料',html,d=>action==='resource-edit'?put(`/admin/resources/${type}/${id}`,d):post(`/admin/resources/${type}`,d));return;}
+ if(action==='resource-new'||action==='resource-edit'){const type=action==='resource-new'?id:b.dataset.type;const row=action==='resource-edit'?state.data[type].find(x=>String(x[{buildings:'building_id',rooms:'room_id',beds:'bed_id'}[type]])===id):{};let html='';if(type==='buildings')html=field('buildingCode','楼栋编号','text',row.building_code||'')+field('buildingName','楼栋名称','text',row.building_name||'')+field('address','地址','text',row.address||'')+select('genderLimit','性别限制',[['男生','男生'],['女生','女生'],['混合','混合']],row.gender_limit);if(type==='rooms'){const building=state.data.buildings.find(x=>Number(x.building_id)===Number(row.building_id));const genderOptions=building?.gender_limit==='混合'?[['男生','男生'],['女生','女生']]:[[building?.gender_limit||'男生',building?.gender_limit||'男生']];const buildingField=action==='resource-edit'?field('buildingName','所属楼栋','text',row.building_name||'',false).replace('<input ','<input readonly '):select('buildingId','楼栋',state.data.buildings.map(x=>[x.building_id,x.building_name]),'',false,true);html=buildingField+field('roomNo','房间号','text',row.room_no||'')+field('floorNo','楼层','number',row.floor_no||1)+field('designCapacity','容量','number',row.design_capacity||4)+select('genderLimit','宿舍性别',genderOptions,row.gender_limit||genderOptions[0][0]);}if(type==='beds')html=select('roomId','房间',state.data.rooms.map(x=>[x.room_id,`${x.building_name} ${x.room_no}`]),row.room_id)+field('bedNo','床位编号','text',row.bed_no||'')+select('managementStatus','管理状态',[['AVAILABLE','可分配'],['DISABLED','停用']],row.management_status);const dialog=modal(`${action==='resource-edit'?'编辑':'新增'}${resourceConfig[type].title}`,html,d=>action==='resource-edit'?put(`/admin/resources/${type}/${id}`,d):post(`/admin/resources/${type}`,d));if(type==='rooms'&&action==='resource-new'){const form=dialog.querySelector('form'),buildingField=form.elements.buildingId,genderField=form.elements.genderLimit;buildingField.onchange=()=>{const selected=state.data.buildings.find(x=>String(x.building_id)===buildingField.value),options=selected?.gender_limit==='混合'?[['男生','男生'],['女生','女生']]:[[selected?.gender_limit||'男生',selected?.gender_limit||'男生']];refillSelect(genderField,'',options,options[0][0]);};}return;}
  if(action==='rule-edit'){const r=state.data.config.rule;modal('发布工单规则版本',[['accept_minutes','接单时限（分钟）'],['normal_minutes','普通维修时限（分钟）'],['urgent_minutes','紧急维修时限（分钟）'],['confirm_days','自动确认（天）'],['edit_days','待修改关闭（天）'],['max_rework_count','重修上限（空值为不限）']].map(([key,label])=>field(key,label,'number',r[key]??'',key!=='max_rework_count')).join(''),d=>post('/admin/repair-rules',d));return;}
  if(action==='worker-edit'){await repairerScopeDialog(id);return;}
  if(action==='student-assign'){await assignmentDialog();return;}
