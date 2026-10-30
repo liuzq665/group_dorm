@@ -24,6 +24,7 @@ const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:5174';
       throw error;
     }
 
+    await page.locator('.nav-group[data-nav-group="roles"] summary').click();
     await page.locator('[data-page="students"]').click();
     await page.locator('#user-filter-form').waitFor();
     const genderSwitch = page.locator('[data-gender-toggle]');

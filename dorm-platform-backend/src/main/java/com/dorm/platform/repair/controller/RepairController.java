@@ -9,7 +9,8 @@ public class RepairController {
  private final RepairService service;
  public RepairController(RepairService service){this.service=service;}
  @GetMapping("/repair-catalog") public ApiResponse<?> catalog(){return ApiResponse.ok(service.catalog());}
- @GetMapping("/repair-orders") public ApiResponse<?> list(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(service.list(currentUser));}
+ @GetMapping("/repair-orders") public ApiResponse<?> list(@RequestAttribute CurrentUser currentUser,@RequestParam Map<String,String> filters){return ApiResponse.ok(service.list(currentUser,filters,false));}
+ @GetMapping("/repair-history") public ApiResponse<?> history(@RequestAttribute CurrentUser currentUser,@RequestParam Map<String,String> filters){return ApiResponse.ok(service.list(currentUser,filters,true));}
  @GetMapping("/repair-orders/{id}") public ApiResponse<?> detail(@RequestAttribute CurrentUser currentUser,@PathVariable long id){return ApiResponse.ok(service.detail(currentUser,id));}
  @GetMapping("/repair-orders/{id}/candidates") public ApiResponse<?> candidates(@RequestAttribute CurrentUser currentUser,@PathVariable long id){return ApiResponse.ok(service.candidates(currentUser,id));}
  @PostMapping("/repair-orders") public ApiResponse<?> create(@RequestAttribute CurrentUser currentUser,@RequestBody Map<String,Object>b){return ApiResponse.ok(service.create(currentUser,b));}

@@ -1,0 +1,141 @@
+[ {
+  "building_id" : 1,
+  "building_code" : "A-01",
+  "building_name" : "知行一号楼",
+  "address" : "东区宿舍组团 1 号",
+  "gender_limit" : "男生",
+  "usage_status" : "IN_USE",
+  "room_count" : 3,
+  "bed_count" : 6,
+  "occupied_count" : 2
+}, {
+  "building_id" : 2,
+  "building_code" : "A-02",
+  "building_name" : "知行二号楼",
+  "address" : "东区宿舍组团 2 号",
+  "gender_limit" : "女生",
+  "usage_status" : "IN_USE",
+  "room_count" : 1,
+  "bed_count" : 2,
+  "occupied_count" : 0
+}, {
+  "building_id" : 7,
+  "building_code" : "A-03",
+  "building_name" : "知行三号楼",
+  "address" : "东区宿舍组团 3 号",
+  "gender_limit" : "男生",
+  "usage_status" : "IN_USE",
+  "room_count" : 12,
+  "bed_count" : 48,
+  "occupied_count" : 40
+}, {
+  "building_id" : 13,
+  "building_code" : "A-04",
+  "building_name" : "知行四号楼",
+  "address" : "东区宿舍组团 4 号",
+  "gender_limit" : "女生",
+  "usage_status" : "IN_USE",
+  "room_count" : 12,
+  "bed_count" : 48,
+  "occupied_count" : 40
+}, {
+  "building_id" : 3,
+  "building_code" : "B-01",
+  "building_name" : "明德一号楼",
+  "address" : "西区宿舍组团 1 号",
+  "gender_limit" : "混合",
+  "usage_status" : "IN_USE",
+  "room_count" : 1,
+  "bed_count" : 1,
+  "occupied_count" : 1
+}, {
+  "building_id" : 4,
+  "building_code" : "B-02",
+  "building_name" : "明德二号楼",
+  "address" : "西区宿舍组团 2 号",
+  "gender_limit" : "男生",
+  "usage_status" : "IN_USE",
+  "room_count" : 3,
+  "bed_count" : 12,
+  "occupied_count" : 1
+}, {
+  "building_id" : 8,
+  "building_code" : "B-03",
+  "building_name" : "明德三号楼",
+  "address" : "西区宿舍组团 3 号",
+  "gender_limit" : "男生",
+  "usage_status" : "IN_USE",
+  "room_count" : 12,
+  "bed_count" : 48,
+  "occupied_count" : 40
+}, {
+  "building_id" : 6,
+  "building_code" : "C-01",
+  "building_name" : "博雅一号楼",
+  "address" : "南区宿舍组团 1 号",
+  "gender_limit" : "混合",
+  "usage_status" : "IN_USE",
+  "room_count" : 3,
+  "bed_count" : 12,
+  "occupied_count" : 0
+}, {
+  "building_id" : 14,
+  "building_code" : "C-02",
+  "building_name" : "博雅二号楼",
+  "address" : "南区宿舍组团 2 号",
+  "gender_limit" : "女生",
+  "usage_status" : "IN_USE",
+  "room_count" : 12,
+  "bed_count" : 48,
+  "occupied_count" : 29
+}, {
+  "building_id" : 5,
+  "building_code" : "C-03",
+  "building_name" : "博雅三号楼",
+  "address" : "南区宿舍组团 3 号",
+  "gender_limit" : "女生",
+  "usage_status" : "IN_USE",
+  "room_count" : 3,
+  "bed_count" : 12,
+  "occupied_count" : 1
+}, {
+  "building_id" : 11,
+  "building_code" : "D-01",
+  "building_name" : "至善一号楼",
+  "address" : "北区宿舍组团 1 号",
+  "gender_limit" : "女生",
+  "usage_status" : "IN_USE",
+  "room_count" : 12,
+  "bed_count" : 48,
+  "occupied_count" : 40
+}, {
+  "building_id" : 12,
+  "building_code" : "D-02",
+  "building_name" : "至善二号楼",
+  "address" : "北区宿舍组团 2 号",
+  "gender_limit" : "女生",
+  "usage_status" : "IN_USE",
+  "room_count" : 12,
+  "bed_count" : 48,
+  "occupied_count" : 40
+}, {
+  "building_id" : 9,
+  "building_code" : "D-03",
+  "building_name" : "至善三号楼",
+  "address" : "北区宿舍组团 1 号",
+  "gender_limit" : "男生",
+  "usage_status" : "IN_USE",
+  "room_count" : 12,
+  "bed_count" : 48,
+  "occupied_count" : 40
+}, {
+  "building_id" : 10,
+  "building_code" : "D-04",
+  "building_name" : "至善四号楼",
+  "address" : "北区宿舍组团 4 号",
+  "gender_limit" : "男生",
+  "usage_status" : "IN_USE",
+  "room_count" : 12,
+  "bed_count" : 48,
+  "occupied_count" : 30
+} ]

@@ -1,8 +1,32 @@
 -------------------------------------------------------------------------------
 Test set: com.dorm.platform.WorkflowIntegrationTest
 -------------------------------------------------------------------------------
-Tests run: 39, Failures: 2, Errors: 15, Skipped: 0, Time elapsed: 18.17 s <<< FAILURE! -- in com.dorm.platform.WorkflowIntegrationTest
-com.dorm.platform.WorkflowIntegrationTest.threeRefusalsMarkAbnormal -- Time elapsed: 0.021 s <<< ERROR!
+Tests run: 39, Failures: 2, Errors: 21, Skipped: 0, Time elapsed: 8.783 s <<< FAILURE! -- in com.dorm.platform.WorkflowIntegrationTest
+com.dorm.platform.WorkflowIntegrationTest.stayAutomaticLockAndExpiredReturn -- Time elapsed: 2.175 s <<< ERROR!
+com.dorm.platform.common.BizException: 编号格式无效
+	at com.dorm.platform.common.Input.id(Input.java:8)
+	at com.dorm.platform.stay.service.StayService.configure(StayService.java:43)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:379)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.stay.service.StayService$$SpringCGLIB$$0.configure(<generated>)
+	at com.dorm.platform.WorkflowIntegrationTest.batch(WorkflowIntegrationTest.java:83)
+	at com.dorm.platform.WorkflowIntegrationTest.stayAutomaticLockAndExpiredReturn(WorkflowIntegrationTest.java:107)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.dorm.platform.WorkflowIntegrationTest.threeRefusalsMarkAbnormal -- Time elapsed: 0.015 s <<< ERROR!
 com.dorm.platform.common.BizException: 维修人员工号格式为RP加6位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
 	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:164)
@@ -25,7 +49,7 @@ com.dorm.platform.common.BizException: 维修人员工号格式为RP加6位数�
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 
-com.dorm.platform.WorkflowIntegrationTest.editingManagerAccountPreservesItsSingleConfiguredBuilding -- Time elapsed: 0.009 s <<< ERROR!
+com.dorm.platform.WorkflowIntegrationTest.editingManagerAccountPreservesItsSingleConfiguredBuilding -- Time elapsed: 0.008 s <<< ERROR!
 com.dorm.platform.common.BizException: 宿管工号格式为DM加6位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
 	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:164)
@@ -48,7 +72,7 @@ com.dorm.platform.common.BizException: 宿管工号格式为DM加6位数字
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 
-com.dorm.platform.WorkflowIntegrationTest.staffCreationAndConfigurationStoreSelectedScopes -- Time elapsed: 0.011 s <<< ERROR!
+com.dorm.platform.WorkflowIntegrationTest.staffCreationAndConfigurationStoreSelectedScopes -- Time elapsed: 0.009 s <<< ERROR!
 com.dorm.platform.common.BizException: 宿管工号格式为DM加6位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
 	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:164)
@@ -71,10 +95,10 @@ com.dorm.platform.common.BizException: 宿管工号格式为DM加6位数字
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 
-com.dorm.platform.WorkflowIntegrationTest.foreignStayCannotBeReviewed -- Time elapsed: 0.059 s <<< ERROR!
-com.dorm.platform.common.BizException: 宿管工号格式为DM加6位数字
-	at com.dorm.platform.common.BizException.require(BizException.java:8)
-	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:164)
+com.dorm.platform.WorkflowIntegrationTest.foreignStayCannotBeReviewed -- Time elapsed: 0.007 s <<< ERROR!
+com.dorm.platform.common.BizException: 编号格式无效
+	at com.dorm.platform.common.Input.id(Input.java:8)
+	at com.dorm.platform.stay.service.StayService.configure(StayService.java:43)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -88,13 +112,14 @@ com.dorm.platform.common.BizException: 宿管工号格式为DM加6位数字
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
 	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
 	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
-	at com.dorm.platform.system.service.ManagementService$$SpringCGLIB$$0.saveUser(<generated>)
+	at com.dorm.platform.stay.service.StayService$$SpringCGLIB$$0.configure(<generated>)
+	at com.dorm.platform.WorkflowIntegrationTest.batch(WorkflowIntegrationTest.java:83)
 	at com.dorm.platform.WorkflowIntegrationTest.foreignStayCannotBeReviewed(WorkflowIntegrationTest.java:93)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 
-com.dorm.platform.WorkflowIntegrationTest.studentNumberIsRequiredUniqueAndSearchable -- Time elapsed: 0.009 s <<< ERROR!
+com.dorm.platform.WorkflowIntegrationTest.studentNumberIsRequiredUniqueAndSearchable -- Time elapsed: 0.008 s <<< ERROR!
 com.dorm.platform.common.BizException: 学号必须为10位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
 	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:162)
@@ -117,7 +142,79 @@ com.dorm.platform.common.BizException: 学号必须为10位数字
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 
-com.dorm.platform.WorkflowIntegrationTest.deletingAccountWithoutBusinessHistoryPhysicallyRemovesIt -- Time elapsed: 0.006 s <<< ERROR!
+com.dorm.platform.WorkflowIntegrationTest.unsubmittedEditsAreNotReviewed -- Time elapsed: 0.006 s <<< ERROR!
+com.dorm.platform.common.BizException: 编号格式无效
+	at com.dorm.platform.common.Input.id(Input.java:8)
+	at com.dorm.platform.stay.service.StayService.configure(StayService.java:43)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:379)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.stay.service.StayService$$SpringCGLIB$$0.configure(<generated>)
+	at com.dorm.platform.WorkflowIntegrationTest.batch(WorkflowIntegrationTest.java:83)
+	at com.dorm.platform.WorkflowIntegrationTest.unsubmittedEditsAreNotReviewed(WorkflowIntegrationTest.java:106)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.dorm.platform.WorkflowIntegrationTest.supplementAndRangeChangesAreReviewed -- Time elapsed: 0.007 s <<< ERROR!
+com.dorm.platform.common.BizException: 编号格式无效
+	at com.dorm.platform.common.Input.id(Input.java:8)
+	at com.dorm.platform.stay.service.StayService.configure(StayService.java:43)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:379)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.stay.service.StayService$$SpringCGLIB$$0.configure(<generated>)
+	at com.dorm.platform.WorkflowIntegrationTest.batch(WorkflowIntegrationTest.java:83)
+	at com.dorm.platform.WorkflowIntegrationTest.supplementAndRangeChangesAreReviewed(WorkflowIntegrationTest.java:90)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.dorm.platform.WorkflowIntegrationTest.withdrawnStayCanSubmitAgain -- Time elapsed: 0.006 s <<< ERROR!
+com.dorm.platform.common.BizException: 编号格式无效
+	at com.dorm.platform.common.Input.id(Input.java:8)
+	at com.dorm.platform.stay.service.StayService.configure(StayService.java:43)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:379)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.stay.service.StayService$$SpringCGLIB$$0.configure(<generated>)
+	at com.dorm.platform.WorkflowIntegrationTest.batch(WorkflowIntegrationTest.java:83)
+	at com.dorm.platform.WorkflowIntegrationTest.withdrawnStayCanSubmitAgain(WorkflowIntegrationTest.java:89)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.dorm.platform.WorkflowIntegrationTest.deletingAccountWithoutBusinessHistoryPhysicallyRemovesIt -- Time elapsed: 0.008 s <<< ERROR!
 com.dorm.platform.common.BizException: 管理员工号格式为SA加6位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
 	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:164)
@@ -140,7 +237,7 @@ com.dorm.platform.common.BizException: 管理员工号格式为SA加6位数字
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 
-com.dorm.platform.WorkflowIntegrationTest.academicStructureFlowsIntoStudentProfileAndFilters -- Time elapsed: 0.016 s <<< ERROR!
+com.dorm.platform.WorkflowIntegrationTest.academicStructureFlowsIntoStudentProfileAndFilters -- Time elapsed: 0.017 s <<< ERROR!
 com.dorm.platform.common.BizException: 学号必须为10位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
 	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:162)
@@ -186,7 +283,31 @@ com.dorm.platform.common.BizException: 学号必须为10位数字
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 
-com.dorm.platform.WorkflowIntegrationTest.studentProfileUsesSharedPrimaryKeyAndBusinessForeignKeys -- Time elapsed: 0.019 s <<< ERROR!
+com.dorm.platform.WorkflowIntegrationTest.stayLocksResubmitsAndArchives -- Time elapsed: 0.006 s <<< ERROR!
+com.dorm.platform.common.BizException: 编号格式无效
+	at com.dorm.platform.common.Input.id(Input.java:8)
+	at com.dorm.platform.stay.service.StayService.configure(StayService.java:43)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:379)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.stay.service.StayService$$SpringCGLIB$$0.configure(<generated>)
+	at com.dorm.platform.WorkflowIntegrationTest.batch(WorkflowIntegrationTest.java:83)
+	at com.dorm.platform.WorkflowIntegrationTest.stayLocksResubmitsAndArchives(WorkflowIntegrationTest.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.dorm.platform.WorkflowIntegrationTest.studentProfileUsesSharedPrimaryKeyAndBusinessForeignKeys -- Time elapsed: 0.018 s <<< ERROR!
 com.dorm.platform.common.BizException: 学号必须为10位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
 	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:162)
@@ -209,7 +330,7 @@ com.dorm.platform.common.BizException: 学号必须为10位数字
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 
-com.dorm.platform.WorkflowIntegrationTest.eachStaffRoleStoresPersonnelFieldsOutsideAuthenticationTable -- Time elapsed: 0.005 s <<< ERROR!
+com.dorm.platform.WorkflowIntegrationTest.eachStaffRoleStoresPersonnelFieldsOutsideAuthenticationTable -- Time elapsed: 0.006 s <<< ERROR!
 com.dorm.platform.common.BizException: 宿管工号格式为DM加6位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
 	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:164)
@@ -232,7 +353,7 @@ com.dorm.platform.common.BizException: 宿管工号格式为DM加6位数字
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 
-com.dorm.platform.WorkflowIntegrationTest.adminUserSearchAndDetailHttpEndpoints -- Time elapsed: 0.006 s <<< FAILURE!
+com.dorm.platform.WorkflowIntegrationTest.adminUserSearchAndDetailHttpEndpoints -- Time elapsed: 0.004 s <<< FAILURE!
 java.lang.AssertionError: com.dorm.platform.common.BizException: 学号必须为10位数字
 	at com.dorm.platform.WorkflowIntegrationTest.adminUserSearchAndDetailHttpEndpoints(WorkflowIntegrationTest.java:71)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
@@ -257,7 +378,7 @@ Caused by: com.dorm.platform.common.BizException: 学号必须为10位数字
 	at com.dorm.platform.system.service.ManagementService$$SpringCGLIB$$0.saveUser(<generated>)
 	... 4 more
 
-com.dorm.platform.WorkflowIntegrationTest.unassignedStudentCanReadEmptyAccommodation -- Time elapsed: 0.006 s <<< ERROR!
+com.dorm.platform.WorkflowIntegrationTest.unassignedStudentCanReadEmptyAccommodation -- Time elapsed: 0.004 s <<< ERROR!
 com.dorm.platform.common.BizException: 学号必须为10位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
 	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:162)
@@ -280,7 +401,7 @@ com.dorm.platform.common.BizException: 学号必须为10位数字
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 
-com.dorm.platform.WorkflowIntegrationTest.occupiedBedAndUnauthorizedMessageAreRejected -- Time elapsed: 0.004 s <<< ERROR!
+com.dorm.platform.WorkflowIntegrationTest.occupiedBedAndUnauthorizedMessageAreRejected -- Time elapsed: 0.005 s <<< ERROR!
 com.dorm.platform.common.BizException: 学号必须为10位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
 	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:162)
@@ -303,7 +424,7 @@ com.dorm.platform.common.BizException: 学号必须为10位数字
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 
-com.dorm.platform.WorkflowIntegrationTest.adminPersonalProfileUpdatesRoleSpecificDetails -- Time elapsed: 0.008 s <<< ERROR!
+com.dorm.platform.WorkflowIntegrationTest.adminPersonalProfileUpdatesRoleSpecificDetails -- Time elapsed: 0.009 s <<< ERROR!
 com.dorm.platform.common.BizException: 管理员工号格式为SA加6位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
 	at com.dorm.platform.system.service.ManagementService.profile(ManagementService.java:146)
@@ -326,7 +447,7 @@ com.dorm.platform.common.BizException: 管理员工号格式为SA加6位数字
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 
-com.dorm.platform.WorkflowIntegrationTest.maintenanceScopeWorkloadAndReworkCap -- Time elapsed: 0.068 s <<< FAILURE!
+com.dorm.platform.WorkflowIntegrationTest.maintenanceScopeWorkloadAndReworkCap -- Time elapsed: 0.069 s <<< FAILURE!
 org.opentest4j.AssertionFailedError: expected: <PENDING_MANUAL> but was: <PENDING_ACCEPT>
 	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
 	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
@@ -339,7 +460,7 @@ org.opentest4j.AssertionFailedError: expected: <PENDING_MANUAL> but was: <PENDIN
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 
-com.dorm.platform.WorkflowIntegrationTest.studentAndBuildingIsolation -- Time elapsed: 0.015 s <<< ERROR!
+com.dorm.platform.WorkflowIntegrationTest.studentAndBuildingIsolation -- Time elapsed: 0.019 s <<< ERROR!
 com.dorm.platform.common.BizException: 学号必须为10位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
 	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:162)
@@ -358,6 +479,30 @@ com.dorm.platform.common.BizException: 学号必须为10位数字
 	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
 	at com.dorm.platform.system.service.ManagementService$$SpringCGLIB$$0.saveUser(<generated>)
 	at com.dorm.platform.WorkflowIntegrationTest.studentAndBuildingIsolation(WorkflowIntegrationTest.java:108)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.dorm.platform.WorkflowIntegrationTest.stayDashboardCountsPeopleNotApplications -- Time elapsed: 0.064 s <<< ERROR!
+com.dorm.platform.common.BizException: 编号格式无效
+	at com.dorm.platform.common.Input.id(Input.java:8)
+	at com.dorm.platform.stay.service.StayService.configure(StayService.java:43)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:379)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.stay.service.StayService$$SpringCGLIB$$0.configure(<generated>)
+	at com.dorm.platform.WorkflowIntegrationTest.batch(WorkflowIntegrationTest.java:83)
+	at com.dorm.platform.WorkflowIntegrationTest.stayDashboardCountsPeopleNotApplications(WorkflowIntegrationTest.java:76)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)

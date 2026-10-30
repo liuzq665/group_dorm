@@ -1,9 +1,12 @@
-import { api,post,put,role,state,esc,button,field,select,check,table,modal,photoField,upload,photos,render,notify,download } from './app.js';
+import { api,post,put,role,state,esc,button,field,select,check,table,modal,photoField,upload,photos,render,notify,download,downloadCsv } from './app.js';
 
 export async function repairPage(){
- const [rows,catalog]=await Promise.all([api('/repair-orders'),api('/repair-catalog')]);state.data.repairs=rows;state.data.catalog=catalog;
- return `<section class="panel"><div class="toolbar"><h3>${role()==='STUDENT'?'我的报修':role()==='REPAIRER'?'维修任务与历史':'报修工单'}</h3><div class="actions">${role()==='STUDENT'?button('新建报修','repair-create'):''}${button('导出记录','repair-export')}</div></div><label class="field search"><span>搜索工单、人员、状态</span><input id="list-search" type="search"></label>${table(rows,[['order_no','工单号'],['title','标题'],['student_name','学生'],['building_name','楼栋'],['room_no','房间'],['category_name','分类'],['current_status','状态'],['repairer_name','维修人员'],['score','评分']],actions,'order_id')}</section>`;
+ const filters=state.data.repairFilters||{};const query=new URLSearchParams(Object.entries(filters).filter(([,v])=>v));
+ const [rows,catalog]=await Promise.all([api('/repair-orders'+(query.size?'?'+query:'')),api('/repair-catalog')]);state.data.repairs=rows;state.data.catalog=catalog;
+ return `<section class="panel"><div class="toolbar"><h3>${role()==='STUDENT'?'我的报修':role()==='REPAIRER'?'维修任务':'报修工单'}</h3><div class="actions">${role()==='STUDENT'?button('新建报修','repair-create'):''}${role()==='ADMIN'?button('报修历史','repair-history-open'):''}${button('导出 CSV','repair-export-csv')}${button('导出 JSON','repair-export')}</div></div>${repairFilters(filters)}${table(rows,[['order_no','工单号'],['title','标题'],['student_name','学生'],['building_name','楼栋'],['room_no','房间'],['category_name','分类'],['current_status','状态'],['repairer_name','维修人员'],['score','评分']],actions,'order_id')}</section>`;
 }
+export async function repairHistoryPage(){const filters=state.data.repairHistoryFilters||{};const query=new URLSearchParams(Object.entries(filters).filter(([,v])=>v));const rows=await api('/repair-history'+(query.size?'?'+query:''));state.data.repairHistory=rows;return `<section class="panel"><div class="toolbar"><h3>报修历史</h3><div class="actions">${button('导出 CSV','repair-export-csv')}${button('导出 JSON','repair-export')}</div></div>${repairFilters(filters,'repair-history-filter-form')} ${table(rows,[['order_no','工单号'],['title','标题'],['student_name','申请学生'],['repairer_name','维修人员'],['building_name','楼栋'],['room_no','房间'],['category_name','分类'],['current_status','状态'],['completed_at','完成时间']],r=>button('详情','repair-detail',r.order_id),'order_id')}</section>`;}
+function repairFilters(filters={},id='repair-filter-form'){return `<form id="${id}" class="filter-grid repair-filter-grid">${[['orderNo','工单号'],['student','申请学生'],['repairer','维修人员'],['building','楼栋'],['room','房间'],['category','分类']].map(([name,label])=>field(name,label,'search',filters[name]||'',false)).join('')}${id==='repair-history-filter-form'?field('completedFrom','完成时间起','date',filters.completedFrom||'',false)+field('completedTo','完成时间止','date',filters.completedTo||'',false):''}<div class="filter-actions"><button class="primary" type="submit">查询</button><button class="secondary" type="reset" data-filter-clear="${id}">清空</button></div></form>`;}
 function actions(r){
  let result=button('详情','repair-detail',r.order_id);
  const add=(label,key)=>result+=button(label,`repair-${key}`,r.order_id);
@@ -28,7 +31,9 @@ function actions(r){
 function repairForm(row={}){return field('title','报修标题','text',row.title||'')+select('categoryId','故障分类',state.data.catalog.categories.map(c=>[c.id,c.name]),row.category_id)+field('description','故障位置与说明','textarea',row.description||'')+photoField();}
 export async function repairAction(action,id){
  const row=state.data.repairs.find(r=>String(r.order_id)===id);
- if(action==='repair-export'){download('repair-orders.json',await Promise.all(state.data.repairs.map(r=>api(`/repair-orders/${r.order_id}`))));return;}
+ if(action==='repair-history-open'){state.page='repairHistory';await render();return;}
+ if(action==='repair-export'){const rows=state.page==='repairHistory'?state.data.repairHistory:state.data.repairs;download('repair-orders.json',await Promise.all((rows||[]).map(r=>api(`/repair-orders/${r.order_id}`))));return;}
+ if(action==='repair-export-csv'){const rows=state.page==='repairHistory'?state.data.repairHistory:state.data.repairs;downloadCsv('报修记录.csv',rows||[]);return;}
  if(action==='repair-create'){
   const homes=await api('/accommodations/current');if(!homes.length)throw new Error('尚未分配宿舍，请联系管理员');
   modal('新建报修',`<p>${esc(homes[0].building_name)} ${esc(homes[0].room_no)} / ${esc(homes[0].bed_no)}</p>`+repairForm()+check('submitNow','保存后提交审核',true),async(d,f)=>{const created=await post('/repair-orders',{...d,fileIds:await upload(f)});if(d.submitNow)await post(`/repair-orders/${created.orderId}/submit`);});return;

@@ -28,6 +28,8 @@ const accounts = [
     await page.getByRole('heading', { name: '工作台' }).waitFor();
     const group = page.locator('summary').filter({ hasText: '角色管理' });
     assert.equal(await group.count(), 1);
+    assert.equal(await group.evaluate(node => getComputedStyle(node, '::after').content), '"▸"');
+    await group.click();
     assert.equal(await group.evaluate(node => getComputedStyle(node, '::after').content), '"▾"');
 
     await page.locator('[data-page="students"]').click();

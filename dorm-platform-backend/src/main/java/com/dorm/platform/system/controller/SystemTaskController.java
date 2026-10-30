@@ -15,6 +15,6 @@ public class SystemTaskController {
  @GetMapping("/data-tasks") public ApiResponse<?> list(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(service.dataTasks(currentUser));}
  @GetMapping("/data-tasks/{id}") public ApiResponse<?> detail(@RequestAttribute CurrentUser currentUser,@PathVariable long id){return ApiResponse.ok(service.dataTask(currentUser,id));}
  @DeleteMapping("/data-tasks/{id}") public ApiResponse<?> cancel(@RequestAttribute CurrentUser currentUser,@PathVariable long id){service.cancel(currentUser,id);return ApiResponse.ok();}
- @PostMapping("/backup-tasks") public ResponseEntity<?> backup(@RequestAttribute CurrentUser currentUser,@RequestBody Map<String,Object>b){BizException.require("BACKUP".equals(Input.text(b,"taskType")),"当前接口仅提供数据库备份");return ResponseEntity.accepted().body(ApiResponse.ok(service.backupTask(currentUser)));}
+ @PostMapping("/backup-tasks") public ResponseEntity<?> backup(@RequestAttribute CurrentUser currentUser,@RequestBody Map<String,Object>b){BizException.require("BACKUP".equals(Input.text(b,"taskType")),"当前接口仅提供数据库备份");return ResponseEntity.accepted().body(ApiResponse.ok(service.backupTask(currentUser,Input.text(b,"businessType"))));}
  @GetMapping("/backup-tasks") public ApiResponse<?> backups(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(service.backups(currentUser));}
 }

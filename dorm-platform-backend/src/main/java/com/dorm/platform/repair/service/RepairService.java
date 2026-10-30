@@ -18,13 +18,19 @@ public class RepairService {
     private final NoticeService notice;
     private final FileService files;
     public RepairService(SqlStore db,DataScope scope,NoticeService notice,FileService files){this.db=db;this.scope=scope;this.notice=notice;this.files=files;}
-    public List<Map<String,Object>> list(CurrentUser u){
+    public List<Map<String,Object>> list(CurrentUser u){return list(u,Map.of(),false);}
+    public List<Map<String,Object>> list(CurrentUser u,Map<String,String> filters,boolean archived){
         String filter=switch(u.role()){
             case "STUDENT" -> "o.student_id="+u.id();
             case "REPAIRER" -> "EXISTS(SELECT 1 FROM repair_dispatch d WHERE d.order_id=o.order_id AND d.repairer_user_id="+u.id()+")";
             default -> scope.buildingFilter(u,"o.building_id");
         };
-        return db.rows("SELECT o.* FROM v_repair_order_dashboard o WHERE "+filter+" ORDER BY o.created_at DESC");
+        StringBuilder sql=new StringBuilder("SELECT o.*, (SELECT MAX(x.created_at) FROM repair_result x WHERE x.order_id=o.order_id) completed_at FROM v_repair_order_dashboard o WHERE ").append(filter);
+        sql.append(archived?" AND o.current_status IN ('ARCHIVED','CLOSED','CANCELLED')":" AND o.current_status NOT IN ('ARCHIVED','CLOSED','CANCELLED')");
+        List<Object> args=new ArrayList<>();
+        for(String[] f:new String[][]{{"orderNo","o.order_no"},{"student","o.student_name"},{"repairer","o.repairer_name"},{"building","o.building_name"},{"room","o.room_no"},{"category","o.category_name"}}){String v=Objects.toString(filters.get(f[0]),"").trim();if(!v.isEmpty()){sql.append(" AND ").append(f[1]).append(" LIKE ?");args.add("%"+v+"%");}}
+        String from=Objects.toString(filters.get("completedFrom"),"").trim(),to=Objects.toString(filters.get("completedTo"),"").trim();if(!from.isEmpty()){sql.append(" AND EXISTS(SELECT 1 FROM repair_result x WHERE x.order_id=o.order_id AND x.created_at>=?)");args.add(from+" 00:00:00");}if(!to.isEmpty()){sql.append(" AND EXISTS(SELECT 1 FROM repair_result x WHERE x.order_id=o.order_id AND x.created_at<DATE_ADD(?,INTERVAL 1 DAY))");args.add(to);}
+        sql.append(" ORDER BY o.created_at DESC");return db.rows(sql.toString(),args.toArray());
     }
     private Map<String,Object> locked(long order){db.one("SELECT order_id FROM repair_order WHERE order_id=? FOR UPDATE",order);return db.one("SELECT * FROM v_repair_order_dashboard WHERE order_id=?",order);}
     private void access(CurrentUser u,Map<String,Object> o){
@@ -55,7 +61,7 @@ public class RepairService {
         files.attach(u,order,"FAULT",b.get("fileIds"),false);db.log(u.id(),"repair","create",order);return Map.of("orderId",order,"orderNo",no);
     }
     @Transactional public void edit(CurrentUser u,long order,Map<String,Object>b){role(u,"STUDENT");var o=locked(order);access(u,o);state(o,"DRAFT","PENDING_EDIT");content(b);editDeadline(o);db.update("UPDATE repair_order SET title=?,description=?,category_id=? WHERE order_id=?",text(b,"title"),text(b,"description"),id(b.get("categoryId")),order);files.attach(u,order,"FAULT",b.get("fileIds"),false);}
-    private void editDeadline(Map<String,Object> o){if("PENDING_EDIT".equals(o.get("current_status"))){var last=db.one("SELECT created_at FROM repair_audit WHERE order_id=? AND result='RETURNED' ORDER BY audit_id DESC LIMIT 1",o.get("order_id"));require(LocalDateTime.now().isBefore(time(last.get("created_at")).plusDays(id(rule(o).get("edit_days")))),"已超过修改期限");}}
+    private void editDeadline(Map<String,Object> o){if("PENDING_EDIT".equals(o.get("current_status"))){var last=db.one("SELECT created_at FROM repair_audit WHERE order_id=? AND result='RETURNED' ORDER BY audit_id DESC LIMIT 1",o.get("order_id"));require(LocalDateTime.now().isBefore(time(last.get("created_at")).plusDays(id(rule(o).get("confirm_days")))),"已超过修改期限");}}
     private void version(long order){db.update("INSERT INTO repair_submission_version(order_id,title,description,category_id) SELECT order_id,title,description,category_id FROM repair_order WHERE order_id=?",order);}
     @Transactional public void submit(CurrentUser u,long order){role(u,"STUDENT");var o=locked(order);access(u,o);state(o,"DRAFT","PENDING_EDIT");editDeadline(o);version(order);db.update("UPDATE repair_order SET current_status='PENDING_REVIEW',reject_reason=NULL WHERE order_id=?",order);notice.managers(id(o.get("building_id")),"报修待审核",o.get("order_no").toString());db.log(u.id(),"repair","submit",order);}
     @Transactional public void cancel(CurrentUser u,long order){role(u,"STUDENT");var o=locked(order);access(u,o);state(o,"DRAFT","PENDING_EDIT","PENDING_REVIEW","PENDING_ASSIGN","PENDING_MANUAL");require(db.count("SELECT COUNT(*) FROM repair_dispatch WHERE order_id=?",order)==0,"已派单工单不可撤销");db.update("UPDATE repair_order SET current_status='CANCELLED',archived_at=NOW(),archive_reason='STUDENT_CANCELLED' WHERE order_id=?",order);db.log(u.id(),"repair","cancel",order);}
@@ -104,7 +110,7 @@ public class RepairService {
             if(s.equals("PENDING_ACCEPT")&&o.get("accept_deadline")!=null&&!time(o.get("accept_deadline")).isAfter(now)){db.update("UPDATE repair_dispatch SET dispatch_status='TIMEOUT',decided_at=NOW() WHERE dispatch_id=?",o.get("dispatch_id"));notice.send(List.of(id(o.get("repairer_user_id"))),"接单超时",o.get("order_no").toString());reroute(order);}
             else if(Set.of("ACCEPTED","DELAYED").contains(s)&&o.get("repair_deadline")!=null&&!time(o.get("repair_deadline")).isAfter(now)&&db.count("SELECT COUNT(*) FROM repair_delay_request WHERE order_id=? AND current_status='PENDING'",order)==0)repairTimeout(o);
             else if(s.equals("REPAIRED")&&db.count("SELECT COUNT(*) FROM repair_order WHERE parent_order_id=? AND current_status NOT IN ('CLOSED','CANCELLED')",order)==0){var result=db.one("SELECT created_at FROM repair_result WHERE order_id=?",order);if(!time(result.get("created_at")).plusDays(id(r.get("confirm_days"))).isAfter(now))confirmOrder(o,"AUTO");}
-            else if(s.equals("PENDING_EDIT")){var audits=db.rows("SELECT created_at FROM repair_audit WHERE order_id=? AND result='RETURNED' ORDER BY audit_id DESC LIMIT 1",order);if(!audits.isEmpty()&&!time(audits.get(0).get("created_at")).plusDays(id(r.get("edit_days"))).isAfter(now)){db.update("UPDATE repair_order SET current_status='CLOSED',archived_at=NOW(),archive_reason='EDIT_EXPIRED' WHERE order_id=?",order);studentNotice(o,"未按期修改，已关闭归档");}}
+            else if(s.equals("PENDING_EDIT")){var audits=db.rows("SELECT created_at FROM repair_audit WHERE order_id=? AND result='RETURNED' ORDER BY audit_id DESC LIMIT 1",order);if(!audits.isEmpty()&&!time(audits.get(0).get("created_at")).plusDays(id(r.get("confirm_days"))).isAfter(now)){db.update("UPDATE repair_order SET current_status='CLOSED',archived_at=NOW(),archive_reason='EDIT_EXPIRED' WHERE order_id=?",order);studentNotice(o,"未按期修改，已关闭归档");}}
         }
     }
 }

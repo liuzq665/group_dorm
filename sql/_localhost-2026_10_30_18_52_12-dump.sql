@@ -1138,7 +1138,7 @@ CREATE TABLE `schema_version` (
 
 LOCK TABLES `schema_version` WRITE;
 /*!40000 ALTER TABLE `schema_version` DISABLE KEYS */;
-INSERT INTO `schema_version` (`version_no`, `installed_at`) VALUES (1,'2026-10-15 09:28:07'),(2,'2026-10-15 09:28:07'),(3,'2026-10-15 09:28:07'),(4,'2026-10-15 10:29:55'),(5,'2026-10-29 16:41:39'),(6,'2026-10-29 17:40:57'),(7,'2026-10-29 18:53:11'),(8,'2026-10-29 19:53:27'),(9,'2026-10-29 19:53:36');
+INSERT INTO `schema_version` (`version_no`, `installed_at`) VALUES (1,'2026-10-15 09:28:07'),(2,'2026-10-15 09:28:07'),(3,'2026-10-15 09:28:07'),(4,'2026-10-15 10:29:55'),(5,'2026-10-29 16:41:39'),(6,'2026-10-29 17:40:57'),(7,'2026-10-29 18:53:11'),(8,'2026-10-29 19:53:27'),(9,'2026-10-29 19:53:36'),(10,'2026-10-30 00:00:00');
 /*!40000 ALTER TABLE `schema_version` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1224,6 +1224,8 @@ CREATE TABLE `stay_batch` (
   `batch_id` bigint NOT NULL AUTO_INCREMENT,
   `batch_code` varchar(40) NOT NULL,
   `batch_name` varchar(100) NOT NULL,
+  `academic_year` smallint unsigned NOT NULL,
+  `vacation_type` enum('SUMMER','WINTER') COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `open_start_date` date NOT NULL,
   `open_end_date` date NOT NULL,
   `application_deadline` datetime NOT NULL,
@@ -1240,9 +1242,29 @@ CREATE TABLE `stay_batch` (
 
 LOCK TABLES `stay_batch` WRITE;
 /*!40000 ALTER TABLE `stay_batch` DISABLE KEYS */;
-INSERT INTO `stay_batch` (`batch_id`, `batch_code`, `batch_name`, `open_start_date`, `open_end_date`, `application_deadline`, `instructions`, `current_status`) VALUES (1,'WINTER-2026','2026 寒假留宿','2027-01-10','2027-02-20','2026-12-20 23:59:59','请按连续开放区间填写留宿日期，提交后等待宿管审核。','OPEN');
+INSERT INTO `stay_batch` (`batch_id`, `batch_code`, `batch_name`, `academic_year`, `vacation_type`, `open_start_date`, `open_end_date`, `application_deadline`, `instructions`, `current_status`) VALUES (1,'WINTER-2026','2026 寒假留宿',2026,'WINTER','2027-01-10','2027-02-20','2026-12-20 23:59:59','请按连续开放区间填写留宿日期，提交后等待宿管审核。','OPEN');
 /*!40000 ALTER TABLE `stay_batch` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `stay_batch_material`
+--
+
+DROP TABLE IF EXISTS `stay_batch_material`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `stay_batch_material` (
+  `material_id` bigint NOT NULL AUTO_INCREMENT,
+  `batch_id` bigint NOT NULL,
+  `file_id` bigint NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`material_id`),
+  UNIQUE KEY `uq_stay_batch_material` (`batch_id`,`file_id`),
+  KEY `idx_stay_batch_material_file` (`file_id`),
+  CONSTRAINT `fk_stay_batch_material_batch` FOREIGN KEY (`batch_id`) REFERENCES `stay_batch` (`batch_id`),
+  CONSTRAINT `fk_stay_batch_material_file` FOREIGN KEY (`file_id`) REFERENCES `file_resource` (`file_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `stay_building_rule`

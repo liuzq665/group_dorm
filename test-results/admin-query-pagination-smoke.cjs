@@ -13,6 +13,7 @@ const assert = require('node:assert/strict');
     await page.getByRole('button', { name: '登录' }).click();
     await page.getByRole('heading', { name: '工作台' }).waitFor();
 
+    await page.locator('.nav-group[data-nav-group="dorm"] summary').click();
     await page.locator('[data-page="buildings"]').click();
     await page.locator('[data-resource-filter="buildings"]').waitFor();
     assert.equal(await page.getByRole('button', { name: '批量删除' }).count(), 1);
@@ -414,6 +415,7 @@ const assert = require('node:assert/strict');
         enrollment_status: 'ENROLLED'
       })) })
     }));
+    await page.locator('.nav-group[data-nav-group="roles"] summary').click();
     await page.locator('[data-page="students"]').click();
     await page.locator('.role-table-students .table-pagination').waitFor();
     assert.equal(await page.getByRole('button', { name: '批量删除' }).count(), 1);

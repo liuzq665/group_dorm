@@ -15,6 +15,7 @@ const baseUrl = process.env.BASE_URL || 'http://localhost:5173';
     await page.getByRole('button', { name: '登录', exact: true }).click();
     await page.getByRole('heading', { name: '工作台', exact: true }).waitFor();
 
+    await page.locator('.nav-group[data-nav-group="roles"] summary').click();
     await page.locator('[data-page="students"]').click();
     await page.locator('#user-filter-form').waitFor();
     assert.equal(await page.locator('#list-search').count(), 0);

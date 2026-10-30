@@ -25,7 +25,7 @@ public class ManagementController {
   counts.put("repairPending",orders.stream().filter(x->Set.of("PENDING_REVIEW","PENDING_ASSIGN","PENDING_MANUAL","PENDING_ACCEPT").contains(x.get("current_status"))).count());
   counts.put("repairProcessing",orders.stream().filter(x->Set.of("ACCEPTED","DELAYED","REPAIRED").contains(x.get("current_status"))).count());
   counts.put("repairClosed",orders.stream().filter(x->Set.of("CONFIRMED","ARCHIVED","CLOSED").contains(x.get("current_status"))).count());
-  counts.put("unread",notice.list(currentUser).stream().filter(x->x.get("read_at")==null).count());
+  counts.put("unread",notice.list(currentUser,Map.of()).stream().filter(x->x.get("read_at")==null).count());
   counts.put("stayOpen",currentUser.role().equals("REPAIRER")?0:stay.batches(currentUser).size());
   counts.put("averageScore",orders.stream().filter(x->x.get("score")!=null).mapToDouble(x->((Number)x.get("score")).doubleValue()).average().orElse(0));
   if(Set.of("ADMIN","DORM_MANAGER").contains(currentUser.role())){
@@ -51,9 +51,10 @@ public class ManagementController {
  @GetMapping("/profile") public ApiResponse<?> profile(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(management.profile(currentUser));}
  @PutMapping("/profile") public ApiResponse<?> profile(@RequestAttribute CurrentUser currentUser,@RequestBody Map<String,Object>b){management.profile(currentUser,b);return ApiResponse.ok(management.profile(currentUser));}
  @PutMapping("/profile/password") public ApiResponse<?> password(@RequestAttribute CurrentUser currentUser,@RequestBody Map<String,Object>b){management.password(currentUser,b);return ApiResponse.ok();}
- @GetMapping("/messages") public ApiResponse<?> messages(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(notice.list(currentUser));}
+ @GetMapping("/messages") public ApiResponse<?> messages(@RequestAttribute CurrentUser currentUser,@RequestParam Map<String,String> filters){return ApiResponse.ok(notice.list(currentUser,filters));}
  @PostMapping("/messages") public ApiResponse<?> publish(@RequestAttribute CurrentUser currentUser,@RequestBody Map<String,Object>b){notice.publish(currentUser,b);return ApiResponse.ok();}
  @PostMapping("/messages/{id}/read") public ApiResponse<?> read(@RequestAttribute CurrentUser currentUser,@PathVariable long id){notice.read(currentUser,id);return ApiResponse.ok();}
+ @DeleteMapping("/messages/read") public ApiResponse<?> clearReadMessages(@RequestAttribute CurrentUser currentUser){notice.clearRead(currentUser);return ApiResponse.ok();}
  @PostMapping("/files") public ApiResponse<?> upload(@RequestAttribute CurrentUser currentUser,@RequestParam MultipartFile file)throws IOException{return ApiResponse.ok(files.upload(currentUser,file));}
  @GetMapping("/files/{id}") public ResponseEntity<byte[]> file(@RequestAttribute CurrentUser currentUser,@PathVariable long id)throws IOException{var file=files.get(currentUser,id);return ResponseEntity.ok().contentType(MediaType.parseMediaType(file.get("content_type").toString())).header("X-Content-Type-Options","nosniff").body(files.bytes(file));}
  @GetMapping("/admin/users") public ApiResponse<?> users(@RequestAttribute CurrentUser currentUser,@RequestParam Map<String,String> filters){return ApiResponse.ok(management.users(currentUser,filters));}
@@ -70,5 +71,5 @@ public class ManagementController {
  @PutMapping("/admin/managers/{id}/buildings") public ApiResponse<?> managerScope(@RequestAttribute CurrentUser currentUser,@PathVariable long id,@RequestBody Map<String,Object>b){management.managerScope(currentUser,id,b);return ApiResponse.ok();}
  @PostMapping("/admin/dictionaries/{type}") public ApiResponse<?> dictionary(@RequestAttribute CurrentUser currentUser,@PathVariable String type,@RequestBody Map<String,Object>b){management.dictionary(currentUser,type,null,b);return ApiResponse.ok();}
  @PutMapping("/admin/dictionaries/{type}/{id}") public ApiResponse<?> dictionary(@RequestAttribute CurrentUser currentUser,@PathVariable String type,@PathVariable long id,@RequestBody Map<String,Object>b){management.dictionary(currentUser,type,id,b);return ApiResponse.ok();}
- @GetMapping("/admin/logs") public ApiResponse<?> logs(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(management.logs(currentUser));}
+ @GetMapping({"/admin/logs","/admin/operation-logs"}) public ApiResponse<?> logs(@RequestAttribute CurrentUser currentUser,@RequestParam Map<String,String> filters){return ApiResponse.ok(management.logs(currentUser,filters));}
 }
