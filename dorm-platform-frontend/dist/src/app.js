@@ -1,6 +1,6 @@
 import { repairPage, repairAction } from './repairs.js';
 import { stayPage, stayAction } from './stay.js';
-import { adminPages, adminAction, cascadeDirectoryFilters } from './management.js';
+import { adminPages, adminAction, cascadeDirectoryFilters, cascadeResourceFilters } from './management.js';
 
 export const API = '/api/v1';
 const roles = { STUDENT:'学生端', DORM_MANAGER:'宿管端', REPAIRER:'维修人员端', ADMIN:'系统管理员端' };
@@ -27,15 +27,66 @@ export function notify(message,error=false){let node=document.querySelector('#to
 export function field(name,label,type='text',value='',required=true){return `<label class="field"><span>${label}</span>${type==='textarea'?`<textarea name="${name}" ${required?'required':''}>${esc(value)}</textarea>`:`<input name="${name}" type="${type}" value="${esc(value)}" ${required?'required':''}>`}</label>`;}
 export function select(name,label,items,value='',multiple=false,required=true){return `<label class="field"><span>${label}</span><select name="${name}" aria-label="${esc(label)}" ${multiple?'multiple':required?'required':''}>${items.map(([id,text])=>`<option value="${esc(id)}" ${(multiple?Array.from(value||[]).map(String).includes(String(id)):String(id)===String(value))?'selected':''}>${esc(text)}</option>`).join('')}</select></label>`;}
 export function check(name,label,checked=false){return `<label class="check"><input type="checkbox" name="${name}" ${checked?'checked':''}> ${label}</label>`;}
-export function table(rows,columns,actions=()=>'',idKey='id'){
+let tableSequence=0;
+const tablePageSize=8;
+function tableMarkup(rows,columns,actions,idKey,pageId,pageSizeOverride){
+  const pageSize=pageSizeOverride|| (role()==='ADMIN'?tablePageSize:rows.length||tablePageSize);
+  const paginated=role()==='ADMIN'||pageSizeOverride!=null;
+  const pageCount=Math.max(1,Math.ceil(rows.length/pageSize));
+  const activePage=Math.min(state.data.tablePages?.[pageId]||1,pageCount);
+  const body=rows.map((row,index)=>`<tr data-row-id="${esc(row[idKey])}" data-table-row-index="${index}" ${index<pageSize*(activePage-1)||index>=pageSize*activePage?'hidden':''}>${columns.map(([key,label])=>{const value=row[key],cell=key==='current_status'?status(value):key==='enabled'?(Number(value)===1?'启用':'停用'):['on_duty','manager_on_duty'].includes(key)?(Number(value)===1?'在岗':'离岗'):key==='gender'?({MALE:'男',FEMALE:'女',OTHER:'其他'}[value]||'未填写'):key==='enrollment_status'?({ENROLLED:'在读',SUSPENDED:'休学',GRADUATED:'毕业',WITHDRAWN:'退学',UNKNOWN:'未登记'}[value]||'-'):esc(value??'-');return `<td data-label="${esc(label)}">${cell}</td>`;}).join('')}${actions?`<td data-label="操作"><div class="actions">${actions(row)||'-'}</div></td>`:''}</tr>`).join('');
+  const pagination=paginated&&rows.length>pageSize?`<div class="table-pagination"><span>共 ${rows.length} 条</span><div class="table-page-controls"><button type="button" class="secondary" data-table-page-step="-1" ${activePage===1?'disabled':''}>上一页</button><span data-table-page-label>${activePage} / ${pageCount}</span><input class="table-page-input" data-table-page-input type="number" min="1" max="${pageCount}" step="1" value="${activePage}" aria-label="跳转到页码"><button type="button" class="secondary" data-table-page-jump>跳转</button><button type="button" class="secondary" data-table-page-step="1" ${activePage===pageCount?'disabled':''}>下一页</button></div></div>`:'';
+  return `<div class="table-wrap table-component" data-table-id="${esc(pageId)}" data-table-page-size="${pageSize}"><table class="table"><thead><tr>${columns.map(([,label])=>`<th>${label}</th>`).join('')}${actions?'<th>操作</th>':''}</tr></thead><tbody>${body}</tbody></table>${pagination}</div>`;
+}
+export function bindTablePagination(container){
+  container.querySelectorAll('[data-table-page-step]').forEach(button=>button.onclick=()=>{
+    const component=button.closest('.table-component'),pageId=component?.dataset.tableId;if(!pageId)return;
+    const current=state.data.tablePages?.[pageId]||1;
+    state.data.tablePages??={};state.data.tablePages[pageId]=Math.max(1,current+Number(button.dataset.tablePageStep));
+    applyTablePage(component);
+  });
+  container.querySelectorAll('[data-table-page-jump]').forEach(button=>button.onclick=()=>{
+    const component=button.closest('.table-component'),pageId=component?.dataset.tableId;
+    const input=component?.querySelector('[data-table-page-input]'),label=component?.querySelector('[data-table-page-label]');
+    if(!pageId||!input||!label)return;
+    const requested=input.value.trim(),current=Number(label.textContent.split('/')[0].trim())||1;
+    if(!/^\d+$/.test(requested)){input.value=String(current);return;}
+    const pageCount=Number(label.textContent.split('/').pop().trim())||1;
+    state.data.tablePages??={};state.data.tablePages[pageId]=Math.min(pageCount,Math.max(1,Number(requested)));
+    applyTablePage(component);
+  });
+  container.querySelectorAll('[data-table-page-input]').forEach(input=>input.onkeydown=event=>{
+    if(event.key==='Enter'){event.preventDefault();input.closest('.table-component')?.querySelector('[data-table-page-jump]')?.click();}
+  });
+}
+function applyTablePage(component){
+  const pageId=component.dataset.tableId,allRows=[...component.querySelectorAll('tbody tr')],query=component.dataset.tableQuery||'';
+  const matching=allRows.filter(row=>row.textContent.toLowerCase().includes(query));
+  const pageSize=Number(component.dataset.tablePageSize)||tablePageSize;
+  const pageCount=Math.max(1,Math.ceil(matching.length/pageSize)),page=Math.min(state.data.tablePages?.[pageId]||1,pageCount),first=(page-1)*pageSize;
+  state.data.tablePages??={};state.data.tablePages[pageId]=page;
+  const visible=new Set(matching.slice(first,first+pageSize));
+  allRows.forEach(row=>row.hidden=!visible.has(row));
+  const pagination=component.querySelector('.table-pagination');
+  if(pagination){pagination.querySelector(':scope > span').textContent=`共 ${matching.length} 条`;pagination.querySelector('[data-table-page-label]').textContent=`${page} / ${pageCount}`;pagination.querySelector('[data-table-page-input]').value=String(page);pagination.querySelector('[data-table-page-input]').max=String(pageCount);pagination.querySelector('[data-table-page-step="-1"]').disabled=page===1;pagination.querySelector('[data-table-page-step="1"]').disabled=page===pageCount;}
+  const table=component.querySelector('.role-table,.resource-table')||component;
+  const all=table.querySelector('[data-select-all],[data-resource-select-all]'),inputs=[...table.querySelectorAll('[data-select-row],[data-resource-select-row]')].filter(input=>!input.closest('tr').hidden),count=inputs.filter(input=>input.checked).length;
+  if(all){all.checked=inputs.length>0&&count===inputs.length;all.indeterminate=count>0&&count<inputs.length;}
+}
+function filterTableComponents(query){
+  document.querySelectorAll('.table-component').forEach(component=>{component.dataset.tableQuery=query.toLowerCase();state.data.tablePages??={};state.data.tablePages[component.dataset.tableId]=1;applyTablePage(component);});
+}
+export function table(rows,columns,actions=()=>'',idKey='id',pageSizeOverride){
   if(!rows.length)return '<div class="empty">暂无记录</div>';
-  return `<div class="table-wrap"><table class="table"><thead><tr>${columns.map(([,label])=>`<th>${label}</th>`).join('')}<th>操作</th></tr></thead><tbody>${rows.map(row=>`<tr data-row-id="${esc(row[idKey])}">${columns.map(([key])=>{const value=row[key],cell=key==='current_status'?status(value):key==='enabled'?(Number(value)===1?'启用':'停用'):["on_duty","manager_on_duty"].includes(key)?(Number(value)===1?'在岗':'离岗'):key==='gender'?({MALE:'男',FEMALE:'女',OTHER:'其他'}[value]||'未填写'):key==='enrollment_status'?({ENROLLED:'在读',SUSPENDED:'休学',GRADUATED:'毕业',WITHDRAWN:'退学',UNKNOWN:'未登记'}[value]||'-'):esc(value??'-');return `<td>${cell}</td>`;}).join('')}<td><div class="actions">${actions(row)||'-'}</div></td></tr>`).join('')}</tbody></table></div>`;
+  const pageId=`${state.page}-${tableSequence++}`;
+  return tableMarkup(rows,columns,actions,idKey,pageId,pageSizeOverride);
 }
 export function modal(title,html,onSubmit,submitLabel='保存'){
   document.querySelector('dialog')?.remove();
   const dialog=document.createElement('dialog');dialog.className='dialog';
   dialog.innerHTML=`<form id="dialog-form"><header class="dialog-header"><h2>${esc(title)}</h2><button type="button" class="icon-button" title="关闭" aria-label="关闭">&times;</button></header><div class="dialog-body">${html}</div><p class="error" role="alert"></p><footer class="dialog-footer">${onSubmit?`<button class="primary" type="submit">${submitLabel}</button>`:''}<button type="button" class="secondary" data-close>关闭</button></footer></form>`;
   document.body.append(dialog);dialog.showModal();
+  bindTablePagination(dialog);
   dialog.querySelectorAll('[data-close],.icon-button').forEach(b=>b.onclick=()=>dialog.close());
   dialog.onclose=()=>{dialog.querySelectorAll('img').forEach(i=>URL.revokeObjectURL(i.src));dialog.remove();};
   dialog.querySelector('form').onsubmit=async event=>{event.preventDefault();if(!onSubmit)return;const submit=dialog.querySelector('[type=submit]');submit.disabled=true;try{const result=await onSubmit(Object.fromEntries(new FormData(event.currentTarget)),event.currentTarget);dialog.close();await render();notify(typeof result==='string'?result:'操作成功');}catch(error){dialog.querySelector('[role=alert]').textContent=error.message;}finally{submit.disabled=false;}};
@@ -47,7 +98,7 @@ export async function photos(dialog,items){for(const file of items){const respon
 export function download(name,data,type='application/json'){const url=URL.createObjectURL(new Blob([typeof data==='string'?data:JSON.stringify(data,null,2)],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 const titles={dashboard:'工作台',repairs:'报修工单',stay:'假期留宿',accommodation:'住宿信息',messages:'消息中心',buildings:'楼栋',rooms:'宿舍',beds:'床位',students:'学生管理',managers:'宿管管理',repairers:'维修人员管理',logs:'操作日志',profile:'个人信息',rules:'报修规则',data:'导入导出与备份'};
 function menus(){const common=[['dashboard','工作台'],['messages','消息中心'],['profile','个人信息']];switch(role()){case 'STUDENT':return [...common,['accommodation','我的住宿'],['repairs','我的报修'],['stay','假期留宿']];case 'DORM_MANAGER':return [...common,['repairs','报修审核与派单'],['stay','留宿审核'],['accommodation','楼栋住宿'],['buildings','楼栋床位']];case 'REPAIRER':return [...common,['repairs','我的维修任务']];default:return [...common,['repairs','全校报修'],['stay','留宿管理'],['accommodation','住宿分配'],{label:'基本资料',children:[['buildings','楼栋'],['rooms','宿舍'],['beds','床位']]},{label:'角色管理',children:[['students','学生管理'],['managers','宿管管理'],['repairers','维修人员管理']]},['rules','报修规则'],['logs','操作日志'],['data','导入导出与备份']];}}
-function layout(content){const menu=menus().map(item=>Array.isArray(item)?`<button data-page="${item[0]}" class="${state.page===item[0]?'active':''}">${item[1]}</button>`:`<details class="nav-group" open><summary class="${item.children.some(([key])=>state.page===key)?'active':''}">${item.label}</summary><div class="nav-children">${item.children.map(([key,label])=>`<button data-page="${key}" class="${state.page===key?'active':''}">${label}</button>`).join('')}</div></details>`).join('');document.querySelector('#app').innerHTML=`<div class="shell"><aside class="sidebar"><h2>宿舍事务平台</h2><div class="role-tag">${roles[role()]}</div><nav class="nav">${menu}</nav><button class="logout" id="logout">退出登录</button></aside><main class="content"><div class="topbar"><div><div class="muted">${roles[role()]}</div><h1>${titles[state.page]}</h1></div><span>${esc(state.user.name)}</span></div>${content}</main></div><div id="toast" class="toast" role="status" hidden></div>`;
+function layout(content){const menu=menus().map(item=>Array.isArray(item)?`<button data-page="${item[0]}" class="${state.page===item[0]?'active':''}">${item[1]}</button>`:`<details class="nav-group" open><summary class="${item.children.some(([key])=>state.page===key)?'active':''}">${item.label}</summary><div class="nav-children">${item.children.map(([key,label])=>`<button data-page="${key}" class="${state.page===key?'active':''}">${label}</button>`).join('')}</div></details>`).join('');document.querySelector('#app').innerHTML=`<div class="shell ${role()==='ADMIN'?'admin-shell':''}"><aside class="sidebar"><h2>宿舍事务平台</h2><div class="role-tag">${roles[role()]}</div><nav class="nav">${menu}</nav><button class="logout" id="logout">退出登录</button></aside><main class="content"><div class="topbar"><div><div class="muted">${roles[role()]}</div><h1>${titles[state.page]}</h1></div><span>${esc(state.user.name)}</span></div>${content}</main></div><div id="toast" class="toast" role="status" hidden></div>`;
  document.querySelectorAll('button[data-page]').forEach(b=>b.onclick=()=>{state.page=b.dataset.page;render();});document.querySelector('#logout').onclick=async()=>{try{await post('/auth/logout');}finally{clearSession();login();}};
 }
 function login(error=''){document.querySelector('#app').innerHTML=`<div class="login"><form class="login-panel" id="login-form"><div class="brand-mark">宿</div><h1>宿舍事务平台</h1>${field('loginAccount','账号','text','')}${field('password','密码','password','')}<p class="error" role="alert">${esc(error)}</p><button class="primary full">登录</button></form></div>`;document.querySelector('#login-form').onsubmit=async e=>{e.preventDefault();const button=e.currentTarget.querySelector('button');button.disabled=true;try{const data=await post('/auth/login',Object.fromEntries(new FormData(e.currentTarget)));state.token=data.token;state.user=data.user;sessionStorage.setItem('dorm_token',data.token);sessionStorage.setItem('dorm_user',JSON.stringify(data.user));state.page='dashboard';await render();}catch(e){login(e.message);}};}
@@ -60,11 +111,13 @@ let renderId=0;
 export async function render(){
  if(!state.token||!state.user){login();return;}
  const current=++renderId;
+ tableSequence=0;
  layout('<div class="empty">正在加载...</div>');
  try{
   const html=await pages[state.page]();
   if(current!==renderId||!state.token)return;
   layout(html);
+  bindTablePagination(document);
   document.querySelectorAll('[data-action]').forEach(b=>b.onclick=async()=>{
    b.disabled=true;
    try{
@@ -86,22 +139,24 @@ export async function render(){
   });
   const roleTable=document.querySelector('.role-table');
   if(roleTable){
-   roleTable.addEventListener('scroll',()=>roleTable.classList.toggle('scroll-shifted',roleTable.scrollLeft>0),{passive:true});
    roleTable.addEventListener('change',event=>{
     const rows=[...roleTable.querySelectorAll('[data-select-row]')],all=roleTable.querySelector('[data-select-all]');
-    if(event.target.matches('[data-select-all]'))rows.forEach(input=>input.checked=event.target.checked);
-    if(all){const count=rows.filter(input=>input.checked).length;all.checked=rows.length>0&&count===rows.length;all.indeterminate=count>0&&count<rows.length;}
+    if(event.target.matches('[data-select-all]'))rows.filter(input=>!input.closest('tr').hidden).forEach(input=>input.checked=event.target.checked);
+    if(all){const visible=rows.filter(input=>!input.closest('tr').hidden),count=visible.filter(input=>input.checked).length;all.checked=visible.length>0&&count===visible.length;all.indeterminate=count>0&&count<visible.length;}
    });
   }
   document.querySelectorAll('.resource-table').forEach(resourceTable=>resourceTable.addEventListener('change',event=>{
    const rows=[...resourceTable.querySelectorAll('[data-resource-select-row]')],all=resourceTable.querySelector('[data-resource-select-all]');
-   if(event.target.matches('[data-resource-select-all]'))rows.forEach(input=>input.checked=event.target.checked);
-   if(all){const count=rows.filter(input=>input.checked).length;all.checked=rows.length>0&&count===rows.length;all.indeterminate=count>0&&count<rows.length;}
+   if(event.target.matches('[data-resource-select-all]'))rows.filter(input=>!input.closest('tr').hidden).forEach(input=>input.checked=event.target.checked);
+   if(all){const visible=rows.filter(input=>!input.closest('tr').hidden),count=visible.filter(input=>input.checked).length;all.checked=visible.length>0&&count===visible.length;all.indeterminate=count>0&&count<visible.length;}
   }));
-  document.querySelectorAll('[data-resource-filter]').forEach(form=>form.onsubmit=event=>{
-   event.preventDefault();const filters=Object.fromEntries(new FormData(form));
-   for(const [key,value] of Object.entries(filters))if(value==='')delete filters[key];
-   state.data.resourceFilters??={};state.data.resourceFilters[form.dataset.resourceFilter]=filters;render();
+  document.querySelectorAll('[data-resource-filter]').forEach(form=>{
+   form.onsubmit=event=>{
+    event.preventDefault();const filters=Object.fromEntries(new FormData(form));
+    for(const [key,value] of Object.entries(filters))if(value==='')delete filters[key];
+    state.data.resourceFilters??={};state.data.resourceFilters[form.dataset.resourceFilter]=filters;render();
+   };
+   form.addEventListener('change',event=>{if(['buildingId','floorNo','roomId'].includes(event.target.name))cascadeResourceFilters(form,event.target.name);});
   });
   const userFilter=document.querySelector('#user-filter-form');
   if(userFilter){
@@ -110,7 +165,7 @@ export async function render(){
     userFilter.addEventListener('change',event=>{if(event.target.matches('[data-directory-filter]'))cascadeDirectoryFilters(userFilter,event.target.name);});
   }
   const search=document.querySelector('#list-search');
-  if(search)search.oninput=()=>document.querySelectorAll('tbody tr').forEach(row=>row.hidden=!row.textContent.toLowerCase().includes(search.value.toLowerCase()));
+  if(search)search.oninput=()=>role()==='ADMIN'?filterTableComponents(search.value.trim()):document.querySelectorAll('tbody tr').forEach(row=>row.hidden=!row.textContent.toLowerCase().includes(search.value.toLowerCase()));
  }catch(e){
   if(!state.token||current!==renderId)return;
   layout(`<section class="panel"><p class="error">${esc(e.message)}</p><button class="secondary" id="retry">重新加载</button></section>`);

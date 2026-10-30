@@ -1,4 +1,4 @@
-import {API,api,post,put,role,state,esc,button,field,select,check,table,modal,render,notify,download,statuses} from './app.js';
+import {API,api,post,put,role,state,esc,button,field,select,check,table,modal,render,notify,download,statuses,bindTablePagination} from './app.js';
 
 export const adminPages={
  async accommodation(){const [rows,history]=await Promise.all([api('/accommodations/current'),api('/accommodations/history')]);state.data.homes=rows;state.data.homeHistory=history;let roommates='';if(role()==='STUDENT')roommates=`<section class="panel"><h3>舍友</h3>${table(await api('/accommodations/roommates'),[['student_name','姓名'],['bed_no','床位']])}</section>`;return `<section class="panel"><div class="toolbar"><h3>当前住宿</h3><div class="actions">${role()==='ADMIN'?button('分配或调整床位','assign'):''}${button('导出住宿','export-homes')}</div></div>${table(rows,[['student_name','学生'],['building_name','楼栋'],['room_no','房间'],['bed_no','床位'],['check_in_date','入住日期']],r=>role()==='ADMIN'?button('退宿','checkout',r.assignment_id):'','assignment_id')}</section>${roommates}<section class="panel"><h3>住宿历史</h3>${table(history,[['student_name','学生'],['building_name','楼栋'],['room_no','房间'],['bed_no','床位'],['check_in_date','入住'],['check_out_date','退宿']])}</section>`;},
@@ -15,62 +15,306 @@ export const adminPages={
 };
 const resourceConfig={
  buildings:{title:'楼栋',id:'building_id',columns:[['building_code','编号'],['building_name','名称'],['address','地址'],['gender_limit','性别限制'],['room_count','宿舍数'],['bed_count','总床位'],['available_bed_count','空闲床位']],filterNames:['keyword','genderLimit','minBeds','maxBeds','minFreeBeds','maxFreeBeds']},
- rooms:{title:'宿舍',id:'room_id',columns:[['building_name','楼栋'],['room_no','宿舍号'],['floor_no','楼层'],['gender_limit','性别'],['design_capacity','容量'],['bed_count','床位数'],['available_bed_count','空闲床位']],filterNames:['buildingId','keyword','floorNo','minBeds','maxBeds','minFreeBeds','maxFreeBeds']},
- beds:{title:'床位',id:'bed_id',columns:[['building_name','楼栋'],['room_no','宿舍号'],['bed_no','床位号'],['management_status','管理状态'],['student_name','入住学生']],filterNames:['buildingId','roomId','keyword','managementStatus','occupied']}
+ rooms:{title:'宿舍',id:'room_id',columns:[['building_name','楼栋'],['room_no','宿舍号'],['floor_no','楼层'],['gender_limit','性别限制'],['bed_count','床位数'],['available_bed_count','空闲床位']],filterNames:['buildingId','roomId','floorNo','genderLimit','minBeds','maxBeds','minFreeBeds','maxFreeBeds']},
+ beds:{title:'床位',id:'bed_id',columns:[['building_name','楼栋'],['floor_no','楼层'],['room_no','宿舍号'],['bed_no','床位号'],['bed_status_label','床位状态'],['student_name','入住学生']],filterNames:['buildingId','floorNo','roomId','bedNo','genderLimit','studentName','bedStatus']}
 };
 async function basicResourcePage(type){
  const [buildings,rooms,beds]=await Promise.all([api('/buildings'),api('/rooms'),api('/beds')]);Object.assign(state.data,{buildings,rooms,beds});
  const config=resourceConfig[type],filters=state.data.resourceFilters?.[type]||{},rows=filterResourceRows(type,state.data[type],filters);
  const filterForm=resourceFilterForm(type,filters,buildings,rooms);
  const actions=row=>button('详情','resource-detail',row[config.id],`data-type="${type}"`)+button('编辑','resource-edit',row[config.id],`data-type="${type}"`)+button('删除','resource-delete',row[config.id],`data-type="${type}"`);
- const tools=button('新增'+config.title,'resource-new',type)+button('删除所选','resource-delete-selected',type)+button('导出','resource-export',type);
- return `<section class="panel"><div class="toolbar"><h3>${config.title}管理</h3><div class="actions">${tools}</div></div>${filterForm}<div class="resource-result-count">共 ${rows.length} 条</div>${resourceSelectableTable(rows,config.columns,actions,type,config.id)}</section>`;
+ const tools=button('新增'+config.title,'resource-new',type)+button('批量删除','resource-delete-selected',type)+button('导出','resource-export',type);
+ const displayRows=type==='beds'?rows.map(row=>({...row,bed_status_label:bedStatusLabel(row)})):rows;
+ return `<section class="panel"><div class="toolbar"><h3>${config.title}管理</h3><div class="actions">${tools}</div></div>${filterForm}<div class="resource-result-count">共 ${rows.length} 条</div>${resourceSelectableTable(displayRows,config.columns,actions,type,config.id)}</section>`;
 }
 function resourceFilterForm(type,filters,buildings,rooms){
- const pick=(name,label,items)=>select(name,label,items,filters[name]||'',false,false),number=(name,label)=>field(name,label,'number',filters[name]||'',false);
- const keyword=field('keyword',type==='buildings'?'名称或编号':type==='rooms'?'宿舍号':'床位号或学生姓名','search',filters.keyword||'',false);
+ const pick=(name,label,items)=>select(name,label,items,filters[name]||'',false,false);
+ const range=(lowName,highName,label,low,high)=>`<div class="field range-field"><span>${label}</span><div class="range-control"><input name="${lowName}" type="number" min="0" value="${esc(low||'')}" placeholder="自定最低值" aria-label="${label}自定最低值"><span aria-hidden="true">—</span><input name="${highName}" type="number" min="0" value="${esc(high||'')}" placeholder="自定最高值" aria-label="${label}自定最高值"></div></div>`;
+ const floorRows=unique(rooms.filter(x=>!filters.buildingId||String(x.building_id)===String(filters.buildingId)).map(x=>x.floor_no)).sort((a,b)=>Number(a)-Number(b));
+ const roomRows=rooms.filter(x=>(!filters.buildingId||String(x.building_id)===String(filters.buildingId))&&(!filters.floorNo||String(x.floor_no)===String(filters.floorNo)));
+ const roomItems=roomRows.map(x=>[x.room_id,filters.buildingId?x.room_no:`${x.building_name} · ${x.room_no}`]);
+ const keyword=field('keyword','名称或编号','search',filters.keyword||'',false);
  let fields=keyword;
- if(type==='buildings')fields+=pick('genderLimit','性别限制',[['','全部'],['男生','男生'],['女生','女生'],['混合','混合']])+number('minBeds','总床位从')+number('maxBeds','总床位至')+number('minFreeBeds','空闲床位从')+number('maxFreeBeds','空闲床位至');
- if(type==='rooms')fields=pick('buildingId','楼栋',[['','全部楼栋'],...buildings.map(x=>[x.building_id,x.building_name])])+fields+number('floorNo','楼层')+number('minBeds','容量从')+number('maxBeds','容量至')+number('minFreeBeds','空闲床位从')+number('maxFreeBeds','空闲床位至');
- if(type==='beds')fields=pick('buildingId','楼栋',[['','全部楼栋'],...buildings.map(x=>[x.building_id,x.building_name])])+pick('roomId','宿舍',[['','全部宿舍'],...rooms.filter(x=>!filters.buildingId||String(x.building_id)===String(filters.buildingId)).map(x=>[x.room_id,`${x.building_name} ${x.room_no}`])])+keyword+pick('managementStatus','床位状态',[['','全部状态'],['AVAILABLE','可分配'],['DISABLED','停用']])+pick('occupied','入住情况',[['','全部'],['yes','已入住'],['no','空闲']]);
+ if(type==='buildings')fields+=pick('genderLimit','性别限制',[['','全部'],['男生','男生'],['女生','女生'],['混合','混合']])+range('minBeds','maxBeds','总床位范围',filters.minBeds,filters.maxBeds)+range('minFreeBeds','maxFreeBeds','空闲床位范围',filters.minFreeBeds,filters.maxFreeBeds);
+ if(type==='rooms')fields=pick('buildingId','楼栋',[['','全部楼栋'],...buildings.map(x=>[x.building_id,x.building_name])])+pick('roomId','宿舍',[['','全部宿舍'],...roomItems])+pick('floorNo','楼层',[['','全部楼层'],...floorRows.map(x=>[x,`${x}层`])])+pick('genderLimit','性别限制',[['','全部'],['男生','男生'],['女生','女生']])+range('minBeds','maxBeds','床位数范围',filters.minBeds,filters.maxBeds)+range('minFreeBeds','maxFreeBeds','空闲床位范围',filters.minFreeBeds,filters.maxFreeBeds);
+ if(type==='beds')fields=pick('buildingId','楼栋',[['','全部楼栋'],...buildings.map(x=>[x.building_id,x.building_name])])+pick('roomId','宿舍',[['','全部宿舍'],...roomItems])+pick('floorNo','楼层',[['','全部楼层'],...floorRows.map(x=>[x,`${x}层`])])+pick('bedNo','床位号',[['','全部床位号'],...unique(bedsForBuildingRoom(buildings,rooms,filters).map(x=>x.bed_no)).map(x=>[x,x])])+pick('genderLimit','性别限制',[['','全部'],['男生','男生'],['女生','女生']])+field('studentName','学生姓名','search',filters.studentName||'',false)+pick('bedStatus','床位状态',[['','全部状态'],['AVAILABLE','可分配'],['OCCUPIED','已入住'],['DISABLED','停用']]);
  return `<form class="filter-grid resource-filter-grid" data-resource-filter="${type}">${fields}<div class="filter-actions"><button class="primary" type="submit">查询</button>${button('清空筛选','resource-filter-reset',type)}</div></form>`;
+}
+function bedsForBuildingRoom(buildings,rooms,filters){
+ const selectedRoom=rooms.find(x=>String(x.room_id)===String(filters.roomId));
+ const selectedBuilding=buildings.find(x=>String(x.building_id)===String(filters.buildingId));
+ return (state.data.beds||[]).filter(x=>(!selectedRoom||Number(x.room_id)===Number(selectedRoom.room_id))&&(!selectedBuilding||Number(x.building_id)===Number(selectedBuilding.building_id))&&(!filters.floorNo||Number(x.floor_no)===Number(filters.floorNo)));
 }
 function filterResourceRows(type,rows,filters){
  const text=(...values)=>values.some(value=>String(value||'').toLowerCase().includes(String(filters.keyword||'').trim().toLowerCase()));
  const within=(value,min,max)=>(!min||Number(value)>=Number(min))&&(!max||Number(value)<=Number(max));
  return rows.filter(row=>{
-  if(filters.keyword&&!text(type==='buildings'?[row.building_code,row.building_name,row.address]:type==='rooms'?[row.room_no,row.building_name]:[row.bed_no,row.student_name]))return false;
+  if(filters.keyword&&!text(type==='buildings'?[row.building_code,row.building_name,row.address]:[row.room_no,row.building_name]))return false;
   if(type==='buildings')return(!filters.genderLimit||row.gender_limit===filters.genderLimit)&&within(row.bed_count,filters.minBeds,filters.maxBeds)&&within(row.available_bed_count,filters.minFreeBeds,filters.maxFreeBeds);
-  if(type==='rooms')return(!filters.buildingId||String(row.building_id)===String(filters.buildingId))&&(!filters.floorNo||Number(row.floor_no)===Number(filters.floorNo))&&within(row.design_capacity,filters.minBeds,filters.maxBeds)&&within(row.available_bed_count,filters.minFreeBeds,filters.maxFreeBeds);
-  return(!filters.buildingId||String(row.building_id)===String(filters.buildingId))&&(!filters.roomId||String(row.room_id)===String(filters.roomId))&&(!filters.managementStatus||row.management_status===filters.managementStatus)&&(!filters.occupied||(filters.occupied==='yes'?!!row.student_id:!row.student_id));
+  if(type==='rooms')return(!filters.buildingId||String(row.building_id)===String(filters.buildingId))&&(!filters.floorNo||Number(row.floor_no)===Number(filters.floorNo))&&(!filters.roomId||String(row.room_id)===String(filters.roomId))&&(!filters.genderLimit||row.gender_limit===filters.genderLimit)&&within(row.bed_count,filters.minBeds,filters.maxBeds)&&within(row.available_bed_count,filters.minFreeBeds,filters.maxFreeBeds);
+  return(!filters.buildingId||String(row.building_id)===String(filters.buildingId))&&(!filters.floorNo||Number(row.floor_no)===Number(filters.floorNo))&&(!filters.roomId||String(row.room_id)===String(filters.roomId))&&(!filters.genderLimit||row.room_gender_limit===filters.genderLimit)&&(!filters.bedNo||row.bed_no===filters.bedNo)&&(!filters.studentName||String(row.student_name||'').toLowerCase().includes(String(filters.studentName).trim().toLowerCase()))&&(!filters.bedStatus||bedStatusCode(row)===filters.bedStatus);
  });
 }
+function bedStatusCode(row){return row.management_status==='DISABLED'?'DISABLED':row.student_id?'OCCUPIED':'AVAILABLE';}
+function bedStatusLabel(row){return {DISABLED:'停用',OCCUPIED:'已入住',AVAILABLE:'可分配'}[bedStatusCode(row)];}
 function resourceSelectableTable(rows,columns,actions,type,idKey){
  return table(rows,columns,actions,idKey).replace('<thead><tr>','<thead><tr><th class="select-col"><input type="checkbox" data-resource-select-all aria-label="全选"></th>')
-  .replace(/<tr data-row-id="([^"]*)">/g,(_,id)=>`<tr data-row-id="${id}"><td class="select-col"><input type="checkbox" data-resource-select-row value="${id}" aria-label="选择记录"></td>`)
-  .replace('<div class="table-wrap">',`<div class="table-wrap resource-table" data-resource-type="${type}">`);
+  .replace(/(<tr data-row-id="([^"]*)"[^>]*>)/g,(_,row,id)=>`${row}<td class="select-col"><input type="checkbox" data-resource-select-row value="${id}" aria-label="选择记录"></td>`)
+  .replace('<div class="table-wrap table-component"',`<div class="table-wrap table-component resource-table" data-resource-type="${type}"`);
 }
+function roomBedsTable(beds){return table(beds,[['bed_no','床位号'],['student_no','学号'],['student_name','姓名'],['grade','年级'],['major_name','专业']],null,'bed_id');}
+function roomBedsSection(beds){return `<section class="detail-section"><div class="toolbar"><h3>床位与入住学生</h3><button type="button" class="secondary" data-room-occupants>调整入住学生</button></div><div data-room-beds-summary>${roomBedsTable(beds)}</div></section>`;}
 function resourceDetail(type,id){
  const config=resourceConfig[type],row=state.data[type].find(x=>String(x[config.id])===String(id));if(!row)return;
  let facts=[];let extra='';
  if(type==='buildings'){
   facts=[['编号',row.building_code],['名称',row.building_name],['地址',row.address],['性别限制',row.gender_limit],['总床位',row.bed_count],['空闲床位',row.available_bed_count]];
-  const rooms=state.data.rooms.filter(x=>Number(x.building_id)===Number(id));extra=`<section class="detail-section"><h3>楼栋宿舍</h3>${rooms.length?`<ol class="resource-detail-list">${rooms.map(x=>`<li>${esc(x.room_no)} · ${esc(x.floor_no)}层 · ${esc(x.gender_limit)} · 容量 ${esc(x.design_capacity)} · 空闲 ${esc(x.available_bed_count)}</li>`).join('')}</ol>`:'<p class="muted">暂无宿舍</p>'}</section>`;
+  extra=buildingRoomsPanel(id,false);
  }
  if(type==='rooms'){
-  facts=[['楼栋',row.building_name],['宿舍号',row.room_no],['楼层',row.floor_no],['性别',row.gender_limit],['容量',row.design_capacity],['空闲床位',row.available_bed_count]];
-  const beds=state.data.beds.filter(x=>Number(x.room_id)===Number(id));extra=`<section class="detail-section"><div class="toolbar"><h3>床位与入住学生</h3><button type="button" class="secondary" data-room-occupants>调整入住学生</button></div>${beds.length?`<ol class="resource-detail-list">${beds.map(x=>`<li>${esc(x.bed_no)}号床 · ${x.student_name?`入住：${esc(x.student_name)}`:'空闲'}</li>`).join('')}</ol>`:'<p class="muted">暂无床位</p>'}</section>`;
+  facts=[['楼栋',row.building_name],['楼层',row.floor_no],['宿舍号',row.room_no],['性别限制',row.gender_limit],['床位数',row.bed_count],['空闲床位',row.available_bed_count]];
+  const beds=state.data.beds.filter(x=>Number(x.room_id)===Number(id));extra=roomBedsSection(beds);
  }
- if(type==='beds')facts=[['楼栋',row.building_name],['宿舍号',row.room_no],['床位号',row.bed_no],['床位状态',row.management_status==='AVAILABLE'?'可分配':'停用'],['入住学生',row.student_name||'空闲'],['宿舍性别',row.room_gender_limit]];
+ if(type==='beds'){
+  facts=[['楼栋',row.building_name],['楼层',row.floor_no],['宿舍号',row.room_no],['床位号',row.bed_no],['床位状态',bedStatusLabel(row)],['性别限制',row.room_gender_limit]];
+  if(row.student_id)extra=`<section class="detail-section"><h3>学生基本信息</h3>${factGrid([['姓名',row.student_name],['学号',row.student_no],['性别',({MALE:'男',FEMALE:'女',OTHER:'其他'})[row.student_gender]||'未填写'],['学院',row.department_name],['专业',row.major_name],['年级',row.grade?`${row.grade}级`:null],['班级',row.class_name],['联系电话',row.student_phone],['生日',row.student_birth_date],['学籍状态',row.enrollment_status]])}</section>`;
+ }
  const dialog=modal(`${config.title}详情`,`<div class="user-detail-content">${factGrid(facts)}${extra}</div>`,null);
+ if(type==='buildings')bindBuildingRooms(dialog,Number(id),false);
  if(type==='rooms')dialog.querySelector('[data-room-occupants]')?.addEventListener('click',()=>roomOccupantsDialog(row));
 }
+function buildingRoomsPanel(buildingId,editable){
+ const building=(state.data.buildings||[]).find(x=>Number(x.building_id)===Number(buildingId));
+ const rooms=(state.data.rooms||[]).filter(x=>Number(x.building_id)===Number(buildingId));
+ const floors=[...new Set(rooms.map(x=>x.floor_no).filter(x=>x!=null))].sort((a,b)=>Number(a)-Number(b));
+ const roomGenderOptions=building?.gender_limit==='混合'?[['男生','男生'],['女生','女生']]:[[building?.gender_limit||'男生',building?.gender_limit||'男生']];
+ const addRoom=editable?`<div class="building-room-create" hidden><div class="building-room-create-grid">${field('newRoomNo','宿舍号','text','',false)}${field('newRoomFloor','楼层','number','1',false)}${field('newRoomCapacity','容量','number','4',false)}${select('newRoomGender','宿舍性别',roomGenderOptions,roomGenderOptions[0][0],false,false)}<div class="actions building-room-create-actions"><button type="button" class="primary" data-building-room-save>保存宿舍</button><button type="button" class="secondary" data-building-room-cancel>取消</button></div></div></div>`:'';
+ return `<section class="detail-section building-rooms-section" data-building-room-panel data-building-id="${buildingId}" data-editable="${editable}"><div class="toolbar"><h3 data-building-room-summary>楼栋宿舍（${rooms.length}）</h3></div><div class="toolbar"><div class="building-room-tools"><label class="building-floor-filter"><span>楼层</span><select data-building-floor-filter aria-label="按楼层筛选"><option value="">全部楼层</option>${floors.map(floor=>`<option value="${esc(floor)}">${esc(floor)}层</option>`).join('')}</select></label>${editable?'<button type="button" class="secondary" data-building-room-add>新增宿舍</button>':''}</div></div>${addRoom}<div data-building-room-table>${buildingRoomsTable(rooms,'',editable)}</div></section>`;
+}
+function buildingRoomsTable(rooms,floor='',editable=false){
+ const rows=rooms.filter(x=>!floor||String(x.floor_no)===String(floor));
+ const actions=editable?room=>`<button type="button" class="secondary" data-building-room-edit="${esc(room.room_id)}">编辑</button>`:null;
+ return rows.length?table(rows,[['floor_no','楼层'],['room_no','宿舍号'],['gender_limit','性别限制'],['design_capacity','容量']],actions,'room_id',5).replace('<div class="table-wrap table-component"','<div class="table-wrap table-component building-room-table"'):'<div class="empty">暂无符合条件的宿舍</div>';
+}
+function buildingRoomEditorRow(room,genderOptions){
+ return `<td><input type="number" min="1" step="1" value="${esc(room.floor_no)}" data-room-floor aria-label="楼层"></td><td><input type="text" value="${esc(room.room_no)}" data-room-no aria-label="宿舍号"></td><td><select data-room-gender aria-label="性别限制">${genderOptions.map(([value,label])=>`<option value="${esc(value)}" ${String(value)===String(room.gender_limit)?'selected':''}>${esc(label)}</option>`).join('')}</select></td><td><input type="number" min="1" step="1" value="${esc(room.design_capacity)}" data-room-capacity aria-label="容量"></td><td><div class="actions building-room-row-actions"><button type="button" class="primary" data-building-room-edit-save="${esc(room.room_id)}">保存</button><button type="button" class="secondary" data-building-room-edit-cancel>取消</button></div></td>`;
+}
+function bindBuildingRooms(dialog,buildingId,editable){
+ const panel=dialog.querySelector('[data-building-room-panel]');if(!panel)return;
+ const floor=panel.querySelector('[data-building-floor-filter]');
+ const tableHost=panel.querySelector('[data-building-room-table]');
+ const renderRooms=()=>{
+  tableHost.innerHTML=buildingRoomsTable((state.data.rooms||[]).filter(x=>Number(x.building_id)===buildingId),floor.value,editable);
+  bindTablePagination(dialog);
+ };
+ floor.onchange=()=>{
+  renderRooms();
+ };
+ if(!editable)return;
+ const form=dialog.querySelector('form'),create=panel.querySelector('.building-room-create');
+ const building=(state.data.buildings||[]).find(x=>Number(x.building_id)===buildingId);
+ const roomGenderOptions=building?.gender_limit==='混合'?[['男生','男生'],['女生','女生']]:[[building?.gender_limit||'男生',building?.gender_limit||'男生']];
+ const addButton=panel.querySelector('[data-building-room-add]');
+ const setActionsDisabled=disabled=>{floor.disabled=disabled;addButton.disabled=disabled;tableHost.querySelectorAll('[data-building-room-edit]').forEach(button=>button.disabled=disabled);};
+ const resetCreateForm=()=>{form.elements.newRoomNo.value='';form.elements.newRoomFloor.value='1';form.elements.newRoomCapacity.value='4';form.elements.newRoomGender.value=roomGenderOptions[0][0];};
+ const refreshResources=async selectedFloor=>{
+  [state.data.buildings,state.data.rooms,state.data.beds]=await Promise.all([api('/buildings'),api('/rooms'),api('/beds')]);
+  const buildingRooms=state.data.rooms.filter(x=>Number(x.building_id)===buildingId);
+  const floors=[...new Set(buildingRooms.map(x=>x.floor_no).filter(x=>x!=null))].sort((a,b)=>Number(a)-Number(b));
+  floor.innerHTML=`<option value="">全部楼层</option>${floors.map(value=>`<option value="${esc(value)}">${esc(value)}层</option>`).join('')}`;
+  floor.value=floors.some(value=>String(value)===String(selectedFloor))?String(selectedFloor):'';
+  panel.querySelector('[data-building-room-summary]').textContent=`楼栋宿舍（${buildingRooms.length}）`;
+  renderRooms();
+ };
+ addButton.onclick=()=>{create.hidden=false;setActionsDisabled(true);};
+ panel.querySelector('[data-building-room-cancel]').onclick=()=>{resetCreateForm();create.hidden=true;setActionsDisabled(false);};
+ panel.querySelector('[data-building-room-save]').onclick=async event=>{
+  const button=event.currentTarget,roomNo=form.elements.newRoomNo.value.trim(),floorNo=Number(form.elements.newRoomFloor.value),capacity=Number(form.elements.newRoomCapacity.value),genderLimit=form.elements.newRoomGender.value;
+  if(!roomNo||!Number.isInteger(floorNo)||floorNo<1||!Number.isInteger(capacity)||capacity<1){notify('请填写有效的宿舍号、楼层和容量',true);return;}
+  button.disabled=true;
+  try{
+   await post('/admin/resources/rooms',{buildingId,roomNo,floorNo,designCapacity:capacity,genderLimit});
+   await refreshResources(floorNo);
+   resetCreateForm();create.hidden=true;setActionsDisabled(false);notify('宿舍已新增');
+  }catch(error){notify(error.message,true);}
+  finally{button.disabled=false;}
+ };
+ tableHost.addEventListener('click',async event=>{
+  const edit=event.target.closest('[data-building-room-edit]');
+  if(edit){
+   const room=(state.data.rooms||[]).find(x=>Number(x.room_id)===Number(edit.dataset.buildingRoomEdit));
+   if(!room)return;
+   edit.closest('tr').innerHTML=buildingRoomEditorRow(room,roomGenderOptions);
+   setActionsDisabled(true);
+   return;
+  }
+  if(event.target.closest('[data-building-room-edit-cancel]')){setActionsDisabled(false);renderRooms();return;}
+  const save=event.target.closest('[data-building-room-edit-save]');
+  if(!save)return;
+  const roomId=Number(save.dataset.buildingRoomEditSave),row=save.closest('tr'),room=(state.data.rooms||[]).find(x=>Number(x.room_id)===roomId);
+  if(!room)return;
+  const roomNo=row.querySelector('[data-room-no]').value.trim(),floorNo=Number(row.querySelector('[data-room-floor]').value),capacity=Number(row.querySelector('[data-room-capacity]').value),genderLimit=row.querySelector('[data-room-gender]').value;
+  if(!roomNo||!Number.isInteger(floorNo)||floorNo<1||!Number.isInteger(capacity)||capacity<1){notify('请填写有效的宿舍号、楼层和容量',true);return;}
+  if(capacity<Number(room.bed_count)){notify('容量不能少于已建床位数',true);return;}
+  save.disabled=true;
+  try{
+   await put(`/admin/resources/rooms/${roomId}`,{buildingId,roomNo,floorNo,designCapacity:capacity,genderLimit});
+   await refreshResources(floorNo);setActionsDisabled(false);notify('宿舍信息已更新');
+  }catch(error){notify(error.message,true);}
+  finally{save.disabled=false;}
+ });
+}
+function gradeLabel(value){const grade=String(value??'');return /^\d{4}$/.test(grade)?`${grade}级`:grade;}
+function studentPickerTable(rows){
+ const items=rows.map(row=>({...row,grade_label:gradeLabel(row.grade)}));
+ return table(items,[['student_no','学号'],['real_name','姓名'],['grade_label','年级'],['major_name','专业']],row=>`<button type="button" class="secondary" data-student-choice="${esc(row.user_id)}">选择</button>`,'user_id',7).replace('<div class="table-wrap table-component"','<div class="table-wrap table-component student-picker-table"');
+}
+function studentPickerMarkup(students){
+ const grades=unique(students.map(x=>x.grade).filter(Boolean));
+ const majors=unique(students.map(x=>x.major_name).filter(Boolean));
+ return `<section class="detail-section student-picker"><h3>选择学生</h3><div class="filter-grid student-picker-filter-grid">${field('pickerName','姓名','search','',false)}${field('pickerStudentNo','学号','search','',false)}${select('pickerGrade','年级',[['','全部年级'],...grades.map(x=>[x,gradeLabel(x)])],'',false,false)}${select('pickerMajor','专业',[['','全部专业'],...majors.map(x=>[x,x])],'',false,false)}<div class="filter-actions"><button type="button" class="primary" data-student-search>查询学生</button></div></div><div data-student-picker-results>${studentPickerTable(students)}</div></section>`;
+}
+function bindStudentPicker(dialog,students,onChoose,exclude=()=>false){
+ const picker=dialog.querySelector('.student-picker');if(!picker)return()=>{};
+ const results=picker.querySelector('[data-student-picker-results]');
+ const refresh=()=>{
+  const name=picker.querySelector('[name="pickerName"]').value.trim().toLowerCase();
+  const studentNo=picker.querySelector('[name="pickerStudentNo"]').value.trim().toLowerCase();
+  const grade=picker.querySelector('[name="pickerGrade"]').value,major=picker.querySelector('[name="pickerMajor"]').value;
+  const rows=students.filter(x=>String(x.real_name||'').toLowerCase().includes(name)&&String(x.student_no||'').toLowerCase().includes(studentNo)&&(!grade||String(x.grade)===grade)&&(!major||String(x.major_name)===major)&&!exclude(x));
+  results.innerHTML=rows.length?studentPickerTable(rows):'<div class="empty">没有符合条件的学生</div>';
+  bindTablePagination(dialog);
+ };
+ picker.querySelector('[data-student-search]').onclick=refresh;
+ picker.querySelectorAll('input,select').forEach(input=>input.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();refresh();}}));
+ results.addEventListener('click',event=>{
+  const button=event.target.closest('[data-student-choice]');if(!button)return;
+  const student=students.find(x=>String(x.user_id)===button.dataset.studentChoice);if(student&&!exclude(student))onChoose(student);
+ });
+ return refresh;
+}
+function studentLabel(student){return student?[student.real_name,gradeLabel(student.grade),student.major_name].filter(Boolean).join(' · '):'';}
+function studentsEligibleForRoom(room,students){
+ return students.filter(student=>{
+  const currentRoom=student.current_building===room.building_name&&String(student.current_room)===String(room.room_no);
+  const assignable=!student.current_building&&Number(student.enabled)===1&&student.enrollment_status==='ENROLLED';
+  return(currentRoom||assignable)&&genderMatches(student.gender,room.gender_limit);
+ });
+}
+function roomOccupantsEditor(roomBeds,students){
+ const beds=roomBeds.map(bed=>{
+  const student=students.find(x=>Number(x.user_id)===Number(bed.student_id));
+  return `<div class="room-occupant-choice" data-bed-choice="${bed.bed_id}"><label class="field"><span>${esc(bed.bed_no)}号床</span><input type="text" name="occupantDisplay_${bed.bed_id}" data-bed-target="${bed.bed_id}" value="${esc(studentLabel(student))}" placeholder="选择入住学生" readonly><input type="hidden" name="occupant_${bed.bed_id}" data-bed-student-id="${bed.bed_id}" value="${student?esc(student.user_id):''}"></label><div class="actions"><button type="button" class="secondary" data-bed-select="${bed.bed_id}">选择学生</button><button type="button" class="secondary" data-bed-clear="${bed.bed_id}">清空</button></div></div>`;
+ }).join('');
+ return `<div class="room-occupant-editor"><div class="room-occupant-grid">${beds||'<div class="empty">宿舍尚未建立床位</div>'}</div>${studentPickerMarkup(students)}</div>`;
+}
+function bindRoomOccupantPicker(dialog,roomBeds,students){
+ let activeBedId='';
+ const refresh=bindStudentPicker(dialog,students,student=>{
+  if(!activeBedId){notify('请先选择床位对应的学生输入框',true);return;}
+  const hidden=dialog.querySelector(`[data-bed-student-id="${activeBedId}"]`),display=dialog.querySelector(`[data-bed-target="${activeBedId}"]`);
+  hidden.value=student.user_id;display.value=studentLabel(student);refresh();
+ },student=>roomBeds.some(bed=>String(bed.bed_id)!==activeBedId&&dialog.querySelector(`[data-bed-student-id="${bed.bed_id}"]`)?.value===String(student.user_id)));
+ const activate=id=>{
+  activeBedId=String(id);
+  dialog.querySelectorAll('[data-bed-choice]').forEach(item=>item.classList.toggle('is-active',item.dataset.bedChoice===activeBedId));
+  refresh();
+ };
+ dialog.querySelectorAll('[data-bed-target]').forEach(input=>input.addEventListener('focus',()=>activate(input.dataset.bedTarget)));
+ dialog.querySelectorAll('[data-bed-select]').forEach(button=>button.onclick=()=>activate(button.dataset.bedSelect));
+ dialog.querySelectorAll('[data-bed-clear]').forEach(button=>button.onclick=()=>{
+  activate(button.dataset.bedClear);
+  dialog.querySelector(`[data-bed-student-id="${activeBedId}"]`).value='';
+  dialog.querySelector(`[data-bed-target="${activeBedId}"]`).value='';
+  refresh();
+ });
+}
+function roomOccupantsPayload(form,roomBeds){
+ const occupants=roomBeds.map(bed=>({bedId:Number(bed.bed_id),studentId:form.elements[`occupant_${bed.bed_id}`].value||null}));
+ const selected=occupants.map(x=>x.studentId).filter(Boolean);
+ if(new Set(selected).size!==selected.length)throw new Error('同一学生不能选择多个床位');
+ return occupants;
+}
+function bindRoomEditOccupants(dialog,roomBeds,students){
+ dialog.classList.add('room-edit-dialog');
+ const form=dialog.querySelector('form'),main=dialog.querySelector('[data-room-edit-main]'),adjustment=dialog.querySelector('[data-room-edit-occupants]');
+ const submit=dialog.querySelector('.dialog-footer [type="submit"]'),summary=dialog.querySelector('[data-room-beds-summary]');
+ let previous=[];
+ const values=()=>roomBeds.map(bed=>[bed.bed_id,form.elements[`occupant_${bed.bed_id}`].value]);
+ const restore=items=>items.forEach(([bedId,studentId])=>{form.elements[`occupant_${bedId}`].value=studentId;const student=students.find(x=>String(x.user_id)===studentId);form.elements[`occupantDisplay_${bedId}`].value=studentLabel(student);});
+ const showMain=()=>{adjustment.hidden=true;main.hidden=false;submit.hidden=false;};
+ dialog.querySelector('[data-room-occupants]').onclick=()=>{previous=values();main.hidden=true;adjustment.hidden=false;submit.hidden=true;};
+ dialog.querySelector('[data-room-occupants-cancel]').onclick=()=>{restore(previous);showMain();};
+ dialog.querySelector('[data-room-occupants-save]').onclick=()=>{
+  try{
+   roomOccupantsPayload(form,roomBeds);
+   const draftBeds=roomBeds.map(bed=>{
+    const student=students.find(x=>String(x.user_id)===form.elements[`occupant_${bed.bed_id}`].value);
+    return {...bed,student_id:student?.user_id||null,student_no:student?.student_no||null,student_name:student?.real_name||null,grade:student?.grade||null,major_name:student?.major_name||null};
+   });
+   summary.innerHTML=roomBedsTable(draftBeds);bindTablePagination(dialog);showMain();
+  }catch(error){notify(error.message,true);}
+ };
+}
+function studentsEligibleForBed(bed,students){
+ return students.filter(student=>{
+  const currentBed=Number(student.current_bed_id)===Number(bed.bed_id);
+  const sameRoom=student.current_building===bed.building_name&&String(student.current_room)===String(bed.room_no);
+  const assignable=!student.current_building&&Number(student.enabled)===1&&student.enrollment_status==='ENROLLED';
+  return(currentBed||sameRoom||assignable)&&genderMatches(student.gender,bed.room_gender_limit);
+ });
+}
+function bedOccupantSummary(student){
+ if(!student)return '<div class="empty">当前床位暂无入住学生</div>';
+ return table([{...student,grade_label:gradeLabel(student.grade)}],[['student_no','学号'],['real_name','姓名'],['grade_label','年级'],['major_name','专业']],null,'user_id');
+}
+function bedOccupantEditor(bed,students){
+ const student=students.find(x=>Number(x.user_id)===Number(bed.student_id));
+ return `<section class="detail-section bed-occupant-editor"><div class="toolbar"><h3>入住学生</h3><button type="button" class="secondary" data-bed-occupants>调整入住学生</button></div><div data-bed-occupant-summary>${bedOccupantSummary(student)}</div></section>`;
+}
+function bedOccupantAdjustment(bed,students){
+ const student=students.find(x=>Number(x.user_id)===Number(bed.student_id));
+ return `<div data-bed-edit-occupants hidden><div class="toolbar"><h3>调整入住学生</h3></div><div class="room-occupant-choice"><label class="field"><span>床位入住学生</span><input type="text" data-bed-student-display value="${esc(studentLabel(student))}" placeholder="选择入住学生" readonly><input type="hidden" name="studentId" value="${student?esc(student.user_id):''}" data-bed-student-id></label><div class="actions"><button type="button" class="secondary" data-bed-student-select>选择学生</button><button type="button" class="secondary" data-bed-student-clear>清空</button></div></div><div data-bed-student-picker></div><div class="actions room-occupant-edit-actions"><button type="button" class="secondary" data-bed-occupants-cancel>取消调整</button><button type="button" class="primary" data-bed-occupants-save>保存调整</button></div></div>`;
+}
+function bindBedEditOccupants(dialog,bed,students){
+ dialog.classList.add('room-edit-dialog');
+ const form=dialog.querySelector('form'),main=dialog.querySelector('[data-bed-edit-main]'),adjustment=dialog.querySelector('[data-bed-edit-occupants]');
+ const submit=dialog.querySelector('.dialog-footer [type="submit"]'),summary=dialog.querySelector('[data-bed-occupant-summary]');
+ const hidden=dialog.querySelector('[data-bed-student-id]'),display=dialog.querySelector('[data-bed-student-display]'),pickerHost=dialog.querySelector('[data-bed-student-picker]');
+ let previous={id:hidden.value,label:display.value};
+ const targetBed=()=>{
+  const room=(state.data.rooms||[]).find(item=>String(item.room_id)===String(form.elements.roomId.value));
+  return room?{...bed,...room,building_name:room.building_name,room_gender_limit:room.gender_limit}:null;
+ };
+ const showMain=()=>{adjustment.hidden=true;main.hidden=false;submit.hidden=false;};
+ const renderPicker=()=>{
+  const target=targetBed(),eligible=target?studentsEligibleForBed(target,students):[];
+  pickerHost.innerHTML=studentPickerMarkup(eligible);
+  let refresh=()=>{};
+  refresh=bindStudentPicker(dialog,eligible,student=>{hidden.value=student.user_id;display.value=studentLabel(student);refresh();});
+  dialog.querySelector('[data-bed-student-select]').onclick=()=>dialog.querySelector('[name="pickerName"]')?.focus();
+  dialog.querySelector('[data-bed-student-clear]').onclick=()=>{hidden.value='';display.value='';refresh();};
+ };
+ dialog.querySelector('[data-bed-occupants]').onclick=()=>{
+  previous={id:hidden.value,label:display.value};main.hidden=true;adjustment.hidden=false;submit.hidden=true;renderPicker();
+ };
+ dialog.querySelector('[data-bed-occupants-cancel]').onclick=()=>{hidden.value=previous.id;display.value=previous.label;showMain();};
+ dialog.querySelector('[data-bed-occupants-save]').onclick=()=>{
+  const selected=students.find(student=>String(student.user_id)===hidden.value);
+  const target=targetBed();
+  if(hidden.value&&(!target||!studentsEligibleForBed(target,students).some(student=>String(student.user_id)===hidden.value))){notify('所选学生不符合该床位的入住条件',true);return;}
+  summary.innerHTML=bedOccupantSummary(selected);bindTablePagination(dialog);showMain();
+ };
+}
 async function roomOccupantsDialog(room){
- const [allStudents,beds]=await Promise.all([api('/admin/users?roleCode=STUDENT'),api('/beds')]);
- const roomBeds=beds.filter(x=>Number(x.room_id)===Number(room.room_id));
- const eligible=allStudents.filter(x=>{const resident=x.current_building===room.building_name&&String(x.current_room)===String(room.room_no);const assignable=!x.current_building&&Number(x.enabled)===1&&x.enrollment_status==='ENROLLED';return(resident||assignable)&&((room.gender_limit==='男生'&&x.gender==='MALE')||(room.gender_limit==='女生'&&x.gender==='FEMALE'));});
- const html=roomBeds.map(bed=>{const options=eligible.filter(student=>bed.management_status==='AVAILABLE'||Number(student.user_id)===Number(bed.student_id));return select(`bed_${bed.bed_id}`,`${bed.bed_no}号床`,[['','空床'],...options.map(x=>[x.user_id,`${x.student_no} · ${x.real_name}`])],bed.student_id||'',false,false);}).join('');
- modal(`调整 ${room.room_no} 宿舍入住学生`,`<div class="room-occupant-grid">${html}</div>`,(data,form)=>{const ids=roomBeds.map(bed=>({bedId:bed.bed_id,studentId:form.elements[`bed_${bed.bed_id}`].value||null}));const chosen=ids.map(x=>x.studentId).filter(Boolean);if(new Set(chosen).size!==chosen.length)throw new Error('同一学生不能选择多个床位');return put(`/admin/rooms/${room.room_id}/occupants`,{occupants:ids});});
+ const [students,beds]=await Promise.all([api('/admin/users?roleCode=STUDENT'),api('/beds')]);
+ const roomBeds=beds.filter(x=>Number(x.room_id)===Number(room.room_id)),eligible=studentsEligibleForRoom(room,students);
+ const editor=`${roomOccupantsEditor(roomBeds,eligible)}<div class="actions room-occupant-edit-actions"><button type="button" class="secondary" data-room-occupants-cancel>取消调整</button></div>`;
+ const dialog=modal(`调整 ${room.room_no} 宿舍入住学生`,editor,(data,form)=>put(`/admin/rooms/${room.room_id}/occupants`,{occupants:roomOccupantsPayload(form,roomBeds)}),'保存调整');
+ dialog.classList.add('room-edit-dialog');
+ dialog.querySelector('.room-occupant-edit-actions').append(dialog.querySelector('.dialog-footer [type="submit"]'));
+ dialog.querySelector('[data-room-occupants-cancel]').onclick=()=>dialog.close();
+ bindRoomOccupantPicker(dialog,roomBeds,eligible);
 }
 const roleLabels={STUDENT:'学生',DORM_MANAGER:'宿管',REPAIRER:'维修人员',ADMIN:'系统管理员'};
 async function userDirectory(page,title,roleCode=null){
@@ -96,7 +340,7 @@ async function userDirectory(page,title,roleCode=null){
    : combo('realName','姓名',[],filters.realName||'')+combo('employeeNo','工号',[],filters.employeeNo||'')+filterSelect('workTypeName','工种',[['','全部工种'],...unique(state.data.config.workTypes.map(x=>x.work_type_name)).map(x=>[x,x])],filters.workTypeName||'')+filterSelect('repairBuildingName','负责楼栋',[['','全部楼栋'],...buildings.map(x=>[x.building_name,x.building_name])],filters.repairBuildingName||'')+accountState(filters)+onDutyState(filters);
  const columns=students?[['student_no','学号'],['real_name','姓名'],['login_account','账号'],['department_name','学院'],['major_name','专业'],['grade','年级'],['class_name','班级'],['current_room_label','当前住宿'],['enabled','账号状态']]:managers?[['employee_no','工号'],['real_name','姓名'],['login_account','账号'],['manager_buildings','负责楼栋'],['manager_on_duty','在岗'],['enabled','账号状态']]:[['employee_no','工号'],['real_name','姓名'],['login_account','账号'],['work_types','工种'],['repairer_buildings','负责楼栋'],['on_duty','在岗'],['enabled','账号状态']];
  const actions=r=>button('详情','user-detail',r.user_id)+button('编辑','user-edit',r.user_id)+button(Number(r.enabled)?'停用':'启用','user-toggle',r.user_id)+button('删除','user-delete',r.user_id);
- const tools=button(students?'新增学生':managers?'新增宿管':'新增维修人员','user-new')+(students?button('分配/调整宿舍','assign'):managers?button('配置负责楼栋','manager-scope-select'):button('配置维修范围','worker-scope-select'));
+ const tools=button(students?'新增学生':managers?'新增宿管':'新增维修人员','user-new')+(students?button('分配/调整宿舍','assign'):managers?button('配置负责楼栋','manager-scope-select'):button('配置维修范围','worker-scope-select'))+button('批量删除','user-delete-selected');
  const rowsForTable=rows.map(row=>({...row,current_room_label:row.current_building?`${row.current_building} · ${row.current_room} · ${row.current_bed}`:'未分配',manager_buildings:row.manager_buildings?.replace(/,\s*/g,'\n'),work_types:row.work_types?.replace(/,\s*/g,'\n'),repairer_buildings:row.repairer_buildings?.replace(/,\s*/g,'\n')}));
   const directoryTable=selectableTable(rowsForTable,columns,actions,page);
  return `<section class="panel"><div class="toolbar"><h3>${title}</h3><div class="actions">${tools}</div></div><form id="user-filter-form" class="filter-grid ${students?'student-filter-grid':managers?'manager-filter-grid':'repairer-filter-grid'}" data-page="${page}">${filterFields}<div class="filter-actions"><button class="primary" type="submit">查询</button>${button('清空筛选','user-filter-reset')}<label class="gender-switch"><span>男</span><input type="checkbox" role="switch" data-gender-toggle ${gender==='FEMALE'?'checked':''} aria-label="切换显示性别"><span>女</span><input type="hidden" name="gender" value="${gender}"></label></div></form>${directoryTable}</section>`;
@@ -104,8 +348,8 @@ async function userDirectory(page,title,roleCode=null){
 function selectableTable(rows,columns,actions,page){
  return table(rows,columns,actions,'user_id')
   .replace('<thead><tr>','<thead><tr><th class="select-col"><input type="checkbox" data-select-all aria-label="全选"></th>')
-  .replace(/<tr data-row-id="([^"]*)">/g,(_,id)=>`<tr data-row-id="${id}"><td class="select-col"><input type="checkbox" data-select-row value="${id}" aria-label="选择人员"></td>`)
-  .replace('<div class="table-wrap">',`<div class="table-wrap role-table role-table-${page}">`);
+  .replace(/(<tr data-row-id="([^"]*)"[^>]*>)/g,(_,row,id)=>`${row}<td class="select-col"><input type="checkbox" data-select-row value="${id}" aria-label="选择人员"></td>`)
+  .replace('<div class="table-wrap table-component"',`<div class="table-wrap table-component role-table role-table-${page}"`);
 }
 function combo(name,label,items,value=''){const listId=`filter-${name}`;return `<label class="field"><span>${label}</span><input name="${name}" type="search" list="${listId}" value="${esc(value)}" autocomplete="off"><datalist id="${listId}">${unique(items).map(item=>`<option value="${esc(item)}"></option>`).join('')}</datalist></label>`;}
 function unique(items){return [...new Set(items.filter(x=>x!=null&&String(x).trim()!=='' ).map(String))].sort((a,b)=>a.localeCompare(b,'zh-CN'));}
@@ -115,6 +359,22 @@ function checkedValues(form,name){return [...form.querySelectorAll(`input[name="
 function selectedUserIds(){return [...document.querySelectorAll('.role-table [data-select-row]:checked')].map(input=>Number(input.value));}
 function genderMatches(gender,limit){return limit==='混合'||(gender==='MALE'&&limit==='男生')||(gender==='FEMALE'&&limit==='女生');}
 function refillSelect(element,placeholder,items,selected=''){element.innerHTML=`<option value="">${placeholder}</option>`+items.map(([value,label])=>`<option value="${esc(value)}" ${String(value)===String(selected)?'selected':''}>${esc(label)}</option>`).join('');}
+export function cascadeResourceFilters(form,changedName){
+ const type=form.dataset.resourceFilter;if(!['rooms','beds'].includes(type))return;
+ const building=form.elements.buildingId,floor=form.elements.floorNo,room=form.elements.roomId,bedNo=form.elements.bedNo;
+ if(changedName==='buildingId'){floor.value='';room.value='';if(bedNo)bedNo.value='';}
+ if(changedName==='floorNo'){room.value='';if(bedNo)bedNo.value='';}
+ const buildingId=building?.value||'',floorNo=floor?.value||'';
+ const roomRows=(state.data.rooms||[]).filter(x=>(!buildingId||String(x.building_id)===buildingId)&&(!floorNo||String(x.floor_no)===floorNo));
+ const floors=unique((state.data.rooms||[]).filter(x=>!buildingId||String(x.building_id)===buildingId).map(x=>x.floor_no)).sort((a,b)=>Number(a)-Number(b));
+ if(floor)refillSelect(floor,'全部楼层',floors.map(x=>[x,`${x}层`]),floorNo);
+ if(room)refillSelect(room,'全部宿舍',roomRows.map(x=>[x.room_id,buildingId?x.room_no:`${x.building_name} · ${x.room_no}`]),room.value);
+ if(bedNo){
+  const roomId=room?.value||'';
+  const bedRows=(state.data.beds||[]).filter(x=>(!buildingId||String(x.building_id)===buildingId)&&(!floorNo||String(x.floor_no)===floorNo)&&(!roomId||String(x.room_id)===roomId));
+  refillSelect(bedNo,'全部床位号',unique(bedRows.map(x=>x.bed_no)).map(x=>[x,x]),bedNo.value);
+ }
+}
 async function assignmentDialog(targetStudentId=null,onCancel=null,staging=null){
  const selected=staging?[]:targetStudentId==null?selectedUserIds():[Number(targetStudentId)];
  if(!staging&&state.page==='students'&&!selected.length){notify('请先勾选要分配住宿的学生',true);return;}
@@ -287,9 +547,55 @@ export async function adminAction(action,id,b){
   if(d.role_code==='REPAIRER')html+=factGrid([['在岗状态',Number(d.profile.on_duty)?'在岗':'离岗'],['最大在办工单',d.profile.max_active_orders??'不限'],['维修工种',stacked(d.workTypes.map(x=>x.work_type_name))],['负责楼栋',stacked(d.buildings.map(x=>x.building_name))]])+`<div class="detail-record-actions">${recordButton('查看历史维修与评价','repairs')}</div>`;
   const dialog=modal(`${roleLabels[d.role_code]}详情`,`<div class="user-detail-content">${html}</div>`,null);bindDetailRecords(dialog,d,html);return;}
  if(action==='user-toggle'){const row=state.data.users.find(x=>String(x.user_id)===id);await put(`/admin/users/${id}/enabled`,{enabled:!row.enabled});await render();notify('账号状态已更新');return;}
+ if(action==='user-delete-selected'){
+  const ids=selectedUserIds();if(!ids.length){notify('请先勾选要删除的账号',true);return;}
+  modal('批量删除账号',`确认处理选中的 ${ids.length} 个账号？有业务历史的账号会停用并保留记录，没有业务历史的账号会被删除。`,async()=>{const result=await api('/admin/users',{method:'DELETE',body:JSON.stringify({ids})});return `已删除 ${result.deletedCount} 个账号，停用并保留历史 ${result.disabledCount} 个账号`;},'确认处理');return;
+ }
  if(action==='user-delete'){modal('删除或停用账号','有业务历史的账号将停用并保留记录；没有业务记录的账号会被删除。',async()=>{const deleted=await api(`/admin/users/${id}`,{method:'DELETE'});return deleted?'账号已删除':'账号存在业务记录，已停用并保留历史';},'确认');return;}
  if(action==='manager-scope'){await managerScopeDialog(id);return;}
- if(action==='resource-new'||action==='resource-edit'){const type=action==='resource-new'?id:b.dataset.type;const row=action==='resource-edit'?state.data[type].find(x=>String(x[{buildings:'building_id',rooms:'room_id',beds:'bed_id'}[type]])===id):{};let html='';if(type==='buildings')html=field('buildingCode','楼栋编号','text',row.building_code||'')+field('buildingName','楼栋名称','text',row.building_name||'')+field('address','地址','text',row.address||'')+select('genderLimit','性别限制',[['男生','男生'],['女生','女生'],['混合','混合']],row.gender_limit);if(type==='rooms'){const building=state.data.buildings.find(x=>Number(x.building_id)===Number(row.building_id));const genderOptions=building?.gender_limit==='混合'?[['男生','男生'],['女生','女生']]:[[building?.gender_limit||'男生',building?.gender_limit||'男生']];const buildingField=action==='resource-edit'?field('buildingName','所属楼栋','text',row.building_name||'',false).replace('<input ','<input readonly '):select('buildingId','楼栋',state.data.buildings.map(x=>[x.building_id,x.building_name]),'',false,true);html=buildingField+field('roomNo','房间号','text',row.room_no||'')+field('floorNo','楼层','number',row.floor_no||1)+field('designCapacity','容量','number',row.design_capacity||4)+select('genderLimit','宿舍性别',genderOptions,row.gender_limit||genderOptions[0][0]);}if(type==='beds')html=select('roomId','房间',state.data.rooms.map(x=>[x.room_id,`${x.building_name} ${x.room_no}`]),row.room_id)+field('bedNo','床位编号','text',row.bed_no||'')+select('managementStatus','管理状态',[['AVAILABLE','可分配'],['DISABLED','停用']],row.management_status);const dialog=modal(`${action==='resource-edit'?'编辑':'新增'}${resourceConfig[type].title}`,html,d=>action==='resource-edit'?put(`/admin/resources/${type}/${id}`,d):post(`/admin/resources/${type}`,d));if(type==='rooms'&&action==='resource-new'){const form=dialog.querySelector('form'),buildingField=form.elements.buildingId,genderField=form.elements.genderLimit;buildingField.onchange=()=>{const selected=state.data.buildings.find(x=>String(x.building_id)===buildingField.value),options=selected?.gender_limit==='混合'?[['男生','男生'],['女生','女生']]:[[selected?.gender_limit||'男生',selected?.gender_limit||'男生']];refillSelect(genderField,'',options,options[0][0]);};}return;}
+ if(action==='resource-new'||action==='resource-edit'){
+  const type=action==='resource-new'?id:b.dataset.type;
+  const row=action==='resource-edit'?state.data[type].find(x=>String(x[{buildings:'building_id',rooms:'room_id',beds:'bed_id'}[type]])===id):{};
+  const roomBeds=type==='rooms'&&action==='resource-edit'?state.data.beds.filter(x=>Number(x.room_id)===Number(id)):[];
+  const roomStudents=type==='rooms'&&action==='resource-edit'?await api('/admin/users?roleCode=STUDENT'):[];
+  const bedStudents=type==='beds'&&action==='resource-edit'?await api('/admin/users?roleCode=STUDENT'):[];
+  let fields='';
+  if(type==='buildings')fields=field('buildingCode','楼栋编号','text',row.building_code||'')+field('buildingName','楼栋名称','text',row.building_name||'')+field('address','地址','text',row.address||'')+select('genderLimit','性别限制',[['男生','男生'],['女生','女生'],['混合','混合']],row.gender_limit);
+  if(type==='rooms'){
+   const building=state.data.buildings.find(x=>Number(x.building_id)===Number(row.building_id));
+   const genderOptions=building?.gender_limit==='混合'?[['男生','男生'],['女生','女生']]:[[building?.gender_limit||'男生',building?.gender_limit||'男生']];
+   const buildingField=action==='resource-edit'?field('buildingName','所属楼栋','text',row.building_name||'',false).replace('<input ','<input readonly '):select('buildingId','楼栋',state.data.buildings.map(x=>[x.building_id,x.building_name]),'',false,true);
+   fields=buildingField+field('roomNo','宿舍号','text',row.room_no||'')+field('floorNo','楼层','number',row.floor_no||1)+field('designCapacity','床位数','number',row.design_capacity||4)+select('genderLimit','性别限制',genderOptions,row.gender_limit||genderOptions[0][0]);
+  }
+  if(type==='beds'){
+   const selectedBuilding=row.building_id||'';
+   const roomOptions=state.data.rooms.filter(x=>!selectedBuilding||Number(x.building_id)===Number(selectedBuilding)).map(x=>[x.room_id,`${x.floor_no}层 ${x.room_no}`]);
+   fields=select('buildingId','楼栋',state.data.buildings.map(x=>[x.building_id,x.building_name]),selectedBuilding,false,true)+select('roomId','宿舍',roomOptions,row.room_id||'',false,true)+field('bedNo','床位号','text',row.bed_no||'')+select('managementStatus','管理状态',[['AVAILABLE','正常使用'],['DISABLED','停用']],row.management_status||'AVAILABLE');
+  }
+  const roomEdit=type==='rooms'&&action==='resource-edit';
+  const roomEligible=roomEdit?studentsEligibleForRoom(row,roomStudents):[];
+  const roomOccupants=roomEdit?`<div data-room-edit-main><div class="edit-grid resource-edit-grid">${fields}</div>${roomBedsSection(roomBeds)}</div><div data-room-edit-occupants hidden><div class="toolbar"><h3>调整入住学生</h3></div>${roomOccupantsEditor(roomBeds,roomEligible)}<div class="actions room-occupant-edit-actions"><button type="button" class="secondary" data-room-occupants-cancel>取消调整</button><button type="button" class="primary" data-room-occupants-save>保存调整</button></div></div>`:'';
+  const bedEdit=type==='beds'&&action==='resource-edit'?`<div data-bed-edit-main><div class="edit-grid resource-edit-grid">${fields}</div>${bedOccupantEditor(row,bedStudents)}</div>${bedOccupantAdjustment(row,bedStudents)}`:'';
+  const html=roomEdit?roomOccupants:type==='beds'&&action==='resource-edit'?bedEdit:`<div class="edit-grid resource-edit-grid">${fields}</div>${type==='buildings'&&action==='resource-edit'?buildingRoomsPanel(id,true):''}`;
+  const dialog=modal(`${action==='resource-edit'?'编辑':'新增'}${resourceConfig[type].title}`,html,(data,form)=>{
+   if(type==='rooms'&&action==='resource-edit')data.occupants=roomOccupantsPayload(form,roomBeds);
+   if(type==='beds'&&action==='resource-edit')data.studentId=form.elements.studentId.value||null;
+   return action==='resource-edit'?put(`/admin/resources/${type}/${id}`,data):post(`/admin/resources/${type}`,data);
+  });
+  if(type==='buildings'&&action==='resource-edit')dialog.classList.add('building-edit-dialog');
+  if(type==='buildings'&&action==='resource-edit')bindBuildingRooms(dialog,Number(id),true);
+  if(type==='rooms'&&action==='resource-new'){
+   const form=dialog.querySelector('form'),buildingField=form.elements.buildingId,genderField=form.elements.genderLimit;
+   buildingField.onchange=()=>{const selected=state.data.buildings.find(x=>String(x.building_id)===buildingField.value),options=selected?.gender_limit==='混合'?[['男生','男生'],['女生','女生']]:[[selected?.gender_limit||'男生',selected?.gender_limit||'男生']];refillSelect(genderField,'',options,options[0][0]);};
+  }
+  if(roomEdit){bindRoomOccupantPicker(dialog,roomBeds,roomEligible);bindRoomEditOccupants(dialog,roomBeds,roomStudents);}
+  if(type==='beds'&&action==='resource-edit'){
+   bindBedEditOccupants(dialog,row,bedStudents);
+   const form=dialog.querySelector('form'),buildingField=form.elements.buildingId,roomField=form.elements.roomId;
+   buildingField.onchange=()=>{const options=state.data.rooms.filter(x=>String(x.building_id)===buildingField.value).map(x=>[x.room_id,`${x.floor_no}层 ${x.room_no}`]);refillSelect(roomField,'请选择宿舍',options,'');};
+  }
+  return;
+ }
  if(action==='rule-edit'){const r=state.data.config.rule;modal('发布工单规则版本',[['accept_minutes','接单时限（分钟）'],['normal_minutes','普通维修时限（分钟）'],['urgent_minutes','紧急维修时限（分钟）'],['confirm_days','自动确认（天）'],['edit_days','待修改关闭（天）'],['max_rework_count','重修上限（空值为不限）']].map(([key,label])=>field(key,label,'number',r[key]??'',key!=='max_rework_count')).join(''),d=>post('/admin/repair-rules',d));return;}
  if(action==='worker-edit'){await repairerScopeDialog(id);return;}
  if(action==='student-assign'){await assignmentDialog();return;}

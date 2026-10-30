@@ -22,10 +22,10 @@ public class ManagementService {
  public List<Map<String,Object>> buildings(CurrentUser u){
   role(u,"STUDENT","DORM_MANAGER","ADMIN");
   String filter=u.role().equals("STUDENT")?"b.building_id IN (SELECT building_id FROM v_accommodation_current WHERE student_id="+u.id()+")":scope.buildingFilter(u,"b.building_id");
-  return db.rows("SELECT b.*,COUNT(DISTINCT r.room_id) room_count,COUNT(DISTINCT bd.bed_id) bed_count,SUM(CASE WHEN bd.bed_id IS NOT NULL AND bd.management_status='AVAILABLE' AND a.student_id IS NULL THEN 1 ELSE 0 END) available_bed_count,(SELECT COUNT(*) FROM v_accommodation_current x WHERE x.building_id=b.building_id) occupied_count FROM building b LEFT JOIN dorm_room r ON r.building_id=b.building_id LEFT JOIN bed bd ON bd.room_id=r.room_id LEFT JOIN v_accommodation_current a ON a.bed_id=bd.bed_id WHERE "+filter+" GROUP BY b.building_id ORDER BY b.building_code");
+  return db.rows("SELECT b.*,COALESCE(r.room_count,0) room_count,COALESCE(bs.bed_count,0) bed_count,COALESCE(bs.available_bed_count,0) available_bed_count,COALESCE(o.occupied_count,0) occupied_count FROM building b LEFT JOIN (SELECT building_id,COUNT(*) room_count FROM dorm_room GROUP BY building_id) r ON r.building_id=b.building_id LEFT JOIN (SELECT r.building_id,COUNT(DISTINCT bd.bed_id) bed_count,COUNT(DISTINCT CASE WHEN bd.management_status='AVAILABLE' AND a.bed_id IS NULL THEN bd.bed_id END) available_bed_count FROM dorm_room r LEFT JOIN bed bd ON bd.room_id=r.room_id LEFT JOIN (SELECT DISTINCT bed_id FROM v_accommodation_current) a ON a.bed_id=bd.bed_id GROUP BY r.building_id) bs ON bs.building_id=b.building_id LEFT JOIN (SELECT building_id,COUNT(DISTINCT student_id) occupied_count FROM v_accommodation_current GROUP BY building_id) o ON o.building_id=b.building_id WHERE "+filter+" ORDER BY b.building_code");
  }
- public List<Map<String,Object>> rooms(CurrentUser u){role(u,"DORM_MANAGER","ADMIN");return db.rows("SELECT r.*,b.building_name,b.gender_limit building_gender_limit,COUNT(DISTINCT bd.bed_id) bed_count,SUM(CASE WHEN bd.bed_id IS NOT NULL AND bd.management_status='AVAILABLE' AND a.student_id IS NULL THEN 1 ELSE 0 END) available_bed_count FROM dorm_room r JOIN building b ON b.building_id=r.building_id LEFT JOIN bed bd ON bd.room_id=r.room_id LEFT JOIN v_accommodation_current a ON a.bed_id=bd.bed_id WHERE "+scope.buildingFilter(u,"r.building_id")+" GROUP BY r.room_id ORDER BY r.building_id,r.room_no");}
- public List<Map<String,Object>> beds(CurrentUser u){role(u,"DORM_MANAGER","ADMIN");return db.rows("SELECT bd.*,r.building_id,r.room_no,r.gender_limit,r.gender_limit room_gender_limit,b.building_name,b.gender_limit building_gender_limit,a.student_name,a.student_id FROM bed bd JOIN dorm_room r ON r.room_id=bd.room_id JOIN building b ON b.building_id=r.building_id LEFT JOIN v_accommodation_current a ON a.bed_id=bd.bed_id WHERE "+scope.buildingFilter(u,"r.building_id")+" ORDER BY b.building_id,r.room_no,bd.bed_no");}
+ public List<Map<String,Object>> rooms(CurrentUser u){role(u,"DORM_MANAGER","ADMIN");return db.rows("SELECT r.*,b.building_name,b.gender_limit building_gender_limit,COUNT(DISTINCT bd.bed_id) bed_count,COUNT(DISTINCT CASE WHEN bd.management_status='AVAILABLE' AND a.bed_id IS NULL THEN bd.bed_id END) available_bed_count FROM dorm_room r JOIN building b ON b.building_id=r.building_id LEFT JOIN bed bd ON bd.room_id=r.room_id LEFT JOIN (SELECT DISTINCT bed_id FROM v_accommodation_current) a ON a.bed_id=bd.bed_id WHERE "+scope.buildingFilter(u,"r.building_id")+" GROUP BY r.room_id ORDER BY r.building_id,r.room_no");}
+ public List<Map<String,Object>> beds(CurrentUser u){role(u,"DORM_MANAGER","ADMIN");return db.rows("SELECT bd.*,r.building_id,r.room_no,r.floor_no,r.gender_limit,r.gender_limit room_gender_limit,b.building_name,b.gender_limit building_gender_limit,a.student_name,a.student_id,s.student_no,s.gender student_gender,s.birth_date student_birth_date,s.phone student_phone,s.enrollment_status,sc.class_name,sc.enrollment_year grade,m.major_name,d.department_name FROM bed bd JOIN dorm_room r ON r.room_id=bd.room_id JOIN building b ON b.building_id=r.building_id LEFT JOIN v_accommodation_current a ON a.bed_id=bd.bed_id LEFT JOIN student s ON s.student_id=a.student_id LEFT JOIN student_class sc ON sc.class_id=s.class_id LEFT JOIN major m ON m.major_id=sc.major_id LEFT JOIN department d ON d.department_id=m.department_id WHERE "+scope.buildingFilter(u,"r.building_id")+" ORDER BY b.building_id,r.floor_no,r.room_no,bd.bed_no");}
  public List<Map<String,Object>> users(CurrentUser u){return users(u,Map.of());}
  public List<Map<String,Object>> users(CurrentUser u,Map<String,String> filters){
   role(u,"ADMIN");
@@ -271,6 +271,12 @@ public class ManagementService {
   db.log(u.id(),"auth","delete",user);
   return true;
  }
+ @Transactional public Map<String,Object> deleteUsers(CurrentUser u,List<Long> users){
+  role(u,"ADMIN");require(!users.isEmpty()&&new HashSet<>(users).size()==users.size(),"请选择要删除的账号");
+  int deleted=0,disabled=0;
+  for(long user:users){if(deleteUser(u,user))deleted++;else disabled++;}
+  return Map.of("deletedCount",deleted,"disabledCount",disabled);
+ }
  @Transactional public long resource(CurrentUser u,String type,Long resourceId,Map<String,Object>b){
   role(u,"ADMIN");long n;
   switch(type){
@@ -295,10 +301,12 @@ public class ManagementService {
    case "beds"->{
     long room=id(b.get("roomId"));var targetRoom=db.one("SELECT * FROM dorm_room WHERE room_id=? FOR UPDATE",room);String status=required(b,"managementStatus");require(Set.of("AVAILABLE","DISABLED").contains(status),"床位状态无效");String bedNo=required(b,"bedNo");
     if(resourceId==null){require(db.count("SELECT COUNT(*) FROM bed WHERE room_id=?",room)<id(targetRoom.get("design_capacity")),"床位数已达到房间容量");require(db.count("SELECT COUNT(*) FROM bed WHERE room_id=? AND bed_no=?",room,bedNo)==0,"该宿舍已存在同名床位");n=db.insert("INSERT INTO bed(room_id,bed_no,management_status) VALUES(?,?,?)",room,bedNo,status);}
-    else{n=resourceId;var old=db.one("SELECT * FROM bed WHERE bed_id=? FOR UPDATE",n);if(id(old.get("room_id"))!=room){require(db.count("SELECT COUNT(*) FROM accommodation_assignment WHERE bed_id=?",n)==0,"存在住宿历史的床位不能移动到其他宿舍");require(db.count("SELECT COUNT(*) FROM bed WHERE room_id=?",room)<id(targetRoom.get("design_capacity")),"目标宿舍床位数已达到容量");}require(!status.equals("DISABLED")||db.count("SELECT COUNT(*) FROM v_accommodation_current WHERE bed_id=?",n)==0,"已分配床位不能停用");require(db.count("SELECT COUNT(*) FROM bed WHERE room_id=? AND bed_no=? AND bed_id<>?",room,bedNo,n)==0,"该宿舍已存在同名床位");db.update("UPDATE bed SET room_id=?,bed_no=?,management_status=? WHERE bed_id=?",room,bedNo,status,n);}
+    else{n=resourceId;var old=db.one("SELECT * FROM bed WHERE bed_id=? FOR UPDATE",n);if(status.equals("DISABLED")&&b.containsKey("studentId")&&text(b,"studentId").isBlank())setBedOccupant(u,n,b);if(id(old.get("room_id"))!=room){require(db.count("SELECT COUNT(*) FROM accommodation_assignment WHERE bed_id=?",n)==0,"存在住宿历史的床位不能移动到其他宿舍");require(db.count("SELECT COUNT(*) FROM bed WHERE room_id=?",room)<id(targetRoom.get("design_capacity")),"目标宿舍床位数已达到容量");}require(!status.equals("DISABLED")||db.count("SELECT COUNT(*) FROM v_accommodation_current WHERE bed_id=?",n)==0,"已分配床位不能停用");require(db.count("SELECT COUNT(*) FROM bed WHERE room_id=? AND bed_no=? AND bed_id<>?",room,bedNo,n)==0,"该宿舍已存在同名床位");db.update("UPDATE bed SET room_id=?,bed_no=?,management_status=? WHERE bed_id=?",room,bedNo,status,n);}
    }
    default->throw new BizException(404,"未知资源");
   }
+  if(type.equals("rooms")&&resourceId!=null&&b.containsKey("occupants"))setRoomOccupants(u,n,b);
+  if(type.equals("beds")&&resourceId!=null&&b.containsKey("studentId")&&!"DISABLED".equals(b.get("managementStatus")))setBedOccupant(u,n,b);
   db.log(u.id(),"dorm",type,n);return n;
  }
  @Transactional public void deleteResources(CurrentUser u,String type,List<Long> ids){
@@ -337,6 +345,15 @@ public class ManagementService {
   for(var row:current){long student=id(row.get("student_id")),bed=id(row.get("bed_id"));Long target=requested.get(bed);if(!Objects.equals(target,student))db.update("UPDATE accommodation_assignment SET check_out_date=CURRENT_DATE() WHERE assignment_id=?",id(row.get("assignment_id")));}
   for(var entry:requested.entrySet()){Long student=entry.getValue();if(student==null||Objects.equals(currentByStudent.get(student),entry.getKey()))continue;db.update("INSERT INTO accommodation_assignment(student_id,bed_id,check_in_date,assignment_type) VALUES(?,?,CURRENT_DATE(),'ASSIGN')",student,entry.getKey());}
   db.log(u.id(),"dorm","room_occupants",roomId);
+ }
+ @Transactional public void setBedOccupant(CurrentUser u,long bedId,Map<String,Object>b){
+  role(u,"ADMIN");db.one("SELECT bed_id FROM bed WHERE bed_id=? FOR UPDATE",bedId);
+  String raw=text(b,"studentId").trim();Long student=raw.isEmpty()?null:id(raw);
+  var current=db.rows("SELECT assignment_id,student_id FROM accommodation_assignment WHERE bed_id=? AND check_in_date<=CURRENT_DATE() AND (check_out_date IS NULL OR check_out_date>CURRENT_DATE()) FOR UPDATE",bedId);
+  if(student!=null&&current.size()==1&&id(current.get(0).get("student_id"))==student)return;
+  for(var row:current)db.update("UPDATE accommodation_assignment SET check_out_date=CURRENT_DATE() WHERE assignment_id=?",id(row.get("assignment_id")));
+  if(student!=null)assign(u,Map.of("studentId",student,"bedId",bedId));
+  else db.log(u.id(),"dorm","bed_occupant",bedId);
  }
  @Transactional public void assign(CurrentUser u,Map<String,Object>b){
   role(u,"ADMIN");long student=id(b.get("studentId")),bed=id(b.get("bedId"));
