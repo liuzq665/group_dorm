@@ -1,5 +1,8 @@
 server:
   port: 8080
+logging:
+  file:
+    name: ../log/dorm-platform-backend.log
 spring:
   servlet:
     multipart:

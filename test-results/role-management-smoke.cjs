@@ -30,6 +30,7 @@ const baseUrl = process.env.BASE_URL || 'http://localhost:5173';
 
     assert.equal(await page.locator('[data-page="users"]').count(), 0);
     assert.equal(await page.locator('summary').filter({ hasText: '角色管理' }).count(), 1);
+    await page.locator('.nav-group[data-nav-group="roles"] summary').click();
     await page.locator('[data-page="students"]').click();
     await page.waitForFunction(() => !document.querySelector('main')?.innerText.includes('正在加载...'));
     await page.locator('#user-filter-form').waitFor({ timeout: 15000 }).catch(async () => {
