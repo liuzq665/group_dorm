@@ -1,0 +1,14 @@
+# 构建产物
+dorm-platform-backend/target/
+# 运行期产物
+log/
+uploads/
+dorm-platform-backend/uploads/
+dorm-platform-backend/backups/
+# IDE / 依赖
+.idea/
+*.iml
+node_modules/
+# 临时文件
+*.log
+*.dumpstream

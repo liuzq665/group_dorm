@@ -12,6 +12,9 @@ public class StayController {
  private final StayService service; private final FileService files;
  public StayController(StayService service,FileService files){this.service=service;this.files=files;}
  @PostMapping("/batches/{id}/lock") public ApiResponse<?> lockBatch(@RequestAttribute CurrentUser currentUser,@PathVariable long id){service.lockBatch(currentUser,id);return ApiResponse.ok();}
+ @PostMapping("/batches/{id}/unlock") public ApiResponse<?> unlockBatch(@RequestAttribute CurrentUser currentUser,@PathVariable long id){service.unlockBatch(currentUser,id);return ApiResponse.ok();}
+ @PostMapping("/batches/{id}/resubmit-deadline") public ApiResponse<?> batchResubmitDeadline(@RequestAttribute CurrentUser currentUser,@PathVariable long id,@RequestBody Map<String,Object>b){service.setBatchResubmitDeadline(currentUser,id,b);return ApiResponse.ok();}
+ @PostMapping("/batches/{id}/review") public ApiResponse<?> batchReview(@RequestAttribute CurrentUser currentUser,@PathVariable long id,@RequestBody Map<String,Object>b){service.reviewBatch(currentUser,id,b);return ApiResponse.ok();}
  @GetMapping("/current") public ApiResponse<?> batches(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(service.batches(currentUser));}
  @GetMapping("/all-batches") public ApiResponse<?> allBatches(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(service.allBatches(currentUser));}
  @GetMapping("/applications") public ApiResponse<?> list(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(service.list(currentUser));}

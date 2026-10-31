@@ -1,8 +1,8 @@
 {
-    "frontendPid":  13376,
-    "backendStartedUtc":  "2026-10-30T07:50:00Z",
-    "frontendStartedUtc":  "2026-10-30T06:36:27Z",
-    "backendPid":  14080,
+    "frontendPid":  28340,
+    "backendStartedUtc":  "2026-10-31T14:18:20Z",
+    "frontendStartedUtc":  "2026-10-31T13:07:12Z",
+    "backendPid":  34052,
     "backendPort":  8080,
     "frontendPort":  5173,
     "database":  "dorm_platform"

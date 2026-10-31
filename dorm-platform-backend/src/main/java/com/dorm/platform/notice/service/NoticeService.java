@@ -43,6 +43,14 @@ public class NoticeService {
   send(db.rows("SELECT manager_user_id user_id FROM manager_building_scope WHERE building_id=?",building).stream().map(x->id(x.get("user_id"))).toList(),title,content);
  }
 
+ /** 通知某楼栋的宿管与全部系统管理员（待人工处理等异常场景使用）。 */
+ public void managersAndAdmins(long building,String title,String content){
+  LinkedHashSet<Long> users=new LinkedHashSet<>();
+  db.rows("SELECT manager_user_id user_id FROM manager_building_scope WHERE building_id=?",building).forEach(x->users.add(id(x.get("user_id"))));
+  db.rows("SELECT user_id FROM v_user_identity WHERE role_code='ADMIN' AND enabled=1").forEach(x->users.add(id(x.get("user_id"))));
+  send(users,title,content);
+ }
+
  public long unreadCount(CurrentUser u){return u.role().equals("ADMIN")?db.count("SELECT COUNT(*) FROM message_receipt r JOIN site_message m ON m.message_id=r.message_id WHERE r.user_id=? AND r.read_at IS NULL AND m.publisher_user_id IS NULL AND EXISTS(SELECT 1 FROM message_target t JOIN v_user_identity i ON i.user_id=t.user_id WHERE t.message_id=m.message_id AND i.role_code='ADMIN')",u.id()):db.count("SELECT COUNT(*) FROM message_receipt WHERE user_id=? AND read_at IS NULL",u.id());}
 
  public List<Map<String,Object>> list(CurrentUser u,Map<String,String> filters){
