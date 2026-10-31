@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.dorm.platform.WorkflowIntegrationTest" time="8.783" tests="39" errors="21" skipped="0" failures="2">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.dorm.platform.WorkflowIntegrationTest" time="16.934" tests="40" errors="30" skipped="0" failures="1">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -13,14 +13,14 @@
     <property name="org.jboss.logging.provider" value="slf4j"/>
     <property name="os.name" value="Windows 11"/>
     <property name="java.vm.specification.version" value="17"/>
-    <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="CN"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="sun.boot.library.path" value="E:\develop\Java\jdk-17\bin"/>
-    <property name="sun.java.command" value="C:\Users\liu\AppData\Local\Temp\surefire84083408253886802\surefirebooter-20261030223755793_3.jar C:\Users\liu\AppData\Local\Temp\surefire84083408253886802 2026-10-30T22-37-55_528-jvmRun1 surefire-20261030223755793_1tmp surefire_0-20261030223755793_2tmp"/>
+    <property name="sun.java.command" value="C:\Users\liu\AppData\Local\Temp\surefire16796708918118064966\surefirebooter-20261031141730832_3.jar C:\Users\liu\AppData\Local\Temp\surefire16796708918118064966 2026-10-31T14-17-22_642-jvmRun1 surefire-20261031141730832_1tmp surefire_0-20261031141730832_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="E:\workspace\group_dorm\dorm-platform\dorm-platform-backend\target\test-classes;E:\workspace\group_dorm\dorm-platform\dorm-platform-backend\target\classes;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\boot\spring-boot-starter-web\3.3.5\spring-boot-starter-web-3.3.5.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\boot\spring-boot-starter\3.3.5\spring-boot-starter-3.3.5.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\boot\spring-boot\3.3.5\spring-boot-3.3.5.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\boot\spring-boot-autoconfigure\3.3.5\spring-boot-autoconfigure-3.3.5.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\boot\spring-boot-starter-logging\3.3.5\spring-boot-starter-logging-3.3.5.jar;E:\develop\apache-maven-3.9.9\mvn_resp\ch\qos\logback\logback-classic\1.5.11\logback-classic-1.5.11.jar;E:\develop\apache-maven-3.9.9\mvn_resp\ch\qos\logback\logback-core\1.5.11\logback-core-1.5.11.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\apache\logging\log4j\log4j-to-slf4j\2.23.1\log4j-to-slf4j-2.23.1.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\apache\logging\log4j\log4j-api\2.23.1\log4j-api-2.23.1.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\slf4j\jul-to-slf4j\2.0.16\jul-to-slf4j-2.0.16.jar;E:\develop\apache-maven-3.9.9\mvn_resp\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\yaml\snakeyaml\2.2\snakeyaml-2.2.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\boot\spring-boot-starter-json\3.3.5\spring-boot-starter-json-3.3.5.jar;E:\develop\apache-maven-3.9.9\mvn_resp\com\fasterxml\jackson\core\jackson-databind\2.17.2\jackson-databind-2.17.2.jar;E:\develop\apache-maven-3.9.9\mvn_resp\com\fasterxml\jackson\core\jackson-annotations\2.17.2\jackson-annotations-2.17.2.jar;E:\develop\apache-maven-3.9.9\mvn_resp\com\fasterxml\jackson\core\jackson-core\2.17.2\jackson-core-2.17.2.jar;E:\develop\apache-maven-3.9.9\mvn_resp\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.17.2\jackson-datatype-jdk8-2.17.2.jar;E:\develop\apache-maven-3.9.9\mvn_resp\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.17.2\jackson-datatype-jsr310-2.17.2.jar;E:\develop\apache-maven-3.9.9\mvn_resp\com\fasterxml\jackson\module\jackson-module-parameter-names\2.17.2\jackson-module-parameter-names-2.17.2.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\boot\spring-boot-starter-tomcat\3.3.5\spring-boot-starter-tomcat-3.3.5.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\apache\tomcat\embed\tomcat-embed-core\10.1.31\tomcat-embed-core-10.1.31.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.31\tomcat-embed-websocket-10.1.31.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\spring-web\6.1.14\spring-web-6.1.14.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\spring-beans\6.1.14\spring-beans-6.1.14.jar;E:\develop\apache-maven-3.9.9\mvn_resp\io\micrometer\micrometer-observation\1.13.6\micrometer-observation-1.13.6.jar;E:\develop\apache-maven-3.9.9\mvn_resp\io\micrometer\micrometer-commons\1.13.6\micrometer-commons-1.13.6.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\spring-webmvc\6.1.14\spring-webmvc-6.1.14.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\spring-aop\6.1.14\spring-aop-6.1.14.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\spring-context\6.1.14\spring-context-6.1.14.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\spring-expression\6.1.14\spring-expression-6.1.14.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\boot\spring-boot-starter-jdbc\3.3.5\spring-boot-starter-jdbc-3.3.5.jar;E:\develop\apache-maven-3.9.9\mvn_resp\com\zaxxer\HikariCP\5.1.0\HikariCP-5.1.0.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\slf4j\slf4j-api\2.0.16\slf4j-api-2.0.16.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\spring-jdbc\6.1.14\spring-jdbc-6.1.14.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\spring-tx\6.1.14\spring-tx-6.1.14.jar;E:\develop\apache-maven-3.9.9\mvn_resp\com\mysql\mysql-connector-j\8.3.0\mysql-connector-j-8.3.0.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\boot\spring-boot-starter-validation\3.3.5\spring-boot-starter-validation-3.3.5.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\apache\tomcat\embed\tomcat-embed-el\10.1.31\tomcat-embed-el-10.1.31.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\hibernate\validator\hibernate-validator\8.0.1.Final\hibernate-validator-8.0.1.Final.jar;E:\develop\apache-maven-3.9.9\mvn_resp\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\jboss\logging\jboss-logging\3.5.3.Final\jboss-logging-3.5.3.Final.jar;E:\develop\apache-maven-3.9.9\mvn_resp\com\fasterxml\classmate\1.7.0\classmate-1.7.0.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\boot\spring-boot-starter-test\3.3.5\spring-boot-starter-test-3.3.5.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\boot\spring-boot-test\3.3.5\spring-boot-test-3.3.5.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\boot\spring-boot-test-autoconfigure\3.3.5\spring-boot-test-autoconfigure-3.3.5.jar;E:\develop\apache-maven-3.9.9\mvn_resp\com\jayway\jsonpath\json-path\2.9.0\json-path-2.9.0.jar;E:\develop\apache-maven-3.9.9\mvn_resp\jakarta\xml\bind\jakarta.xml.bind-api\4.0.2\jakarta.xml.bind-api-4.0.2.jar;E:\develop\apache-maven-3.9.9\mvn_resp\jakarta\activation\jakarta.activation-api\2.1.3\jakarta.activation-api-2.1.3.jar;E:\develop\apache-maven-3.9.9\mvn_resp\net\minidev\json-smart\2.5.1\json-smart-2.5.1.jar;E:\develop\apache-maven-3.9.9\mvn_resp\net\minidev\accessors-smart\2.5.1\accessors-smart-2.5.1.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\ow2\asm\asm\9.6\asm-9.6.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\assertj\assertj-core\3.25.3\assertj-core-3.25.3.jar;E:\develop\apache-maven-3.9.9\mvn_resp\net\bytebuddy\byte-buddy\1.14.19\byte-buddy-1.14.19.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\awaitility\awaitility\4.2.2\awaitility-4.2.2.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\hamcrest\hamcrest\2.2\hamcrest-2.2.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\junit\jupiter\junit-jupiter\5.10.5\junit-jupiter-5.10.5.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\junit\jupiter\junit-jupiter-api\5.10.5\junit-jupiter-api-5.10.5.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\junit\platform\junit-platform-commons\1.10.5\junit-platform-commons-1.10.5.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\junit\jupiter\junit-jupiter-params\5.10.5\junit-jupiter-params-5.10.5.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\junit\jupiter\junit-jupiter-engine\5.10.5\junit-jupiter-engine-5.10.5.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\junit\platform\junit-platform-engine\1.10.5\junit-platform-engine-1.10.5.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;E:\develop\apache-maven-3.9.9\mvn_resp\net\bytebuddy\byte-buddy-agent\1.14.19\byte-buddy-agent-1.14.19.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\objenesis\objenesis\3.3\objenesis-3.3.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\mockito\mockito-junit-jupiter\5.11.0\mockito-junit-jupiter-5.11.0.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\skyscreamer\jsonassert\1.5.3\jsonassert-1.5.3.jar;E:\develop\apache-maven-3.9.9\mvn_resp\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\spring-core\6.1.14\spring-core-6.1.14.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\spring-jcl\6.1.14\spring-jcl-6.1.14.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\springframework\spring-test\6.1.14\spring-test-6.1.14.jar;E:\develop\apache-maven-3.9.9\mvn_resp\org\xmlunit\xmlunit-core\2.9.1\xmlunit-core-2.9.1.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
-    <property name="user.home" value="C:\Users\liu"/>
+    <property name="user.home" value="C:\"/>
     <property name="user.language" value="zh"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>
     <property name="java.version.date" value="2025-07-15"/>
@@ -33,7 +33,7 @@
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="FILE_LOG_CHARSET" value="GBK"/>
     <property name="java.awt.headless" value="true"/>
-    <property name="surefire.real.class.path" value="C:\Users\liu\AppData\Local\Temp\surefire84083408253886802\surefirebooter-20261030223755793_3.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\liu\AppData\Local\Temp\surefire16796708918118064966\surefirebooter-20261031141730832_3.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="17.0.16+12-LTS-247"/>
@@ -43,6 +43,7 @@
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="file.encoding" value="GBK"/>
     <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="LOG_FILE" value="../log/dorm-platform-backend.log"/>
     <property name="localRepository" value="E:\develop\apache-maven-3.9.9\mvn_resp"/>
     <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
     <property name="java.io.tmpdir" value="C:\Users\liu\AppData\Local\Temp\"/>
@@ -51,11 +52,11 @@
     <property name="user.dir" value="E:\workspace\group_dorm\dorm-platform\dorm-platform-backend"/>
     <property name="os.arch" value="amd64"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="PID" value="16964"/>
+    <property name="PID" value="27288"/>
     <property name="sun.os.patch.level" value=""/>
     <property name="CONSOLE_LOG_CHARSET" value="GBK"/>
     <property name="native.encoding" value="GBK"/>
-    <property name="java.library.path" value="E:\develop\Java\jdk-17\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Users\liu\.codex\tmp\arg0-windows\codex-arg027sCt6;E:\develop\anaconda;E:\develop\anaconda\Library\mingw-w64\bin;E:\develop\anaconda\Library\usr\bin;E:\develop\anaconda\Library\bin;E:\develop\anaconda\Scripts;E:\develop\anaconda\bin;E:\develop\anaconda\condabin;D:\Program Files\WpsPdf\Kingsoft PDF\12.6.0.22857\office6;C:\Program Files\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;E:\develop\Java\jdk-17\bin;D:\Program Files\Microsoft VS Code\bin;E:\迅雷\迅雷下载\visual studio code2024\x86_64-8.1.0-release-win32-seh-rt_v6-rev0(这个就是minGW64)\mingw64\bin;E:\develo;\mysql\files\MySQL Server 8.0\bin;E:\develop\apache-maven-3.9.9\bin;E:\develop\anaconda;E:\develop\anaconda\Scripts;E:\develop\anaconda\Library\bin;E:\develop\modeltech64_2020.4\win64;E:\develop\Tomcat 10.1\bin;E:\develop\Rational\common;E:\develop\apache-maven-3.9.9\bin;E:\develop\Docker\resources\bin;E:\develop\Git\cmd;E:\develop\微信web开发者工具;E:\develop\nodejs;E:\develop\python\Scripts;E:\develop\python;C:\Users\liu\AppData\Local\Programs\Python\Launcher;E:\develop\mysql\files\MySQL Shell 8.0\bin;C:\Users\liu\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell;C:\Users\liu\AppData\Local\Microsoft\WindowsApps;E:\develop\pycharm\PyCharm 2025.1\bin;.;E:\develop\modeltech64_2020.4\win64;E:\develop\mysql\files\MySQL Server 8.0\bin;C:\Users\liu\AppData\Roaming\npm;E:\develop\IntelFPGA_lite\20.1\modelsim_ase\win32aloem;D:\WindowsApps\OpenAI.Codex_26.1023.6123.0_x64__2p2nqsd0c76g0\app\resources;."/>
+    <property name="java.library.path" value="E:\develop\Java\jdk-17\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Users\liu\.codex\tmp\arg0-windows\codex-arg0GyMoOu;E:\develop\anaconda;E:\develop\anaconda\Library\mingw-w64\bin;E:\develop\anaconda\Library\usr\bin;E:\develop\anaconda\Library\bin;E:\develop\anaconda\Scripts;E:\develop\anaconda\bin;E:\develop\anaconda\condabin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;E:\develop\Java\jdk-17\bin;D:\Program Files\Microsoft VS Code\bin;E:\迅雷\迅雷下载\visual studio code2024\x86_64-8.1.0-release-win32-seh-rt_v6-rev0(这个就是minGW64)\mingw64\bin;E:\develo;\mysql\files\MySQL Server 8.0\bin;E:\develop\apache-maven-3.9.9\bin;E:\develop\anaconda;E:\develop\anaconda\Scripts;E:\develop\anaconda\Library\bin;E:\develop\modeltech64_2020.4\win64;E:\develop\Tomcat 10.1\bin;E:\develop\Rational\common;E:\develop\apache-maven-3.9.9\bin;E:\develop\Docker\resources\bin;E:\develop\Git\cmd;E:\develop\微信web开发者工具;E:\develop\nodejs;E:\develop\python\Scripts;E:\develop\python;C:\Users\liu\AppData\Local\Programs\Python\Launcher;E:\develop\mysql\files\MySQL Shell 8.0\bin;C:\Users\liu\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell;C:\Users\liu\AppData\Local\Microsoft\WindowsApps;E:\develop\pycharm\PyCharm 2025.1\bin;.;E:\develop\modeltech64_2020.4\win64;E:\develop\mysql\files\MySQL Server 8.0\bin;C:\Users\liu\AppData\Roaming\npm;E:\develop\IntelFPGA_lite\20.1\modelsim_ase\win32aloem;D:\WindowsApps\OpenAI.Codex_26.1027.3384.0_x64__2p2nqsd0c76g0\app\resources;."/>
     <property name="java.vm.info" value="mixed mode, sharing"/>
     <property name="java.vendor" value="Oracle Corporation"/>
     <property name="java.vm.version" value="17.0.16+12-LTS-247"/>
@@ -63,10 +64,10 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="stayAutomaticLockAndExpiredReturn" classname="com.dorm.platform.WorkflowIntegrationTest" time="2.175">
+  <testcase name="stayAutomaticLockAndExpiredReturn" classname="com.dorm.platform.WorkflowIntegrationTest" time="9.993">
     <error message="编号格式无效" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 编号格式无效
 	at com.dorm.platform.common.Input.id(Input.java:8)
-	at com.dorm.platform.stay.service.StayService.configure(StayService.java:43)
+	at com.dorm.platform.stay.service.StayService.configure(StayService.java:71)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -82,13 +83,13 @@
 	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
 	at com.dorm.platform.stay.service.StayService$$SpringCGLIB$$0.configure(<generated>)
 	at com.dorm.platform.WorkflowIntegrationTest.batch(WorkflowIntegrationTest.java:83)
-	at com.dorm.platform.WorkflowIntegrationTest.stayAutomaticLockAndExpiredReturn(WorkflowIntegrationTest.java:107)
+	at com.dorm.platform.WorkflowIntegrationTest.stayAutomaticLockAndExpiredReturn(WorkflowIntegrationTest.java:108)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 ]]></error>
-    <system-out><![CDATA[22:37:57.133 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.dorm.platform.WorkflowIntegrationTest]: WorkflowIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-22:37:57.319 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.dorm.platform.DormPlatformApplication for test class com.dorm.platform.WorkflowIntegrationTest
+    <system-out><![CDATA[14:17:32.150 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.dorm.platform.WorkflowIntegrationTest]: WorkflowIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+14:17:32.370 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.dorm.platform.DormPlatformApplication for test class com.dorm.platform.WorkflowIntegrationTest
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -99,21 +100,21 @@
 
  :: Spring Boot ::                (v3.3.5)
 
-2026-10-30T22:37:57.963+08:00  INFO 16964 --- [           main] c.dorm.platform.WorkflowIntegrationTest  : Starting WorkflowIntegrationTest using Java 17.0.16 with PID 16964 (started by liu in E:\workspace\group_dorm\dorm-platform\dorm-platform-backend)
-2026-10-30T22:37:57.965+08:00  INFO 16964 --- [           main] c.dorm.platform.WorkflowIntegrationTest  : No active profile set, falling back to 1 default profile: "default"
-2026-10-30T22:38:01.108+08:00  INFO 16964 --- [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-10-30T22:38:01.109+08:00  INFO 16964 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-10-30T22:38:01.113+08:00  INFO 16964 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
-2026-10-30T22:38:01.186+08:00  INFO 16964 --- [           main] c.dorm.platform.WorkflowIntegrationTest  : Started WorkflowIntegrationTest in 3.667 seconds (process running for 5.232)
-2026-10-30T22:38:01.275+08:00  INFO 16964 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-10-30T22:38:01.872+08:00  INFO 16964 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@191ec193
-2026-10-30T22:38:01.876+08:00  INFO 16964 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-31T14:17:33.100+08:00  INFO 27288 --- [           main] c.dorm.platform.WorkflowIntegrationTest  : Starting WorkflowIntegrationTest using Java 17.0.16 with PID 27288 (started by liu in E:\workspace\group_dorm\dorm-platform\dorm-platform-backend)
+2026-10-31T14:17:33.103+08:00  INFO 27288 --- [           main] c.dorm.platform.WorkflowIntegrationTest  : No active profile set, falling back to 1 default profile: "default"
+2026-10-31T14:17:36.428+08:00  INFO 27288 --- [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-10-31T14:17:36.429+08:00  INFO 27288 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-10-31T14:17:36.431+08:00  INFO 27288 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 2 ms
+2026-10-31T14:17:36.479+08:00  INFO 27288 --- [           main] c.dorm.platform.WorkflowIntegrationTest  : Started WorkflowIntegrationTest in 3.841 seconds (process running for 5.468)
+2026-10-31T14:17:36.555+08:00  INFO 27288 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-31T14:17:37.247+08:00  INFO 27288 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@632cf7d3
+2026-10-31T14:17:37.252+08:00  INFO 27288 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
 ]]></system-out>
   </testcase>
-  <testcase name="threeRefusalsMarkAbnormal" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.015">
+  <testcase name="threeRefusalsMarkAbnormal" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.012">
     <error message="维修人员工号格式为RP加6位数字" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 维修人员工号格式为RP加6位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
-	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:164)
+	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:174)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -128,17 +129,17 @@
 	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
 	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
 	at com.dorm.platform.system.service.ManagementService$$SpringCGLIB$$0.saveUser(<generated>)
-	at com.dorm.platform.WorkflowIntegrationTest.threeRefusalsMarkAbnormal(WorkflowIntegrationTest.java:99)
+	at com.dorm.platform.WorkflowIntegrationTest.threeRefusalsMarkAbnormal(WorkflowIntegrationTest.java:100)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 ]]></error>
   </testcase>
-  <testcase name="exportTaskCanRunAndPendingTaskCanCancel" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.357"/>
-  <testcase name="editingManagerAccountPreservesItsSingleConfiguredBuilding" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.008">
+  <testcase name="exportTaskCanRunAndPendingTaskCanCancel" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.334"/>
+  <testcase name="editingManagerAccountPreservesItsSingleConfiguredBuilding" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.009">
     <error message="宿管工号格式为DM加6位数字" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 宿管工号格式为DM加6位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
-	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:164)
+	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:174)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -159,11 +160,67 @@
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 ]]></error>
   </testcase>
-  <testcase name="pendingDelayPausesTimeoutAndRejectedExpiredDelayReassigns" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.28"/>
-  <testcase name="staffCreationAndConfigurationStoreSelectedScopes" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.009">
+  <testcase name="pendingDelayPausesTimeoutAndRejectedExpiredDelayReassigns" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.318"/>
+  <testcase name="administratorCanSeeOwnPublishedMessagesEvenWhenUnreadFilterWasSelected" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.05">
+    <error message="PreparedStatementCallback; bad SQL grammar [INSERT INTO message_building_target(message_id,building_id) VALUES(?,?)]" type="org.springframework.jdbc.BadSqlGrammarException"><![CDATA[org.springframework.jdbc.BadSqlGrammarException: PreparedStatementCallback; bad SQL grammar [INSERT INTO message_building_target(message_id,building_id) VALUES(?,?)]
+	at org.springframework.jdbc.support.SQLExceptionSubclassTranslator.doTranslate(SQLExceptionSubclassTranslator.java:103)
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:107)
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1548)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:677)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:970)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1014)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1024)
+	at com.dorm.platform.common.SqlStore.update(SqlStore.java:14)
+	at jdk.internal.reflect.GeneratedMethodAccessor14.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:138)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.common.SqlStore$$SpringCGLIB$$0.update(<generated>)
+	at com.dorm.platform.notice.service.NoticeService.publish(NoticeService.java:137)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:379)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.notice.service.NoticeService$$SpringCGLIB$$0.publish(<generated>)
+	at com.dorm.platform.WorkflowIntegrationTest.administratorCanSeeOwnPublishedMessagesEvenWhenUnreadFilterWasSelected(WorkflowIntegrationTest.java:96)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.sql.SQLSyntaxErrorException: Table 'dorm_platform_test.message_building_target' doesn't exist
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:121)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeInternal(ClientPreparedStatement.java:912)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1054)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1003)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeLargeUpdate(ClientPreparedStatement.java:1312)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdate(ClientPreparedStatement.java:988)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+	at org.springframework.jdbc.core.JdbcTemplate.lambda$update$2(JdbcTemplate.java:975)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:658)
+	... 35 more
+]]></error>
+  </testcase>
+  <testcase name="staffCreationAndConfigurationStoreSelectedScopes" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.007">
     <error message="宿管工号格式为DM加6位数字" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 宿管工号格式为DM加6位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
-	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:164)
+	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:174)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -187,7 +244,7 @@
   <testcase name="foreignStayCannotBeReviewed" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.007">
     <error message="编号格式无效" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 编号格式无效
 	at com.dorm.platform.common.Input.id(Input.java:8)
-	at com.dorm.platform.stay.service.StayService.configure(StayService.java:43)
+	at com.dorm.platform.stay.service.StayService.configure(StayService.java:71)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -209,11 +266,66 @@
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 ]]></error>
   </testcase>
-  <testcase name="delayedNoticesAreDeliveredOnce" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.024"/>
-  <testcase name="studentNumberIsRequiredUniqueAndSearchable" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.008">
+  <testcase name="delayedNoticesAreDeliveredOnce" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.021">
+    <error message="PreparedStatementCallback; bad SQL grammar [INSERT INTO message_building_target(message_id,building_id) VALUES(?,?)]" type="org.springframework.jdbc.BadSqlGrammarException"><![CDATA[org.springframework.jdbc.BadSqlGrammarException: PreparedStatementCallback; bad SQL grammar [INSERT INTO message_building_target(message_id,building_id) VALUES(?,?)]
+	at org.springframework.jdbc.support.SQLExceptionSubclassTranslator.doTranslate(SQLExceptionSubclassTranslator.java:103)
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:107)
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1548)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:677)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:970)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1014)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1024)
+	at com.dorm.platform.common.SqlStore.update(SqlStore.java:14)
+	at jdk.internal.reflect.GeneratedMethodAccessor14.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:138)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.common.SqlStore$$SpringCGLIB$$0.update(<generated>)
+	at com.dorm.platform.notice.service.NoticeService.publish(NoticeService.java:137)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:379)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.notice.service.NoticeService$$SpringCGLIB$$0.publish(<generated>)
+	at com.dorm.platform.WorkflowIntegrationTest.delayedNoticesAreDeliveredOnce(WorkflowIntegrationTest.java:94)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.sql.SQLSyntaxErrorException: Table 'dorm_platform_test.message_building_target' doesn't exist
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:121)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeInternal(ClientPreparedStatement.java:912)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1054)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1003)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeLargeUpdate(ClientPreparedStatement.java:1312)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdate(ClientPreparedStatement.java:988)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+	at org.springframework.jdbc.core.JdbcTemplate.lambda$update$2(JdbcTemplate.java:975)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:658)
+	... 35 more
+]]></error>
+  </testcase>
+  <testcase name="studentNumberIsRequiredUniqueAndSearchable" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.01">
     <error message="学号必须为10位数字" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 学号必须为10位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
-	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:162)
+	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:172)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -234,10 +346,10 @@
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 ]]></error>
   </testcase>
-  <testcase name="unsubmittedEditsAreNotReviewed" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.006">
+  <testcase name="unsubmittedEditsAreNotReviewed" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.008">
     <error message="编号格式无效" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 编号格式无效
 	at com.dorm.platform.common.Input.id(Input.java:8)
-	at com.dorm.platform.stay.service.StayService.configure(StayService.java:43)
+	at com.dorm.platform.stay.service.StayService.configure(StayService.java:71)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -253,16 +365,16 @@
 	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
 	at com.dorm.platform.stay.service.StayService$$SpringCGLIB$$0.configure(<generated>)
 	at com.dorm.platform.WorkflowIntegrationTest.batch(WorkflowIntegrationTest.java:83)
-	at com.dorm.platform.WorkflowIntegrationTest.unsubmittedEditsAreNotReviewed(WorkflowIntegrationTest.java:106)
+	at com.dorm.platform.WorkflowIntegrationTest.unsubmittedEditsAreNotReviewed(WorkflowIntegrationTest.java:107)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 ]]></error>
   </testcase>
-  <testcase name="supplementAndRangeChangesAreReviewed" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.007">
+  <testcase name="supplementAndRangeChangesAreReviewed" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.006">
     <error message="编号格式无效" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 编号格式无效
 	at com.dorm.platform.common.Input.id(Input.java:8)
-	at com.dorm.platform.stay.service.StayService.configure(StayService.java:43)
+	at com.dorm.platform.stay.service.StayService.configure(StayService.java:71)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -284,10 +396,10 @@
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 ]]></error>
   </testcase>
-  <testcase name="withdrawnStayCanSubmitAgain" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.006">
+  <testcase name="withdrawnStayCanSubmitAgain" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.007">
     <error message="编号格式无效" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 编号格式无效
 	at com.dorm.platform.common.Input.id(Input.java:8)
-	at com.dorm.platform.stay.service.StayService.configure(StayService.java:43)
+	at com.dorm.platform.stay.service.StayService.configure(StayService.java:71)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -309,12 +421,12 @@
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 ]]></error>
   </testcase>
-  <testcase name="delayApprovalAndRejectionKeepCorrectDeadlines" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.203"/>
-  <testcase name="disabledAccountsLoseActiveSessions" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.311"/>
+  <testcase name="delayApprovalAndRejectionKeepCorrectDeadlines" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.207"/>
+  <testcase name="disabledAccountsLoseActiveSessions" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.403"/>
   <testcase name="deletingAccountWithoutBusinessHistoryPhysicallyRemovesIt" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.008">
     <error message="管理员工号格式为SA加6位数字" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 管理员工号格式为SA加6位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
-	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:164)
+	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:174)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -338,7 +450,7 @@
   <testcase name="academicStructureFlowsIntoStudentProfileAndFilters" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.017">
     <error message="学号必须为10位数字" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 学号必须为10位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
-	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:162)
+	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:172)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -359,11 +471,66 @@
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 ]]></error>
   </testcase>
-  <testcase name="immediateNoticeIsVisibleBeforeSchedulerRuns" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.015"/>
+  <testcase name="immediateNoticeIsVisibleBeforeSchedulerRuns" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.013">
+    <error message="PreparedStatementCallback; bad SQL grammar [INSERT INTO message_building_target(message_id,building_id) VALUES(?,?)]" type="org.springframework.jdbc.BadSqlGrammarException"><![CDATA[org.springframework.jdbc.BadSqlGrammarException: PreparedStatementCallback; bad SQL grammar [INSERT INTO message_building_target(message_id,building_id) VALUES(?,?)]
+	at org.springframework.jdbc.support.SQLExceptionSubclassTranslator.doTranslate(SQLExceptionSubclassTranslator.java:103)
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:107)
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1548)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:677)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:970)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1014)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1024)
+	at com.dorm.platform.common.SqlStore.update(SqlStore.java:14)
+	at jdk.internal.reflect.GeneratedMethodAccessor14.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:138)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.common.SqlStore$$SpringCGLIB$$0.update(<generated>)
+	at com.dorm.platform.notice.service.NoticeService.publish(NoticeService.java:137)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:379)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.notice.service.NoticeService$$SpringCGLIB$$0.publish(<generated>)
+	at com.dorm.platform.WorkflowIntegrationTest.immediateNoticeIsVisibleBeforeSchedulerRuns(WorkflowIntegrationTest.java:95)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.sql.SQLSyntaxErrorException: Table 'dorm_platform_test.message_building_target' doesn't exist
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:121)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeInternal(ClientPreparedStatement.java:912)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1054)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1003)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeLargeUpdate(ClientPreparedStatement.java:1312)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdate(ClientPreparedStatement.java:988)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+	at org.springframework.jdbc.core.JdbcTemplate.lambda$update$2(JdbcTemplate.java:975)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:658)
+	... 35 more
+]]></error>
+  </testcase>
   <testcase name="editingStudentCanKeepOrChangeAccommodationBed" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.006">
     <error message="学号必须为10位数字" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 学号必须为10位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
-	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:162)
+	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:172)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -384,10 +551,10 @@
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 ]]></error>
   </testcase>
-  <testcase name="stayLocksResubmitsAndArchives" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.006">
+  <testcase name="stayLocksResubmitsAndArchives" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.007">
     <error message="编号格式无效" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 编号格式无效
 	at com.dorm.platform.common.Input.id(Input.java:8)
-	at com.dorm.platform.stay.service.StayService.configure(StayService.java:43)
+	at com.dorm.platform.stay.service.StayService.configure(StayService.java:71)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -403,21 +570,150 @@
 	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
 	at com.dorm.platform.stay.service.StayService$$SpringCGLIB$$0.configure(<generated>)
 	at com.dorm.platform.WorkflowIntegrationTest.batch(WorkflowIntegrationTest.java:83)
-	at com.dorm.platform.WorkflowIntegrationTest.stayLocksResubmitsAndArchives(WorkflowIntegrationTest.java:104)
+	at com.dorm.platform.WorkflowIntegrationTest.stayLocksResubmitsAndArchives(WorkflowIntegrationTest.java:105)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 ]]></error>
   </testcase>
-  <testcase name="loginLogoutAndHttpStatus" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.059"/>
+  <testcase name="loginLogoutAndHttpStatus" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.056"/>
   <testcase name="staySharedBoundaryIsOverlap" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.006"/>
-  <testcase name="urgentManualDispatchCannotBeRejected" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.063"/>
-  <testcase name="rejectionWithoutNewCandidateStopsAutoDispatch" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.071"/>
+  <testcase name="urgentManualDispatchCannotBeRejected" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.039">
+    <error message="PreparedStatementCallback; bad SQL grammar [INSERT INTO message_building_target(message_id,building_id) VALUES(?,?)]" type="org.springframework.jdbc.BadSqlGrammarException"><![CDATA[org.springframework.jdbc.BadSqlGrammarException: PreparedStatementCallback; bad SQL grammar [INSERT INTO message_building_target(message_id,building_id) VALUES(?,?)]
+	at org.springframework.jdbc.support.SQLExceptionSubclassTranslator.doTranslate(SQLExceptionSubclassTranslator.java:103)
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:107)
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1548)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:677)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:970)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1014)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1024)
+	at com.dorm.platform.common.SqlStore.update(SqlStore.java:14)
+	at jdk.internal.reflect.GeneratedMethodAccessor14.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:138)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.common.SqlStore$$SpringCGLIB$$0.update(<generated>)
+	at com.dorm.platform.notice.service.NoticeService.admins(NoticeService.java:35)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:716)
+	at com.dorm.platform.notice.service.NoticeService$$SpringCGLIB$$0.admins(<generated>)
+	at com.dorm.platform.repair.service.RepairService.autoDispatch(RepairService.java:130)
+	at com.dorm.platform.repair.service.RepairService.review(RepairService.java:124)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:379)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.repair.service.RepairService$$SpringCGLIB$$0.review(<generated>)
+	at com.dorm.platform.WorkflowIntegrationTest.urgentManualDispatchCannotBeRejected(WorkflowIntegrationTest.java:98)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.sql.SQLSyntaxErrorException: Table 'dorm_platform_test.message_building_target' doesn't exist
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:121)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeInternal(ClientPreparedStatement.java:912)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1054)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1003)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeLargeUpdate(ClientPreparedStatement.java:1312)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdate(ClientPreparedStatement.java:988)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+	at org.springframework.jdbc.core.JdbcTemplate.lambda$update$2(JdbcTemplate.java:975)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:658)
+	... 44 more
+]]></error>
+  </testcase>
+  <testcase name="rejectionWithoutNewCandidateStopsAutoDispatch" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.065">
+    <error message="PreparedStatementCallback; bad SQL grammar [INSERT INTO message_building_target(message_id,building_id) VALUES(?,?)]" type="org.springframework.jdbc.BadSqlGrammarException"><![CDATA[org.springframework.jdbc.BadSqlGrammarException: PreparedStatementCallback; bad SQL grammar [INSERT INTO message_building_target(message_id,building_id) VALUES(?,?)]
+	at org.springframework.jdbc.support.SQLExceptionSubclassTranslator.doTranslate(SQLExceptionSubclassTranslator.java:103)
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:107)
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1548)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:677)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:970)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1014)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1024)
+	at com.dorm.platform.common.SqlStore.update(SqlStore.java:14)
+	at jdk.internal.reflect.GeneratedMethodAccessor14.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:138)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.common.SqlStore$$SpringCGLIB$$0.update(<generated>)
+	at com.dorm.platform.notice.service.NoticeService.admins(NoticeService.java:35)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:716)
+	at com.dorm.platform.notice.service.NoticeService$$SpringCGLIB$$0.admins(<generated>)
+	at com.dorm.platform.repair.service.RepairService.autoDispatch(RepairService.java:137)
+	at com.dorm.platform.repair.service.RepairService.reroute(RepairService.java:148)
+	at com.dorm.platform.repair.service.RepairService.decision(RepairService.java:147)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:379)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.repair.service.RepairService$$SpringCGLIB$$0.decision(<generated>)
+	at com.dorm.platform.WorkflowIntegrationTest.rejectionWithoutNewCandidateStopsAutoDispatch(WorkflowIntegrationTest.java:99)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.sql.SQLSyntaxErrorException: Table 'dorm_platform_test.message_building_target' doesn't exist
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:121)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeInternal(ClientPreparedStatement.java:912)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1054)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1003)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeLargeUpdate(ClientPreparedStatement.java:1312)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdate(ClientPreparedStatement.java:988)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+	at org.springframework.jdbc.core.JdbcTemplate.lambda$update$2(JdbcTemplate.java:975)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:658)
+	... 45 more
+]]></error>
+  </testcase>
   <testcase name="deletingHistoricalRepairerDisablesAndRemovesFromDuty" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.015"/>
-  <testcase name="studentProfileUsesSharedPrimaryKeyAndBusinessForeignKeys" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.018">
+  <testcase name="studentProfileUsesSharedPrimaryKeyAndBusinessForeignKeys" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.012">
     <error message="学号必须为10位数字" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 学号必须为10位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
-	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:162)
+	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:172)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -438,10 +734,10 @@
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 ]]></error>
   </testcase>
-  <testcase name="eachStaffRoleStoresPersonnelFieldsOutsideAuthenticationTable" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.006">
+  <testcase name="eachStaffRoleStoresPersonnelFieldsOutsideAuthenticationTable" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.005">
     <error message="宿管工号格式为DM加6位数字" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 宿管工号格式为DM加6位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
-	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:164)
+	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:174)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -462,10 +758,75 @@
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 ]]></error>
   </testcase>
-  <testcase name="repairReturnEditAndReworkCap" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.09"/>
-  <testcase name="accountDetailsExposeRoleSpecificBusinessData" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.028"/>
-  <testcase name="timersAreIdempotent" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.128"/>
-  <testcase name="adminUserSearchAndDetailHttpEndpoints" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.004">
+  <testcase name="repairReturnEditAndReworkCap" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.095"/>
+  <testcase name="accountDetailsExposeRoleSpecificBusinessData" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.033"/>
+  <testcase name="timersAreIdempotent" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.134">
+    <error message="PreparedStatementCallback; bad SQL grammar [INSERT INTO message_building_target(message_id,building_id) VALUES(?,?)]" type="org.springframework.jdbc.BadSqlGrammarException"><![CDATA[org.springframework.jdbc.BadSqlGrammarException: PreparedStatementCallback; bad SQL grammar [INSERT INTO message_building_target(message_id,building_id) VALUES(?,?)]
+	at org.springframework.jdbc.support.SQLExceptionSubclassTranslator.doTranslate(SQLExceptionSubclassTranslator.java:103)
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:107)
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1548)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:677)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:970)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1014)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1024)
+	at com.dorm.platform.common.SqlStore.update(SqlStore.java:14)
+	at jdk.internal.reflect.GeneratedMethodAccessor14.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:138)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.common.SqlStore$$SpringCGLIB$$0.update(<generated>)
+	at com.dorm.platform.notice.service.NoticeService.admins(NoticeService.java:35)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:716)
+	at com.dorm.platform.notice.service.NoticeService$$SpringCGLIB$$0.admins(<generated>)
+	at com.dorm.platform.repair.service.RepairService.autoDispatch(RepairService.java:137)
+	at com.dorm.platform.repair.service.RepairService.reroute(RepairService.java:148)
+	at com.dorm.platform.repair.service.RepairService.tick(RepairService.java:161)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:379)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.repair.service.RepairService$$SpringCGLIB$$0.tick(<generated>)
+	at com.dorm.platform.WorkflowIntegrationTest.timersAreIdempotent(WorkflowIntegrationTest.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.sql.SQLSyntaxErrorException: Table 'dorm_platform_test.message_building_target' doesn't exist
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:121)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeInternal(ClientPreparedStatement.java:912)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1054)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1003)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeLargeUpdate(ClientPreparedStatement.java:1312)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdate(ClientPreparedStatement.java:988)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+	at org.springframework.jdbc.core.JdbcTemplate.lambda$update$2(JdbcTemplate.java:975)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:658)
+	... 45 more
+]]></error>
+  </testcase>
+  <testcase name="adminUserSearchAndDetailHttpEndpoints" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.008">
     <failure message="com.dorm.platform.common.BizException: 学号必须为10位数字" type="java.lang.AssertionError"><![CDATA[java.lang.AssertionError: com.dorm.platform.common.BizException: 学号必须为10位数字
 	at com.dorm.platform.WorkflowIntegrationTest.adminUserSearchAndDetailHttpEndpoints(WorkflowIntegrationTest.java:71)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
@@ -473,7 +834,7 @@
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 Caused by: com.dorm.platform.common.BizException: 学号必须为10位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
-	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:162)
+	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:172)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -491,10 +852,10 @@ Caused by: com.dorm.platform.common.BizException: 学号必须为10位数字
 	... 4 more
 ]]></failure>
   </testcase>
-  <testcase name="unassignedStudentCanReadEmptyAccommodation" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.004">
+  <testcase name="unassignedStudentCanReadEmptyAccommodation" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.006">
     <error message="学号必须为10位数字" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 学号必须为10位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
-	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:162)
+	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:172)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -515,11 +876,59 @@ Caused by: com.dorm.platform.common.BizException: 学号必须为10位数字
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 ]]></error>
   </testcase>
-  <testcase name="repairCompletesAcrossRoles" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.078"/>
+  <testcase name="repairCompletesAcrossRoles" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.101">
+    <error message="PreparedStatementCallback; bad SQL grammar [SELECT m.message_id,m.title,m.content,m.created_at,r.read_at,IF(r.message_id IS NULL,&apos;发送给他人&apos;,IF(r.read_at IS NULL,&apos;未读&apos;,&apos;已读&apos;)) read_label,IF(r.message_id IS NULL,0,1) is_recipient,m.publisher_user_id,COALESCE(p.real_name,&apos;系统&apos;) publisher_name,p.role_code publisher_role,CASE WHEN p.role_code=&apos;DORM_MANAGER&apos; THEN &apos;宿管&apos; WHEN m.publisher_user_id=? THEN &apos;我发布的&apos; WHEN m.publisher_user_id IS NULL AND EXISTS(SELECT 1 FROM message_target smt JOIN v_user_identity su ON su.user_id=smt.user_id WHERE smt.message_id=m.message_id AND su.role_code=&apos;ADMIN&apos;) THEN &apos;系统通知&apos; ELSE &apos;宿管&apos; END source_label FROM site_message m JOIN message_receipt r ON r.message_id=m.message_id AND r.user_id=? LEFT JOIN v_user_identity p ON p.user_id=m.publisher_user_id WHERE m.delivered_at IS NOT NULL AND r.deleted_at IS NULL GROUP BY m.message_id,r.read_at,r.message_id,p.real_name,p.role_code ORDER BY m.message_id DESC LIMIT 500]" type="org.springframework.jdbc.BadSqlGrammarException"><![CDATA[org.springframework.jdbc.BadSqlGrammarException: PreparedStatementCallback; bad SQL grammar [SELECT m.message_id,m.title,m.content,m.created_at,r.read_at,IF(r.message_id IS NULL,'发送给他人',IF(r.read_at IS NULL,'未读','已读')) read_label,IF(r.message_id IS NULL,0,1) is_recipient,m.publisher_user_id,COALESCE(p.real_name,'系统') publisher_name,p.role_code publisher_role,CASE WHEN p.role_code='DORM_MANAGER' THEN '宿管' WHEN m.publisher_user_id=? THEN '我发布的' WHEN m.publisher_user_id IS NULL AND EXISTS(SELECT 1 FROM message_target smt JOIN v_user_identity su ON su.user_id=smt.user_id WHERE smt.message_id=m.message_id AND su.role_code='ADMIN') THEN '系统通知' ELSE '宿管' END source_label FROM site_message m JOIN message_receipt r ON r.message_id=m.message_id AND r.user_id=? LEFT JOIN v_user_identity p ON p.user_id=m.publisher_user_id WHERE m.delivered_at IS NOT NULL AND r.deleted_at IS NULL GROUP BY m.message_id,r.read_at,r.message_id,p.real_name,p.role_code ORDER BY m.message_id DESC LIMIT 500]
+	at org.springframework.jdbc.support.SQLExceptionSubclassTranslator.doTranslate(SQLExceptionSubclassTranslator.java:103)
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:107)
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1548)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:677)
+	at org.springframework.jdbc.core.JdbcTemplate.query(JdbcTemplate.java:723)
+	at org.springframework.jdbc.core.JdbcTemplate.query(JdbcTemplate.java:754)
+	at org.springframework.jdbc.core.JdbcTemplate.query(JdbcTemplate.java:767)
+	at org.springframework.jdbc.core.JdbcTemplate.query(JdbcTemplate.java:820)
+	at org.springframework.jdbc.core.JdbcTemplate.queryForList(JdbcTemplate.java:952)
+	at com.dorm.platform.common.SqlStore.rows(SqlStore.java:11)
+	at jdk.internal.reflect.GeneratedMethodAccessor16.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:138)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.common.SqlStore$$SpringCGLIB$$0.rows(<generated>)
+	at com.dorm.platform.notice.service.NoticeService.list(NoticeService.java:78)
+	at com.dorm.platform.notice.service.NoticeService.list(NoticeService.java:83)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:716)
+	at com.dorm.platform.notice.service.NoticeService$$SpringCGLIB$$0.list(<generated>)
+	at com.dorm.platform.WorkflowIntegrationTest.repairCompletesAcrossRoles(WorkflowIntegrationTest.java:88)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.sql.SQLSyntaxErrorException: Unknown column 'r.deleted_at' in 'where clause'
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:121)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeInternal(ClientPreparedStatement.java:912)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeQuery(ClientPreparedStatement.java:968)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeQuery(HikariProxyPreparedStatement.java)
+	at org.springframework.jdbc.core.JdbcTemplate$1.doInPreparedStatement(JdbcTemplate.java:732)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:658)
+	... 31 more
+]]></error>
+  </testcase>
   <testcase name="occupiedBedAndUnauthorizedMessageAreRejected" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.005">
     <error message="学号必须为10位数字" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 学号必须为10位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
-	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:162)
+	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:172)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -534,16 +943,16 @@ Caused by: com.dorm.platform.common.BizException: 学号必须为10位数字
 	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
 	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
 	at com.dorm.platform.system.service.ManagementService$$SpringCGLIB$$0.saveUser(<generated>)
-	at com.dorm.platform.WorkflowIntegrationTest.occupiedBedAndUnauthorizedMessageAreRejected(WorkflowIntegrationTest.java:110)
+	at com.dorm.platform.WorkflowIntegrationTest.occupiedBedAndUnauthorizedMessageAreRejected(WorkflowIntegrationTest.java:111)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 ]]></error>
   </testcase>
-  <testcase name="adminPersonalProfileUpdatesRoleSpecificDetails" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.009">
+  <testcase name="adminPersonalProfileUpdatesRoleSpecificDetails" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.008">
     <error message="管理员工号格式为SA加6位数字" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 管理员工号格式为SA加6位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
-	at com.dorm.platform.system.service.ManagementService.profile(ManagementService.java:146)
+	at com.dorm.platform.system.service.ManagementService.profile(ManagementService.java:156)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -564,24 +973,75 @@ Caused by: com.dorm.platform.common.BizException: 学号必须为10位数字
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 ]]></error>
   </testcase>
-  <testcase name="maintenanceScopeWorkloadAndReworkCap" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.069">
-    <failure message="expected: &lt;PENDING_MANUAL&gt; but was: &lt;PENDING_ACCEPT&gt;" type="org.opentest4j.AssertionFailedError"><![CDATA[org.opentest4j.AssertionFailedError: expected: <PENDING_MANUAL> but was: <PENDING_ACCEPT>
-	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
-	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
-	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
-	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
-	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
-	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)
+  <testcase name="maintenanceScopeWorkloadAndReworkCap" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.034">
+    <error message="PreparedStatementCallback; bad SQL grammar [INSERT INTO message_building_target(message_id,building_id) VALUES(?,?)]" type="org.springframework.jdbc.BadSqlGrammarException"><![CDATA[org.springframework.jdbc.BadSqlGrammarException: PreparedStatementCallback; bad SQL grammar [INSERT INTO message_building_target(message_id,building_id) VALUES(?,?)]
+	at org.springframework.jdbc.support.SQLExceptionSubclassTranslator.doTranslate(SQLExceptionSubclassTranslator.java:103)
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:107)
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1548)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:677)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:970)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1014)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1024)
+	at com.dorm.platform.common.SqlStore.update(SqlStore.java:14)
+	at jdk.internal.reflect.GeneratedMethodAccessor14.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:138)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.common.SqlStore$$SpringCGLIB$$0.update(<generated>)
+	at com.dorm.platform.notice.service.NoticeService.admins(NoticeService.java:35)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:716)
+	at com.dorm.platform.notice.service.NoticeService$$SpringCGLIB$$0.admins(<generated>)
+	at com.dorm.platform.repair.service.RepairService.autoDispatch(RepairService.java:137)
+	at com.dorm.platform.repair.service.RepairService.review(RepairService.java:124)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:379)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.repair.service.RepairService$$SpringCGLIB$$0.review(<generated>)
 	at com.dorm.platform.WorkflowIntegrationTest.maintenanceScopeWorkloadAndReworkCap(WorkflowIntegrationTest.java:91)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-]]></failure>
+Caused by: java.sql.SQLSyntaxErrorException: Table 'dorm_platform_test.message_building_target' doesn't exist
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:121)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeInternal(ClientPreparedStatement.java:912)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1054)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1003)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeLargeUpdate(ClientPreparedStatement.java:1312)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdate(ClientPreparedStatement.java:988)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+	at org.springframework.jdbc.core.JdbcTemplate.lambda$update$2(JdbcTemplate.java:975)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:658)
+	... 44 more
+]]></error>
   </testcase>
-  <testcase name="studentAndBuildingIsolation" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.019">
+  <testcase name="studentAndBuildingIsolation" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.018">
     <error message="学号必须为10位数字" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 学号必须为10位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
-	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:162)
+	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:172)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -596,16 +1056,52 @@ Caused by: com.dorm.platform.common.BizException: 学号必须为10位数字
 	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
 	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
 	at com.dorm.platform.system.service.ManagementService$$SpringCGLIB$$0.saveUser(<generated>)
-	at com.dorm.platform.WorkflowIntegrationTest.studentAndBuildingIsolation(WorkflowIntegrationTest.java:108)
+	at com.dorm.platform.WorkflowIntegrationTest.studentAndBuildingIsolation(WorkflowIntegrationTest.java:109)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 ]]></error>
   </testcase>
-  <testcase name="stayDashboardCountsPeopleNotApplications" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.064">
-    <error message="编号格式无效" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 编号格式无效
-	at com.dorm.platform.common.Input.id(Input.java:8)
-	at com.dorm.platform.stay.service.StayService.configure(StayService.java:43)
+  <testcase name="stayDashboardCountsPeopleNotApplications" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.004">
+    <error message="&apos;com.dorm.platform.common.ApiResponse com.dorm.platform.system.controller.ManagementController.dashboard(com.dorm.platform.security.CurrentUser)&apos;" type="java.lang.NoSuchMethodError"><![CDATA[java.lang.NoSuchMethodError: 'com.dorm.platform.common.ApiResponse com.dorm.platform.system.controller.ManagementController.dashboard(com.dorm.platform.security.CurrentUser)'
+	at com.dorm.platform.WorkflowIntegrationTest.stayDashboardCountsPeopleNotApplications(WorkflowIntegrationTest.java:76)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+]]></error>
+  </testcase>
+  <testcase name="reworkUsesManualAssignmentAndArchivesParent" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.083">
+    <error message="PreparedStatementCallback; bad SQL grammar [INSERT INTO message_building_target(message_id,building_id) VALUES(?,?)]" type="org.springframework.jdbc.BadSqlGrammarException"><![CDATA[org.springframework.jdbc.BadSqlGrammarException: PreparedStatementCallback; bad SQL grammar [INSERT INTO message_building_target(message_id,building_id) VALUES(?,?)]
+	at org.springframework.jdbc.support.SQLExceptionSubclassTranslator.doTranslate(SQLExceptionSubclassTranslator.java:103)
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:107)
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1548)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:677)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:970)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1014)
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1024)
+	at com.dorm.platform.common.SqlStore.update(SqlStore.java:14)
+	at jdk.internal.reflect.GeneratedMethodAccessor14.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:138)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.dorm.platform.common.SqlStore$$SpringCGLIB$$0.update(<generated>)
+	at com.dorm.platform.notice.service.NoticeService.admins(NoticeService.java:35)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:716)
+	at com.dorm.platform.notice.service.NoticeService$$SpringCGLIB$$0.admins(<generated>)
+	at com.dorm.platform.repair.service.RepairService.autoDispatch(RepairService.java:130)
+	at com.dorm.platform.repair.service.RepairService.review(RepairService.java:124)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -619,19 +1115,30 @@ Caused by: com.dorm.platform.common.BizException: 学号必须为10位数字
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
 	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
 	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
-	at com.dorm.platform.stay.service.StayService$$SpringCGLIB$$0.configure(<generated>)
-	at com.dorm.platform.WorkflowIntegrationTest.batch(WorkflowIntegrationTest.java:83)
-	at com.dorm.platform.WorkflowIntegrationTest.stayDashboardCountsPeopleNotApplications(WorkflowIntegrationTest.java:76)
+	at com.dorm.platform.repair.service.RepairService$$SpringCGLIB$$0.review(<generated>)
+	at com.dorm.platform.WorkflowIntegrationTest.reworkUsesManualAssignmentAndArchivesParent(WorkflowIntegrationTest.java:103)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.sql.SQLSyntaxErrorException: Table 'dorm_platform_test.message_building_target' doesn't exist
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:121)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeInternal(ClientPreparedStatement.java:912)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1054)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1003)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeLargeUpdate(ClientPreparedStatement.java:1312)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdate(ClientPreparedStatement.java:988)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+	at org.springframework.jdbc.core.JdbcTemplate.lambda$update$2(JdbcTemplate.java:975)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:658)
+	... 44 more
 ]]></error>
   </testcase>
-  <testcase name="reworkUsesManualAssignmentAndArchivesParent" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.097"/>
-  <testcase name="accommodationAssignmentRejectsBedsForAnotherGender" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.004">
+  <testcase name="accommodationAssignmentRejectsBedsForAnotherGender" classname="com.dorm.platform.WorkflowIntegrationTest" time="0.005">
     <error message="学号必须为10位数字" type="com.dorm.platform.common.BizException"><![CDATA[com.dorm.platform.common.BizException: 学号必须为10位数字
 	at com.dorm.platform.common.BizException.require(BizException.java:8)
-	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:162)
+	at com.dorm.platform.system.service.ManagementService.saveUser(ManagementService.java:172)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)

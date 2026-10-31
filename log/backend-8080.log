@@ -1,3 +1,30 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------< com.dorm.platform:dorm-platform-backend >---------------
+[INFO] Building dorm-platform-backend 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.3.5:run (default-cli) > test-compile @ dorm-platform-backend >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ dorm-platform-backend ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ dorm-platform-backend ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ dorm-platform-backend ---
+[INFO] skip non existing resourceDirectory E:\workspace\group_dorm\dorm-platform\dorm-platform-backend\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ dorm-platform-backend ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] <<< spring-boot:3.3.5:run (default-cli) < test-compile @ dorm-platform-backend <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.3.5:run (default-cli) @ dorm-platform-backend ---
+[INFO] Attaching agents: []
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -8,21 +35,31 @@
 
  :: Spring Boot ::                (v3.3.5)
 
-2026-10-15T15:15:08.258+08:00  INFO 22128 --- [           main] c.dorm.platform.DormPlatformApplication  : Starting DormPlatformApplication v1.0.0 using Java 17.0.16 with PID 22128 (E:\workspace\group_dorm\dorm-platform\dorm-platform-backend\target\dorm-platform-backend-1.0.0.jar started by liu in E:\workspace\group_dorm\dorm-platform\dorm-platform-backend)
-2026-10-15T15:15:08.263+08:00  INFO 22128 --- [           main] c.dorm.platform.DormPlatformApplication  : No active profile set, falling back to 1 default profile: "default"
-2026-10-15T15:15:18.638+08:00  INFO 22128 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
-2026-10-15T15:15:18.663+08:00  INFO 22128 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-10-15T15:15:18.664+08:00  INFO 22128 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.31]
-2026-10-15T15:15:18.743+08:00  INFO 22128 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2026-10-15T15:15:18.747+08:00  INFO 22128 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 10395 ms
-2026-10-15T15:15:20.440+08:00  INFO 22128 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
-2026-10-15T15:15:20.506+08:00  INFO 22128 --- [           main] c.dorm.platform.DormPlatformApplication  : Started DormPlatformApplication in 13.055 seconds (process running for 14.017)
-2026-10-15T15:15:22.493+08:00  INFO 22128 --- [   scheduling-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-10-15T15:15:22.819+08:00  INFO 22128 --- [   scheduling-1] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@46e439f3
-2026-10-15T15:15:22.823+08:00  INFO 22128 --- [   scheduling-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-10-15T15:16:54.334+08:00  INFO 22128 --- [nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-10-15T15:16:54.335+08:00  INFO 22128 --- [nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2026-10-15T15:16:54.338+08:00  INFO 22128 --- [nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
-2026-10-15T18:06:30.685+08:00  WARN 22128 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m47s421ms357?s700ns).
-2026-10-15T19:48:56.078+08:00  WARN 22128 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h35m31s88ms921?s400ns).
-2026-10-16T10:37:49.812+08:00  WARN 22128 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=10h29m57s34ms935?s300ns).
+2026-10-31T11:12:03.593+08:00  INFO 21032 --- [           main] c.dorm.platform.DormPlatformApplication  : Starting DormPlatformApplication using Java 17.0.16 with PID 21032 (E:\workspace\group_dorm\dorm-platform\dorm-platform-backend\target\classes started by liu in E:\workspace\group_dorm\dorm-platform\dorm-platform-backend)
+2026-10-31T11:12:03.598+08:00  INFO 21032 --- [           main] c.dorm.platform.DormPlatformApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-10-31T11:12:12.876+08:00  INFO 21032 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-10-31T11:12:12.894+08:00  INFO 21032 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-31T11:12:12.895+08:00  INFO 21032 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.31]
+2026-10-31T11:12:12.974+08:00  INFO 21032 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-10-31T11:12:12.975+08:00  INFO 21032 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 9316 ms
+2026-10-31T11:12:13.683+08:00  INFO 21032 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-10-31T11:12:13.697+08:00  INFO 21032 --- [           main] c.dorm.platform.DormPlatformApplication  : Started DormPlatformApplication in 10.704 seconds (process running for 11.126)
+2026-10-31T11:12:15.715+08:00  INFO 21032 --- [   scheduling-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-31T11:12:15.900+08:00  INFO 21032 --- [   scheduling-1] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@48f9e2f2
+2026-10-31T11:12:15.903+08:00  INFO 21032 --- [   scheduling-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-31T11:12:30.647+08:00  INFO 21032 --- [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-31T11:12:30.684+08:00  INFO 21032 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-31T11:12:30.686+08:00  INFO 21032 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:17 h
+[INFO] Finished at: 2026-10-31T12:29:37+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.3.5:run (default-cli) on project dorm-platform-backend: Process terminated with exit code: -1 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

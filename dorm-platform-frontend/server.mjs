@@ -4,11 +4,16 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 const project=path.dirname(fileURLToPath(import.meta.url));
 const root=process.env.SERVE_DIST==='1'?path.join(project,'dist'):project;
-const port=Number(process.env.PORT||5173);
+const portOption=process.argv.indexOf('--port');
+const port=Number(portOption>=0?process.argv[portOption+1]:process.env.PORT||5173);
 const backend=new URL(process.env.API_TARGET||'http://127.0.0.1:8080');
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8'};
 http.createServer((req,res)=>{
  const url=new URL(req.url,'http://localhost');
+ if(url.pathname==='/vendor/echarts.min.js'&&['GET','HEAD'].includes(req.method)){
+  const asset=path.join(project,'node_modules','echarts','dist','echarts.min.js');
+  fs.readFile(asset,(error,data)=>{if(error){res.writeHead(404);res.end('ECharts asset not found');return;}res.writeHead(200,{'Content-Type':types['.js'],'Cache-Control':'no-cache','X-Content-Type-Options':'nosniff'});res.end(req.method==='HEAD'?undefined:data);});return;
+ }
  if(url.pathname.startsWith('/api/')){
   const headers={...req.headers,host:backend.host};
   delete headers.origin;

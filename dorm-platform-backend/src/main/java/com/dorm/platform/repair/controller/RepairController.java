@@ -8,7 +8,7 @@ import java.util.Map;
 public class RepairController {
  private final RepairService service;
  public RepairController(RepairService service){this.service=service;}
- @GetMapping("/repair-catalog") public ApiResponse<?> catalog(){return ApiResponse.ok(service.catalog());}
+ @GetMapping("/repair-catalog") public ApiResponse<?> catalog(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(service.catalog(currentUser));}
  @GetMapping("/repair-orders") public ApiResponse<?> list(@RequestAttribute CurrentUser currentUser,@RequestParam Map<String,String> filters){return ApiResponse.ok(service.list(currentUser,filters,false));}
  @GetMapping("/repair-history") public ApiResponse<?> history(@RequestAttribute CurrentUser currentUser,@RequestParam Map<String,String> filters){return ApiResponse.ok(service.list(currentUser,filters,true));}
  @GetMapping("/repair-orders/{id}") public ApiResponse<?> detail(@RequestAttribute CurrentUser currentUser,@PathVariable long id){return ApiResponse.ok(service.detail(currentUser,id));}

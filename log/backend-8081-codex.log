@@ -292,3 +292,5 @@ org.springframework.web.servlet.resource.NoResourceFoundException: No static res
 	at java.base/java.lang.Thread.run(Thread.java:842) ~[na:na]
 
 2026-10-30T09:15:37.538+08:00  WARN 18444 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=9h52m18s877ms717?s600ns).
+2026-10-30T23:44:22.448+08:00  WARN 18444 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=41m13s481ms679?s800ns).
+2026-10-31T09:17:23.242+08:00  WARN 18444 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=8h14m36s100ms807?s800ns).
