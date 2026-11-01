@@ -125,4 +125,15 @@ class WorkflowIntegrationTest {
  @Test void batchResubmitDeadlineAndUnlockWork(){long b=batch();publish(b);long a=application(b);stay.submit(student,a);stay.lock(manager,a,true);stay.unlockBatch(manager,b);assertEquals("PENDING_REVIEW",stayState(a));stay.lock(manager,a,true);stay.review(manager,a,Map.of("pass",false,"reason","Fix it","resubmitDeadline",LocalDateTime.now().plusHours(2).withNano(0).toString()));stay.setBatchResubmitDeadline(manager,b,Map.of("resubmitDeadline",LocalDateTime.now().plusHours(3).withNano(0).toString()));assertTrue(Input.time(db.one("SELECT resubmit_deadline FROM stay_application WHERE application_id=?",a).get("resubmit_deadline")).isAfter(LocalDateTime.now().plusHours(2)));}
  @Test void withdrawRecordsAndManagerCannotSeeDraft(){long b=batch();publish(b);long a=application(b);stay.submit(student,a);stay.withdraw(student,a);assertEquals("DRAFT",stayState(a));assertEquals(1L,Input.id(db.one("SELECT withdraw_count FROM stay_application WHERE application_id=?",a).get("withdraw_count")));assertNotNull(db.one("SELECT withdrawn_at FROM stay_application WHERE application_id=?",a).get("withdrawn_at"));assertFalse(stay.list(manager).stream().anyMatch(x->Input.id(x.get("application_id"))==a));}
  @Test void contactAndGenderValidationAndIdentityPreview(){assertThrows(BizException.class,()->management.profile(student,Map.of("phone","12345")));management.profile(student,Map.of("phone","13912345678"));assertThrows(BizException.class,()->management.profile(student,Map.of("gender","OTHER")));assertThrows(BizException.class,()->management.saveUser(admin,null,Map.of("account","gender-other-"+UUID.randomUUID(),"realName","G","gender","OTHER","roleCode","STUDENT","password","123456")));assertTrue(Objects.toString(management.nextIdentityNumber(admin,"STUDENT",null).get("number")).matches("^[0-9]{10}$"));assertTrue(Objects.toString(management.nextIdentityNumber(admin,"REPAIRER",null).get("number")).matches("^RP[0-9]{6}$"));}
+
+ @Test void repairerCanReadScopedBuildingOptions(){var list=management.buildings(new CurrentUser(3,"repair1","Worker","REPAIRER"));assertFalse(list.isEmpty());assertTrue(list.stream().anyMatch(x->Input.id(x.get("building_id"))==4));}
+
+ @Test void queryFiltersAreScopedByRole(){
+  var studentCatalog=repair.catalog(student);assertTrue(((List<?>)studentCatalog.get("repairers")).isEmpty());
+  var repairerCatalog=repair.catalog(worker);assertEquals(1,((List<?>)repairerCatalog.get("repairers")).size());assertEquals(3L,Input.id(((Map<?,?>)((List<?>)repairerCatalog.get("repairers")).get(0)).get("id")));
+  var managerCatalog=repair.catalog(manager);assertTrue(((List<?>)managerCatalog.get("rooms")).stream().allMatch(x->Input.id(((Map<?,?>)x).get("building_id"))==4));
+  assertTrue(repair.list(manager,Map.of("building","1"),false).isEmpty());
+  long managerBase=repair.list(manager,Map.of(),false).size();assertEquals(managerBase,repair.list(manager,Map.of("repairer","3"),false).size());
+  long repairerBase=repair.list(worker,Map.of(),false).size();assertEquals(repairerBase,repair.list(worker,Map.of("student","someone"),false).size());
+ }
 }

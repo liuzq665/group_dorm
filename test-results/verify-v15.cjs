@@ -65,8 +65,15 @@ async function getJson(url, opt) { const r = await fetch(url, opt); if (!r.ok) t
     const expectedStats = {'待审核': statusTotals.PENDING_REVIEW || 0, '待人工处理': statusTotals.PENDING_MANUAL || 0, '待接单': statusTotals.PENDING_ACCEPT || 0, '维修中': statusTotals.IN_REPAIR || 0, '待确认': statusTotals.PENDING_CONFIRM || 0, '已完成': statusTotals.COMPLETED || 0, '已归档': statusTotals.ARCHIVED || 0};
     const statsMatch = renderedStats.length === 7 && renderedStats.every(([label, value]) => expectedStats[label] === value);
     check(statsMatch, `学生工作台报修统计与接口一致（${renderedStats.map((x) => x.join(':')).join(',')}）`);
+    let filterNames;
+    await clickPage('repairs');
+    await waitFor(`!!document.querySelector('#repair-filter-form')`);
+    filterNames = await ev(`[...document.querySelectorAll('#repair-filter-form [name]')].map(x=>x.name)`);
+    check(!filterNames.includes('student') && !filterNames.includes('repairer') && !filterNames.includes('building') && !filterNames.includes('room') && filterNames.includes('orderNo') && filterNames.includes('category'), `学生报修筛选仅本人范围字段（${filterNames.join('/')}）`);
     await clickPage('repairHistory');
     await waitFor(`!!document.querySelector('#repair-history-filter-form')`);
+    filterNames = await ev(`[...document.querySelectorAll('#repair-history-filter-form [name]')].map(x=>x.name)`);
+    check(!filterNames.includes('student') && !filterNames.includes('building') && !filterNames.includes('room') && !filterNames.includes('repairer'), `学生报修历史隐藏越权筛选（${filterNames.join('/')}）`);
     check((await bodyText()).includes('我的评价记录'), '学生报修历史页提供“我的评价记录”入口');
     await clickAction('repair-evaluations-open');
     await waitFor(`!!document.querySelector('dialog')`);
@@ -77,6 +84,14 @@ async function getJson(url, opt) { const r = await fetch(url, opt); if (!r.ok) t
     await login('repair1');
     menu = await menuText();
     check(menu.includes('维修统计') && menu.includes('报修历史'), '维修人员菜单出现“维修统计/报修历史”');
+    await clickPage('repairs');
+    await waitFor(`!!document.querySelector('.repair-status-tabs')`);
+    check(await ev(`document.querySelector('h1')?.textContent==='我的维修任务'`), '维修人员“我的维修任务”页标题正确');
+    check(!(await bodyText()).includes('无权访问该数据或执行此操作'), '维修任务页不再出现无权访问错误');
+    const repairerRows = await ev(`document.querySelectorAll('tbody tr').length`);
+    check(repairerRows >= 0, `维修任务列表正常渲染（${repairerRows} 行）`);
+    filterNames = await ev(`[...document.querySelectorAll('#repair-filter-form [name]')].map(x=>x.name)`);
+    check(filterNames.includes('building') && filterNames.includes('room') && !filterNames.includes('student') && !filterNames.includes('repairer'), `维修人员报修筛选限定负责范围且隐藏越权条件（${filterNames.join('/')}）`);
     await clickPage('repairerStats');
     await waitFor(`!!document.querySelector('.grid .stat')`);
     const statCount = await ev(`document.querySelectorAll('.grid .stat').length`);
@@ -103,6 +118,12 @@ async function getJson(url, opt) { const r = await fetch(url, opt); if (!r.ok) t
     await waitFor(`!!document.querySelector('.repair-status-tabs')`);
     const dispatchButtons = await ev(`[...document.querySelectorAll('[data-action="repair-dispatch"]')].length`);
     check(dispatchButtons > 0, `管理员报修列表出现强制派单入口（${dispatchButtons}）`);
+    filterNames = await ev(`[...document.querySelectorAll('#repair-filter-form [name]')].map(x=>x.name)`);
+    check(filterNames.includes('student') && filterNames.includes('repairer') && filterNames.includes('building') && filterNames.includes('room') && filterNames.includes('category'), `管理员保留多条件查询字段（${filterNames.join('/')}）`);
+    await clickPage('repairHistory');
+    await waitFor(`!!document.querySelector('#repair-history-filter-form')`);
+    filterNames = await ev(`[...document.querySelectorAll('#repair-history-filter-form [name]')].map(x=>x.name)`);
+    check(filterNames.includes('repairer') && filterNames.includes('completedFrom') && filterNames.includes('completedTo'), `管理员报修历史额外提供维修人/完成时间筛选（${filterNames.join('/')}）`);
     await clickPage('profile');
     await waitFor(`!!document.querySelector('.profile-grid')`);
     await clickAction('profile-edit');
@@ -112,6 +133,10 @@ async function getJson(url, opt) { const r = await fetch(url, opt); if (!r.ok) t
 
     // 宿管：留宿批量操作、评价统计
     await login('manager1');
+    await clickPage('repairs');
+    await waitFor(`!!document.querySelector('#repair-filter-form')`);
+    filterNames = await ev(`[...document.querySelectorAll('#repair-filter-form [name]')].map(x=>x.name)`);
+    check(filterNames.includes('student') && filterNames.includes('building') && filterNames.includes('room') && !filterNames.includes('repairer'), `宿管报修筛选限定负责楼栋且隐藏维修人筛选（${filterNames.join('/')}）`);
     await clickPage('stay');
     await waitFor(`!!document.querySelector('.panel')`);
     const stayButtons = await bodyText();

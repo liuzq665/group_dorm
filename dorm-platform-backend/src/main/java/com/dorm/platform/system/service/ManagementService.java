@@ -30,8 +30,12 @@ public class ManagementService {
  }
  public List<Map<String,Object>> roommates(CurrentUser u){role(u,"STUDENT");return db.rows("SELECT student_name,bed_no FROM v_accommodation_current WHERE room_id IN (SELECT room_id FROM v_accommodation_current WHERE student_id=?) AND student_id<>?",u.id(),u.id());}
  public List<Map<String,Object>> buildings(CurrentUser u){
-  role(u,"STUDENT","DORM_MANAGER","ADMIN");
-  String filter=u.role().equals("STUDENT")?"b.building_id IN (SELECT building_id FROM v_accommodation_current WHERE student_id="+u.id()+")":scope.buildingFilter(u,"b.building_id");
+  role(u,"STUDENT","DORM_MANAGER","REPAIRER","ADMIN");
+  String filter=switch(u.role()){
+   case "STUDENT" -> "b.building_id IN (SELECT building_id FROM v_accommodation_current WHERE student_id="+u.id()+")";
+   case "REPAIRER" -> "(b.building_id IN (SELECT building_id FROM repairer_building_scope WHERE repairer_user_id="+u.id()+") OR b.building_id IN (SELECT r.building_id FROM repair_order o JOIN dorm_room r ON r.room_id=o.room_id JOIN repair_dispatch d ON d.order_id=o.order_id WHERE d.repairer_user_id="+u.id()+"))";
+   default -> scope.buildingFilter(u,"b.building_id");
+  };
   return db.rows("SELECT b.*,COALESCE(r.room_count,0) room_count,COALESCE(bs.bed_count,0) bed_count,COALESCE(bs.available_bed_count,0) available_bed_count,COALESCE(o.occupied_count,0) occupied_count FROM building b LEFT JOIN (SELECT building_id,COUNT(*) room_count FROM dorm_room GROUP BY building_id) r ON r.building_id=b.building_id LEFT JOIN (SELECT r.building_id,COUNT(DISTINCT bd.bed_id) bed_count,COUNT(DISTINCT CASE WHEN bd.management_status='AVAILABLE' AND a.bed_id IS NULL THEN bd.bed_id END) available_bed_count FROM dorm_room r LEFT JOIN bed bd ON bd.room_id=r.room_id LEFT JOIN (SELECT DISTINCT bed_id FROM v_accommodation_current) a ON a.bed_id=bd.bed_id GROUP BY r.building_id) bs ON bs.building_id=b.building_id LEFT JOIN (SELECT building_id,COUNT(DISTINCT student_id) occupied_count FROM v_accommodation_current GROUP BY building_id) o ON o.building_id=b.building_id WHERE "+filter+" ORDER BY b.building_code");
  }
  public List<Map<String,Object>> rooms(CurrentUser u){role(u,"DORM_MANAGER","ADMIN");return db.rows("SELECT r.*,b.building_name,b.gender_limit building_gender_limit,COUNT(DISTINCT bd.bed_id) bed_count,COUNT(DISTINCT CASE WHEN bd.management_status='AVAILABLE' AND a.bed_id IS NULL THEN bd.bed_id END) available_bed_count FROM dorm_room r JOIN building b ON b.building_id=r.building_id LEFT JOIN bed bd ON bd.room_id=r.room_id LEFT JOIN (SELECT DISTINCT bed_id FROM v_accommodation_current) a ON a.bed_id=bd.bed_id WHERE "+scope.buildingFilter(u,"r.building_id")+" GROUP BY r.room_id ORDER BY r.building_id,r.room_no");}
