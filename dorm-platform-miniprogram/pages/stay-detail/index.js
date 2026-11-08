@@ -1,0 +1,8 @@
+const { request, showError } = require('../../utils/request');
+const { statusText, statusClass, ranges } = require('../../utils/format');
+Page({
+ data:{loading:true,id:'',detail:null}, onLoad(q){this.setData({id:q.id});}, onShow(){if(getApp().requireStudent())this.load();}, async load(){this.setData({loading:true});try{const items=await request('/stay/applications');const detail=items.find(x=>String(x.application_id)===String(this.data.id));this.setData({detail:detail?{...detail,statusLabel:statusText(detail.current_status),statusStyle:statusClass(detail.current_status),dateRangeText:ranges(detail.dateRanges),reviews:detail.reviews||[]}:null});}catch(e){showError(e);}finally{this.setData({loading:false});}},
+ edit(){const d=this.data.detail;wx.navigateTo({url:`/pages/stay-form/index?batchId=${d.batch_id}&applicationId=${d.application_id}`});},
+ async submit(){try{await request(`/stay/applications/${this.data.id}/submit`,{method:'POST'});wx.showToast({title:'已提交审核'});this.load();}catch(e){showError(e);}},
+ withdraw(){wx.showModal({title:'撤回申请',content:'撤回后将回到草稿，可继续修改。',success:async r=>{if(!r.confirm)return;try{await request(`/stay/applications/${this.data.id}/withdraw`,{method:'POST'});wx.showToast({title:'已撤回'});this.load();}catch(e){showError(e);}}});}
+});

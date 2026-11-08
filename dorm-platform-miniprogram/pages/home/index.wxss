@@ -1,0 +1,6 @@
+.quick-grid { display:grid; grid-template-columns:1fr 1fr; gap:20rpx; margin-top:24rpx; }
+.quick-card { position:relative; min-height:140rpx; padding:24rpx; box-sizing:border-box; background:#fff; border-radius:22rpx; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 8rpx 24rpx rgba(21,55,57,.06); }
+.quick-icon { color:#0C8075; font-size:34rpx; font-weight:700; }.badge { position:absolute; right:20rpx; top:18rpx; color:#fff; background:#E35D57; min-width:34rpx; height:34rpx; line-height:34rpx; text-align:center; border-radius:18rpx; font-size:21rpx; }
+.section-inline { font-weight:700; font-size:31rpx; }.home-address { font-size:38rpx; font-weight:700; color:#123E4A; margin-top:22rpx; }
+.service-card { background:#fff; border-radius:22rpx; padding:30rpx; margin-top:16rpx; display:flex; justify-content:space-between; align-items:center; box-shadow:0 8rpx 24rpx rgba(21,55,57,.06); }.service-title { font-size:32rpx; font-weight:700; display:block; margin-bottom:10rpx; }.service-arrow { color:#0C8075; font-size:52rpx; }
+

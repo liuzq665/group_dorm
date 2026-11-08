@@ -1,0 +1,1 @@
+.card .row { align-items:flex-start; }.card .row text:last-child { text-align:right; max-width:62%; }

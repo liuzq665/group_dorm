@@ -1,0 +1,1 @@
+.detail-copy { white-space:pre-wrap; display:block; line-height:1.7; margin:18rpx 0; }.card .row { align-items:flex-start; }

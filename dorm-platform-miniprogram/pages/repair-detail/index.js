@@ -1,0 +1,9 @@
+const { request, upload, showError } = require('../../utils/request');
+const { statusText, statusClass } = require('../../utils/format');
+Page({
+ data:{loading:true,id:'',detail:null}, onLoad(q){this.setData({id:q.id});}, onShow(){if(getApp().requireStudent())this.load();}, async load(){this.setData({loading:true});try{const detail=await request(`/repair-orders/${this.data.id}`);this.setData({detail:{...detail,statusLabel:statusText(detail.current_status),statusStyle:statusClass(detail.current_status),audits:detail.audits||[]}});}catch(e){showError(e);}finally{this.setData({loading:false});}},
+ edit(){wx.navigateTo({url:`/pages/repair-form/index?id=${this.data.id}`});},
+ async simple(e){const action=e.currentTarget.dataset.action;const labels={submit:'提交审核',cancel:'撤销报修',confirm:'确认维修完成',resubmit:'重新提交'};wx.showModal({title:labels[action],content:'确定继续吗？',success:async r=>{if(!r.confirm)return;try{await request(`/repair-orders/${this.data.id}/${action}`,{method:'POST'});wx.showToast({title:'操作成功'});this.load();}catch(err){showError(err);}}});},
+ evaluate(){wx.showActionSheet({itemList:['5 分 · 非常满意','4 分 · 满意','3 分 · 一般','2 分 · 不满意','1 分 · 很不满意'],success:choice=>{const score=5-choice.tapIndex;wx.showModal({title:`维修评价（${score} 分）`,editable:true,placeholderText:'请填写评价内容（可选）',success:async r=>{if(!r.confirm)return;try{await request(`/repair-orders/${this.data.id}/evaluation`,{method:'POST',data:{score,comment:r.content||''}});wx.showToast({title:'评价已提交'});this.load();}catch(e){showError(e);}}});}});},
+ rework(){wx.showModal({title:'申请重修',editable:true,placeholderText:'请说明仍未解决的问题',success:async r=>{if(!r.confirm||!r.content.trim())return;try{await request(`/repair-orders/${this.data.id}/rework`,{method:'POST',data:{reason:r.content.trim(),fileIds:[]}});wx.showToast({title:'重修申请已提交'});this.load();}catch(e){showError(e);}}});}
+});

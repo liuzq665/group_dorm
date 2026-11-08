@@ -1,0 +1,1 @@
+.small-button { margin:0; line-height:54rpx; font-size:24rpx; }.full-button,.logout-button { margin-top:26rpx; line-height:78rpx; }.logout-button { background:#FFF0EF !important; color:#B53D37 !important; border-radius:16rpx; }

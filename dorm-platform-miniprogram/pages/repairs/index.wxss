@@ -1,0 +1,2 @@
+.tabs { display:flex; gap:36rpx; padding-top:20rpx; }.tab { color:#718080; padding-bottom:15rpx; }.tab.active { color:#0C8075; font-weight:700; border-bottom:5rpx solid #0C8075; }.new-button { margin:0; line-height:66rpx; font-size:25rpx; }.repair-item { background:#fff; padding:26rpx; border-radius:20rpx; margin-top:20rpx; box-shadow:0 6rpx 18rpx rgba(21,55,57,.05); }.repair-title { font-size:31rpx; font-weight:700; max-width:440rpx; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }.repair-item .muted { display:block; margin-top:13rpx; }
+

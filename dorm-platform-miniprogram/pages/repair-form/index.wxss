@@ -1,0 +1,1 @@
+.file-row { display:flex; justify-content:space-between; gap:18rpx; padding-top:14rpx; color:#526566; font-size:24rpx; }.file-row text:first-child { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }.file-remove { color:#B53D37; }

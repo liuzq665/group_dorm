@@ -1,0 +1,37 @@
+{
+  "pages": [
+    "pages/login/index",
+    "pages/home/index",
+    "pages/repairs/index",
+    "pages/stays/index",
+    "pages/mine/index",
+    "pages/accommodation/index",
+    "pages/messages/index",
+    "pages/repair-form/index",
+    "pages/repair-detail/index",
+    "pages/stay-form/index",
+    "pages/stay-detail/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "宿舍事务",
+    "navigationBarBackgroundColor": "#123E4A",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F3F7F6",
+    "backgroundTextStyle": "light"
+  },
+  "tabBar": {
+    "color": "#6C7A7A",
+    "selectedColor": "#0C8075",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/home/index", "text": "工作台" },
+      { "pagePath": "pages/repairs/index", "text": "报修" },
+      { "pagePath": "pages/stays/index", "text": "留宿" },
+      { "pagePath": "pages/mine/index", "text": "我的" }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
+

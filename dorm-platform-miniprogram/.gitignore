@@ -1,0 +1,4 @@
+# Keep device-specific addresses and all local credentials out of Git.
+utils/config.local.js
+project.private.config.json
+

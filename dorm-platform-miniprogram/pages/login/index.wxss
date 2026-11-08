@@ -1,0 +1,8 @@
+.login-page { padding-top: 150rpx; }
+.login-mark { width:110rpx; height:110rpx; line-height:110rpx; text-align:center; color:#fff; font-weight:700; font-size:54rpx; border-radius:30rpx; background:#0C8075; box-shadow:0 16rpx 30rpx rgba(12,128,117,.25); }
+.login-title { display:block; margin-top:34rpx; font-size:52rpx; font-weight:700; color:#123E4A; }
+.login-copy { display:block; margin-top:12rpx; color:#718080; }
+.login-form { margin-top:64rpx; }
+.login-button { margin-top:30rpx; line-height:86rpx; }
+.login-tip { display:block; text-align:center; margin-top:32rpx; color:#718080; font-size:24rpx; }
+

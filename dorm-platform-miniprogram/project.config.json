@@ -1,0 +1,14 @@
+{
+  "description": "Dorm platform student mini program",
+  "compileType": "miniprogram",
+  "libVersion": "3.7.8",
+  "appid": "",
+  "projectname": "dorm-platform-student",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "postcss": true,
+    "minified": false
+  }
+}
+
