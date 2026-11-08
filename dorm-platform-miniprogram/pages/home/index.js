@@ -11,6 +11,12 @@ Page({
       this.setData({ user: session.user, profile, home: homes[0] || null, unread: unread.count || 0, dashboard });
     } catch (error) { showError(error); } finally { this.setData({ loading: false }); }
   },
-  go(e) { const url = e.currentTarget.dataset.url; if (url) wx.navigateTo({ url }); },
+  go(e) {
+    const url = e.currentTarget.dataset.url;
+    if (!url) return;
+    const tabPages = require('../../app.json').tabBar.list;
+    if (tabPages.some(item => `/${item.pagePath}` === url)) wx.switchTab({ url });
+    else wx.navigateTo({ url });
+  },
   statusText
 });
