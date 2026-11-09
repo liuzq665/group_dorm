@@ -1,14 +1,52 @@
 <view class="page">
   <view wx:if="{{loading}}" class="loading">正在加载工作台…</view>
   <block wx:else>
-    <view class="hero"><text class="hero-kicker">学生服务</text><text class="hero-title">你好，{{profile.real_name || user.name}}</text><text class="hero-copy">把宿舍里的事情一次办清楚</text></view>
-    <view class="quick-grid">
-      <view class="quick-card" bindtap="go" data-url="/pages/accommodation/index"><text class="quick-icon">⌂</text><text>我的住宿</text></view>
-      <view class="quick-card" bindtap="go" data-url="/pages/messages/index"><text class="quick-icon">✦</text><text>消息中心</text><text wx:if="{{unread}}" class="badge">{{unread}}</text></view>
+    <view class="hero role-hero role-{{role}}">
+      <text class="hero-kicker">{{roleLabel}}端</text>
+      <text class="hero-title">{{profile.real_name || user.name}}</text>
+      <text class="hero-copy">{{headline}}</text>
+      <text wx:if="{{unread}}" class="hero-unread" bindtap="go" data-url="/pages/messages/index">{{unread}} 条未读消息</text>
     </view>
-    <view class="card" bindtap="go" data-url="/pages/accommodation/index"><view class="row"><text class="section-inline">当前住宿</text><text class="muted">查看详情 ›</text></view><view wx:if="{{home}}" class="home-address">{{home.building_name}} · {{home.room_no}} · {{home.bed_no}} 床</view><view wx:else class="muted">暂未分配床位，请联系管理员</view></view>
-    <text class="section-title">常用服务</text>
-    <view class="service-card" bindtap="go" data-url="/pages/repairs/index"><view><text class="service-title">报修进度</text><text class="muted">提交问题、跟进维修、确认评价</text></view><text class="service-arrow">›</text></view>
-    <view class="service-card" bindtap="go" data-url="/pages/stays/index"><view><text class="service-title">假期留宿</text><text class="muted">填写日期段，随时查看审核结果</text></view><text class="service-arrow">›</text></view>
+
+    <view wx:if="{{role==='STUDENT'}}" class="card">
+      <view class="row"><text class="section-inline">当前住宿</text><text class="muted">{{home ? '已分配' : '待分配'}}</text></view>
+      <text wx:if="{{home}}" class="home-address">{{home.building_name}} · {{home.room_no}} · {{home.bed_no}} 床</text>
+      <text wx:else class="muted">暂未分配床位，请联系系统管理员</text>
+    </view>
+
+    <view wx:if="{{role==='DORM_MANAGER'}}" class="metric-grid">
+      <view class="metric-card"><text class="metric-number">{{stats.pendingRepairs}}</text><text class="metric-label">待处理报修</text></view>
+      <view class="metric-card"><text class="metric-number">{{stats.pendingStays}}</text><text class="metric-label">待审核留宿</text></view>
+      <view class="metric-card metric-wide"><text class="metric-number">{{dashboard.stayApproved || 0}}</text><text class="metric-label">管辖楼栋通过留宿人数</text></view>
+    </view>
+
+    <view wx:if="{{role==='REPAIRER'}}" class="metric-grid">
+      <view class="metric-card"><text class="metric-number">{{stats.current || 0}}</text><text class="metric-label">当前任务</text></view>
+      <view class="metric-card"><text class="metric-number">{{stats.completed || 0}}</text><text class="metric-label">累计完工</text></view>
+      <view class="metric-card"><text class="metric-number">{{stats.averageScore || 0}}</text><text class="metric-label">服务平均评分</text></view>
+      <view class="metric-card"><text class="metric-number">{{stats.delays || 0}}</text><text class="metric-label">延期申请</text></view>
+    </view>
+
+    <view wx:if="{{role==='ADMIN'}}" class="metric-grid">
+      <view class="metric-card"><text class="metric-number">{{stats.students}}</text><text class="metric-label">在读学生</text></view>
+      <view class="metric-card"><text class="metric-number">{{stats.housed}}</text><text class="metric-label">已安排住宿</text></view>
+      <view class="metric-card"><text class="metric-number">{{stats.repairs}}</text><text class="metric-label">处理中报修</text></view>
+      <view class="metric-card"><text class="metric-number">{{stats.stays}}</text><text class="metric-label">当前通过留宿</text></view>
+    </view>
+
+    <view wx:if="{{repairStatusRows.length || stayStatusRows.length}}" class="home-workload">
+      <view class="home-workload-heading"><text class="section-inline">业务状态</text><text class="muted">当前可见工单与申请</text></view>
+      <view wx:if="{{repairStatusRows.length}}" class="status-group"><text class="status-group-title">报修工单</text><view class="status-chip-list"><view wx:for="{{repairStatusRows}}" wx:key="label" class="status-chip"><text>{{item.label}}</text><text class="status-chip-count">{{item.count}}</text></view></view></view>
+      <view wx:if="{{stayStatusRows.length}}" class="status-group"><text class="status-group-title">留宿申请</text><view class="status-chip-list"><view wx:for="{{stayStatusRows}}" wx:key="label" class="status-chip"><text>{{item.label}}</text><text class="status-chip-count">{{item.count}}</text></view></view></view>
+    </view>
+
+    <text class="section-title">{{role==='STUDENT' ? '校园服务' : role==='DORM_MANAGER' ? '楼栋事务' : role==='REPAIRER' ? '维修工作' : '系统管理'}}</text>
+    <view class="service-list">
+      <view class="service-card role-service" wx:for="{{links}}" wx:key="url" data-url="{{item.url}}" bindtap="go">
+        <text class="service-mark">{{item.mark}}</text>
+        <view class="service-copy"><text class="service-title">{{item.title}}</text><text class="muted">{{item.detail}}</text></view>
+        <text class="service-arrow">›</text>
+      </view>
+    </view>
   </block>
 </view>

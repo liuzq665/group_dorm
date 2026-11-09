@@ -24,8 +24,9 @@ http.createServer((req,res)=>{
  }
  let requested;try{requested=decodeURIComponent(url.pathname);}catch{res.writeHead(400);res.end();return;}
  if(requested==='/'||requested==='/login')requested='/index.html';
+ if(requested==='/h5')requested='/h5.html';
  const safe=path.resolve(root,'.'+requested);
- const allowed=requested==='/index.html'||/^\/src\/[a-zA-Z0-9_-]+\.(js|css)$/.test(requested);
+ const allowed=requested==='/index.html'||requested==='/h5.html'||/^\/src\/[a-zA-Z0-9_-]+\.(js|css)$/.test(requested)||/^\/h5\/[a-zA-Z0-9_-]+\.(js|css)$/.test(requested);
  if(!allowed||!safe.startsWith(root+path.sep)||!['GET','HEAD'].includes(req.method)){res.writeHead(404);res.end('Not found');return;}
  fs.readFile(safe,(error,data)=>{if(error){res.writeHead(404);res.end('Not found');return;}res.writeHead(200,{'Content-Type':types[path.extname(safe)],'Cache-Control':'no-cache','X-Content-Type-Options':'nosniff'});res.end(req.method==='HEAD'?undefined:data);});
 }).listen(port,'127.0.0.1',()=>console.log(`Dorm platform: http://localhost:${port}/login`));

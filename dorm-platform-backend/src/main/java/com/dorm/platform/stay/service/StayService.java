@@ -44,20 +44,23 @@ public class StayService {
    case "DORM_MANAGER" -> scope.buildingFilter(u,"a.building_id");
    default -> "1=1";
   };
-  return db.rows("SELECT a.current_status status,COUNT(*) total FROM stay_application a WHERE "+filter+" AND a.current_status<>'DRAFT' GROUP BY a.current_status ORDER BY total DESC,a.current_status");
+  var rows=db.rows("SELECT a.current_status status,COUNT(*) total FROM stay_application a WHERE "+filter+" AND a.current_status<>'DRAFT' GROUP BY a.current_status");
+  Map<String,Long> totals=new HashMap<>();rows.forEach(row->totals.put(Objects.toString(row.get("status")),((Number)row.get("total")).longValue()));
+  return List.of("PENDING_REVIEW","UNDER_REVIEW","PENDING_EDIT","APPROVED","COMPLETED","ARCHIVED").stream().map(status->Map.<String,Object>of("status",status,"total",totals.getOrDefault(status,0L))).toList();
  }
  public List<Map<String,Object>> monthlyStats(CurrentUser u){
-  role(u,"ADMIN");
-  return db.rows("WITH RECURSIVE months(month_no) AS (SELECT 1 UNION ALL SELECT month_no+1 FROM months WHERE month_no<12) SELECT m.month_no month,COUNT(a.application_id) total FROM months m LEFT JOIN stay_application a ON YEAR(a.created_at)=YEAR(CURRENT_DATE()) AND MONTH(a.created_at)=m.month_no AND a.current_status<>'DRAFT' GROUP BY m.month_no ORDER BY m.month_no");
+  role(u,"ADMIN","DORM_MANAGER");String scopeFilter=u.role().equals("ADMIN")?"1=1":scope.buildingFilter(u,"a.building_id");
+  return db.rows("WITH RECURSIVE months(month_no) AS (SELECT 1 UNION ALL SELECT month_no+1 FROM months WHERE month_no<12) SELECT m.month_no month,COUNT(a.application_id) total FROM months m LEFT JOIN stay_application a ON YEAR(a.created_at)=YEAR(CURRENT_DATE()) AND MONTH(a.created_at)=m.month_no AND a.current_status<>'DRAFT' AND "+scopeFilter+" GROUP BY m.month_no ORDER BY m.month_no");
  }
  public Map<String,Object> dashboardAnalysis(CurrentUser u,String period,String batchId,String buildingId){
-  role(u,"ADMIN");
+  role(u,"ADMIN","DORM_MANAGER");
   StringBuilder where=new StringBuilder(" WHERE a.current_status IN ('APPROVED','COMPLETED')");
   List<Object> args=new ArrayList<>();
+  if(u.role().equals("DORM_MANAGER"))where.append(" AND ").append(scope.buildingFilter(u,"a.building_id"));
   if("year1".equals(period)){where.append(" AND b.open_end_date>=DATE_SUB(CURRENT_DATE(),INTERVAL 1 YEAR)");}
   else if("year10".equals(period)){where.append(" AND b.open_end_date>=DATE_SUB(CURRENT_DATE(),INTERVAL 10 YEAR)");}
   if(batchId!=null&&!batchId.isBlank()&&!"all".equals(batchId)){where.append(" AND b.batch_id=?");args.add(id(batchId));}
-  if(buildingId!=null&&!buildingId.isBlank()){where.append(" AND a.building_id=?");args.add(id(buildingId));}
+  if(buildingId!=null&&!buildingId.isBlank()){if(u.role().equals("DORM_MANAGER"))scope.building(u,id(buildingId));where.append(" AND a.building_id=?");args.add(id(buildingId));}
   String group="all".equals(batchId)?("all".equals(period)?"CAST(b.academic_year AS CHAR)":"CONCAT(b.academic_year,' ',b.batch_name)"):"b.batch_name";
   var rows=db.rows("SELECT "+group+" series,COALESCE(bd.building_name,'未分配楼栋') label,COUNT(DISTINCT a.student_id) total FROM stay_application a JOIN stay_batch b ON b.batch_id=a.batch_id LEFT JOIN building bd ON bd.building_id=a.building_id"+where+" GROUP BY series,label ORDER BY series,label",args.toArray());
   return Map.of("period",period,"batchId",batchId==null?"":batchId,"rows",rows);

@@ -1,1 +1,9 @@
-.card-hint .muted { display:block; margin-top:12rpx; }.file-remove { color:#B53D37; font-size:24rpx; }
+.card-hint { padding-bottom: 14rpx; border-bottom: 1rpx solid #e7ecea; }
+.card-hint .section-inline { display: block; margin-bottom: 4rpx; }
+.range { margin: 8rpx 0 12rpx; }
+.range-grid picker { min-width: 0; padding: 10rpx; background: #fff; border: 1rpx solid #dfe7e4; border-radius: 5rpx; }
+.range-date { overflow-wrap: anywhere; }
+.field > .outline { margin-top: 8rpx; }
+.file-remove { color: #a43d3b; font-size: 23rpx; }
+.form-card > .button-row { padding-top: 12rpx; }
+.form-card > .button-row button { flex: 1; min-width: 0; }

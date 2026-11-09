@@ -1,0 +1,15 @@
+.repairer-stats-hero { background: #344f70; border-left: 8rpx solid #70c2af; }
+.stats-grid { margin-top: 14rpx; }
+.stats-grid .metric-card { min-height: 112rpx; border-top-width: 4rpx; }
+.stats-grid .metric-number { font-size: 34rpx; }
+.rating-panel { margin-top: 14rpx; padding: 18rpx; background: #fff; border: 1rpx solid #e0e8e5; border-radius: 6rpx; }
+.rating-trend-row { display: grid; grid-template-columns: 90rpx minmax(0,1fr) 62rpx; align-items: center; gap: 10rpx; margin-top: 12rpx; }
+.rating-period { color: #566864; font-size: 21rpx; }
+.rating-track { height: 12rpx; overflow: hidden; background: #e9efed; border-radius: 6rpx; }
+.rating-bar { height: 100%; background: #d39b47; border-radius: 6rpx; }
+.rating-score { color: #72531e; text-align: right; font-size: 22rpx; font-weight: 650; }
+.stats-section { margin-top: 22rpx; }
+.section-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12rpx; margin-bottom: 8rpx; }
+.section-heading .muted { font-size: 21rpx; }
+.stats-record { padding: 14rpx 16rpx; }
+.compact-empty { padding: 22rpx 12rpx; background: #fff; border: 1rpx solid #e3e9e7; border-radius: 6rpx; font-size: 23rpx; }

@@ -39,6 +39,9 @@ function upload(filePath, path = '/files') {
     });
   });
 }
+function uploadMessage(filePath) { return upload(filePath, '/messages/files'); }
+function uploadStayApplication(filePath) { return upload(filePath, '/stay/applications/files'); }
+function uploadStayMaterial(batchId, filePath) { return upload(filePath, `/stay/batches/${batchId}/materials`); }
 function showError(error) { wx.showToast({ title: error.message || '操作失败', icon: 'none', duration: 2600 }); }
-module.exports = { request, upload, getSession, setSession, clearSession, showError };
+module.exports = { request, upload, uploadMessage, uploadStayApplication, uploadStayMaterial, getSession, setSession, clearSession, showError };
 

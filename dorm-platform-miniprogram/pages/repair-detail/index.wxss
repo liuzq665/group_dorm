@@ -1,1 +1,9 @@
-.detail-copy { white-space:pre-wrap; display:block; line-height:1.7; margin:18rpx 0; }.card .row { align-items:flex-start; }
+.hero { margin-top: 12rpx; }
+.card .row { align-items: flex-start; padding: 10rpx 0; border-bottom: 1rpx solid #e8edeb; }
+.card .row:last-child { border-bottom: 0; }
+.card .row > text:last-child { max-width: 65%; color: #334743; text-align: right; overflow-wrap: anywhere; }
+.detail-copy { display: block; margin: 14rpx 0; color: #3c504c; line-height: 1.65; white-space: pre-wrap; }
+.button-row button { flex: 1 1 180rpx; }
+.history-entry + .history-entry { margin-top: 14rpx; padding-top: 12rpx; border-top: 1rpx solid #e7ecea; }
+.history-entry .detail-copy { margin-bottom: 6rpx; }
+.rating-value { color: #176d62; font-weight: 700; }

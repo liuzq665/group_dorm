@@ -246,7 +246,7 @@ button:disabled { cursor:wait; opacity:.6; }
 .table th { font-size:12px; color:#71808c; white-space:nowrap; }
 .table td { max-width:330px; overflow-wrap:anywhere; text-wrap:balance; }
 .table td:last-child { min-width:120px; }
-.table td:last-child .actions { flex-flow:row nowrap; align-items:center; justify-content:flex-start; width:max-content; max-width:100%; overflow-x:auto; scrollbar-width:thin; }
+.table td:last-child .actions { flex-flow:row nowrap; align-items:center; justify-content:flex-start; width:100%; max-width:100%; overflow:visible; }
 .table td:last-child .actions button { flex:0 0 auto; min-height:var(--control-height); white-space:nowrap; }
 .admin-shell .table-wrap { overflow-x:hidden; }
 .admin-shell .table { width:100%; min-width:0; table-layout:fixed; }
@@ -385,28 +385,58 @@ button:disabled { cursor:wait; opacity:.6; }
 .toast { position:fixed; right:24px; bottom:24px; color:white; background:#287245; padding:12px 18px; border-radius:8px; z-index:3; max-width:min(460px,90vw); overflow-wrap:anywhere; }
 .error-toast { background:#b7473e; }
 body:has(.repair-status-tabs) .table { width:100%; min-width:0; table-layout:fixed; }
-body:has(.repair-status-tabs) .table td:last-child { width:250px; min-width:250px; }
-body:has(.repair-status-tabs) .table td:last-child .actions { display:flex; flex-flow:row wrap; justify-content:flex-start; width:100%; max-width:100%; overflow:visible; gap:5px; }
-body:has(.repair-status-tabs) .table td:last-child .actions button { flex:0 1 auto; min-width:0; white-space:normal; }
+body:has(.repair-status-tabs) .bulk-table .table { width:100%; min-width:0; table-layout:fixed; }
+body:has(.repair-status-tabs) .bulk-table .table th.select-col,body:has(.repair-status-tabs) .bulk-table .table td.select-col { width:34px; min-width:34px; padding-inline:5px; text-align:center; }
+body:has(.repair-status-tabs) .bulk-table .table td:last-child { width:21%; min-width:0; white-space:nowrap; }
+body:has(.repair-status-tabs) .bulk-table .table td:last-child .actions { display:flex; flex-flow:row nowrap; justify-content:flex-start; width:100%; max-width:100%; overflow:visible; gap:4px; }
+body:has(.repair-status-tabs) .bulk-table .table td:last-child .actions button { flex:0 1 auto; min-width:0; padding:5px 5px; font-size:12px; white-space:nowrap; }
+.repair-orders-student .table th.select-col,.repair-orders-student .table td.select-col,.repair-orders-repairer .table th.select-col,.repair-orders-repairer .table td.select-col { width:34px; min-width:34px; padding-inline:5px; text-align:center; }
+.repair-orders-student .table th:nth-child(2),.repair-orders-student .table td:nth-child(2),.repair-orders-repairer .table th:nth-child(2),.repair-orders-repairer .table td:nth-child(2) { width:9.5%; }
+.repair-orders-student .table th:nth-child(3),.repair-orders-student .table td:nth-child(3),.repair-orders-repairer .table th:nth-child(3),.repair-orders-repairer .table td:nth-child(3) { width:10.5%; }
+.repair-orders-student .table th:nth-child(4),.repair-orders-student .table td:nth-child(4),.repair-orders-repairer .table th:nth-child(4),.repair-orders-repairer .table td:nth-child(4) { width:8.5%; }
+.repair-orders-student .table th:nth-child(5),.repair-orders-student .table td:nth-child(5),.repair-orders-repairer .table th:nth-child(5),.repair-orders-repairer .table td:nth-child(5) { width:7.5%; }
+.repair-orders-student .table th:nth-child(6),.repair-orders-student .table td:nth-child(6),.repair-orders-repairer .table th:nth-child(6),.repair-orders-repairer .table td:nth-child(6) { width:5.7%; }
+.repair-orders-student .table th:nth-child(7),.repair-orders-student .table td:nth-child(7),.repair-orders-repairer .table th:nth-child(7),.repair-orders-repairer .table td:nth-child(7) { width:8.7%; }
+.repair-orders-student .table th:nth-child(8),.repair-orders-student .table td:nth-child(8),.repair-orders-repairer .table th:nth-child(8),.repair-orders-repairer .table td:nth-child(8) { width:9.8%; }
+.repair-orders-student .table th:nth-child(9),.repair-orders-student .table td:nth-child(9),.repair-orders-repairer .table th:nth-child(9),.repair-orders-repairer .table td:nth-child(9) { width:8.8%; }
+.repair-orders-student .table th:nth-child(10),.repair-orders-student .table td:nth-child(10),.repair-orders-repairer .table th:nth-child(10),.repair-orders-repairer .table td:nth-child(10) { width:4.5%; }
+body:has(.repair-status-tabs) .bulk-table.repair-orders-student .table th:last-child,body:has(.repair-status-tabs) .bulk-table.repair-orders-student .table td:last-child,body:has(.repair-status-tabs) .bulk-table.repair-orders-repairer .table th:last-child,body:has(.repair-status-tabs) .bulk-table.repair-orders-repairer .table td:last-child { width:26.5%; min-width:0; white-space:nowrap; }
+body:has(.repair-status-tabs) .bulk-table.repair-orders-student .table td:last-child .actions,body:has(.repair-status-tabs) .bulk-table.repair-orders-repairer .table td:last-child .actions { display:flex; flex-flow:row nowrap; justify-content:flex-start; align-items:center; width:100%; max-width:100%; overflow:visible; gap:4px; }
+body:has(.repair-status-tabs) .bulk-table.repair-orders-student .table td:last-child .actions button,body:has(.repair-status-tabs) .bulk-table.repair-orders-repairer .table td:last-child .actions button { flex:0 0 auto; min-width:0; padding:5px 5px; font-size:12px; white-space:nowrap; }
 .admin-shell:has(.repair-status-tabs) .table { width:100%; min-width:0; table-layout:fixed; }
-.admin-shell:has(.repair-status-tabs) .bulk-table .table th:nth-child(1),.admin-shell:has(.repair-status-tabs) .bulk-table .table td:nth-child(1) { width:3%; min-width:36px; padding-inline:4px; text-align:center; }
-.admin-shell:has(.repair-status-tabs) .bulk-table .table th:nth-child(2),.admin-shell:has(.repair-status-tabs) .bulk-table .table td:nth-child(2) { width:10%; }
-.admin-shell:has(.repair-status-tabs) .bulk-table .table th:nth-child(3),.admin-shell:has(.repair-status-tabs) .bulk-table .table td:nth-child(3) { width:10%; }
-.admin-shell:has(.repair-status-tabs) .bulk-table .table th:nth-child(4),.admin-shell:has(.repair-status-tabs) .bulk-table .table td:nth-child(4) { width:8%; }
-.admin-shell:has(.repair-status-tabs) .bulk-table .table th:nth-child(5),.admin-shell:has(.repair-status-tabs) .bulk-table .table td:nth-child(5) { width:7%; }
-.admin-shell:has(.repair-status-tabs) .bulk-table .table th:nth-child(6),.admin-shell:has(.repair-status-tabs) .bulk-table .table td:nth-child(6) { width:5%; }
+.admin-shell:has(.repair-status-tabs) .bulk-table .table th.select-col,.admin-shell:has(.repair-status-tabs) .bulk-table .table td.select-col { width:34px; min-width:34px; padding-inline:5px; text-align:center; }
+.admin-shell:has(.repair-status-tabs) .bulk-table .table th:nth-child(2),.admin-shell:has(.repair-status-tabs) .bulk-table .table td:nth-child(2) { width:11%; }
+.admin-shell:has(.repair-status-tabs) .bulk-table .table th:nth-child(3),.admin-shell:has(.repair-status-tabs) .bulk-table .table td:nth-child(3) { width:12%; }
+.admin-shell:has(.repair-status-tabs) .bulk-table .table th:nth-child(4),.admin-shell:has(.repair-status-tabs) .bulk-table .table td:nth-child(4) { width:9%; }
+.admin-shell:has(.repair-status-tabs) .bulk-table .table th:nth-child(5),.admin-shell:has(.repair-status-tabs) .bulk-table .table td:nth-child(5) { width:6%; }
+.admin-shell:has(.repair-status-tabs) .bulk-table .table th:nth-child(6),.admin-shell:has(.repair-status-tabs) .bulk-table .table td:nth-child(6) { width:6%; }
 .admin-shell:has(.repair-status-tabs) .bulk-table .table th:nth-child(7),.admin-shell:has(.repair-status-tabs) .bulk-table .table td:nth-child(7) { width:8%; }
-.admin-shell:has(.repair-status-tabs) .bulk-table .table th:nth-child(8),.admin-shell:has(.repair-status-tabs) .bulk-table .table td:nth-child(8) { width:8%; }
-.admin-shell:has(.repair-status-tabs) .bulk-table .table th:nth-child(9),.admin-shell:has(.repair-status-tabs) .bulk-table .table td:nth-child(9) { width:12%; }
-.admin-shell:has(.repair-status-tabs) .bulk-table .table th:nth-child(10),.admin-shell:has(.repair-status-tabs) .bulk-table .table td:nth-child(10) { width:13%; }
-.admin-shell:has(.repair-status-tabs) .bulk-table .table th:nth-child(11),.admin-shell:has(.repair-status-tabs) .bulk-table .table td:nth-child(11) { width:5%; }
-.admin-shell:has(.repair-status-tabs) .bulk-table .table th:last-child,.admin-shell:has(.repair-status-tabs) .bulk-table .table td:last-child { width:11%; min-width:0; }
+.admin-shell:has(.repair-status-tabs) .bulk-table .table th:nth-child(8),.admin-shell:has(.repair-status-tabs) .bulk-table .table td:nth-child(8) { width:9%; }
+.admin-shell:has(.repair-status-tabs) .bulk-table .table th:nth-child(9),.admin-shell:has(.repair-status-tabs) .bulk-table .table td:nth-child(9) { width:9%; }
+.admin-shell:has(.repair-status-tabs) .bulk-table .table th:nth-child(10),.admin-shell:has(.repair-status-tabs) .bulk-table .table td:nth-child(10) { width:5%; }
 .admin-shell:has(.repair-status-tabs) .bulk-table .table th.select-col input,.admin-shell:has(.repair-status-tabs) .bulk-table .table td.select-col input { width:16px; height:16px; margin:0; }
-.admin-shell:has(.repair-status-tabs) .table td:last-child .actions { display:flex; flex-flow:row wrap; justify-content:flex-start; width:100%; max-width:100%; overflow:visible; gap:5px; }
-.admin-shell:has(.repair-status-tabs) .table td:last-child .actions button { flex:0 1 auto; min-width:0; white-space:normal; }
+.admin-shell:has(.repair-status-tabs) .table td:last-child .actions { display:flex; flex-flow:row nowrap; justify-content:flex-start; width:100%; max-width:100%; overflow:visible; gap:4px; }
+.admin-shell:has(.repair-status-tabs) .table td:last-child .actions button { flex:0 1 auto; min-width:0; padding:5px 5px; font-size:12px; white-space:nowrap; }
 #repair-history-filter-form .date-range-field .range-control { background:#f1f4f6; }
 #repair-history-filter-form .date-range-field input[type="date"] { height:34px; padding:2px 1px; font-size:13px; }
 @media(max-width:1200px) { .student-filter-grid { grid-template-columns:repeat(4,minmax(0,1fr)); } .resource-filter-grid[data-resource-filter="beds"] { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media(min-width:851px) and (max-width:1150px) {
+ .shell:not(.admin-shell):has(.repair-status-tabs) .repair-filter-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+ .shell:not(.admin-shell):has(.repair-status-tabs) .table-wrap { overflow:visible; }
+ .shell:not(.admin-shell):has(.repair-status-tabs) .table { display:block; }
+ .shell:not(.admin-shell):has(.repair-status-tabs) .table thead,.shell:not(.admin-shell):has(.repair-status-tabs) .table thead tr { display:block; }
+ .shell:not(.admin-shell):has(.repair-status-tabs) .table thead th { display:none; }
+ .shell:not(.admin-shell):has(.repair-status-tabs) .table thead th.select-col { display:block; width:auto; padding:4px 8px 8px; }
+ .shell:not(.admin-shell):has(.repair-status-tabs) .table tbody { display:grid; gap:8px; }
+ .shell:not(.admin-shell):has(.repair-status-tabs) .table tbody tr { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border:1px solid #e3e8ec; border-radius:6px; }
+ .shell:not(.admin-shell):has(.repair-status-tabs) .table tbody td { display:flex; flex-direction:column; gap:3px; width:auto; min-width:0; max-width:none; padding:8px; border:0; font-size:13px; }
+ .shell:not(.admin-shell):has(.repair-status-tabs) .table tbody td::before { content:attr(data-label); color:#71808c; font-size:12px; }
+ .shell:not(.admin-shell):has(.repair-status-tabs) .table tbody td.select-col { grid-column:1/-1; display:block; padding:8px; border-bottom:1px solid #edf0f2; }
+ .shell:not(.admin-shell):has(.repair-status-tabs) .table tbody td.select-col::before { content:none; }
+ .shell:not(.admin-shell):has(.repair-status-tabs) .table tbody td:last-child { grid-column:1/-1; border-top:1px solid #edf0f2; }
+ .shell:not(.admin-shell):has(.repair-status-tabs) .table tbody td:last-child .actions { display:flex; flex-flow:row nowrap; align-items:center; gap:6px; width:max-content; max-width:100%; overflow:visible; }
+ .shell:not(.admin-shell):has(.repair-status-tabs) .table tbody td:last-child .actions button { flex:0 0 auto; white-space:nowrap; }
+}
 @media(max-width:850px) { .shell { grid-template-columns:1fr; } .sidebar { top:0; z-index:10; height:auto; max-height:42vh; padding:14px 18px 10px; } .sidebar h2 { margin-bottom:22px; } .role-tag { margin-top:-16px; margin-bottom:8px; } .nav { display:flex; flex:none; min-height:38px; overflow-x:auto; overflow-y:hidden; } .nav button { white-space:nowrap; flex:none; } .nav-group { display:flex; align-items:flex-start; flex:none; gap:3px; } .nav-group summary { white-space:nowrap; } .nav-children { display:flex; padding:0; gap:3px; } .nav-children button { white-space:nowrap; flex:none; } .logout { align-self:flex-end; width:auto; min-width:112px; margin-top:8px; } .content { padding:24px 16px; } .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .filter-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .admin-shell .history-filter-grid,.admin-shell .stay-history-filter-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .admin-shell .history-filter-grid > .range-field { grid-column:span 1; } .resource-filter-grid[data-resource-filter="beds"] { grid-template-columns:repeat(2,minmax(0,1fr)); } .detail-summary { grid-template-columns:repeat(2,minmax(0,1fr)); } .detail-summary div:nth-child(2) { border-right:0; } .dialog { padding:18px; } .stay-batch-form-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .bed-choice-list { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:520px) {
  .filter-grid,.detail-grid,.profile-grid,.edit-grid,.assignment-form { grid-template-columns:minmax(0,1fr); }
@@ -423,7 +453,7 @@ body:has(.repair-status-tabs) .table td:last-child .actions button { flex:0 1 au
  .gender-switch { margin-left:0; }
  .bed-choice-list { grid-template-columns:minmax(0,1fr); }
  .table th,.table td { padding:8px 5px; font-size:12px; }
- .table td:last-child .actions { display:flex; flex-flow:row nowrap; align-items:center; width:100%; max-width:100%; overflow-x:auto; scrollbar-width:thin; }
+ .table td:last-child .actions { display:flex; flex-flow:row nowrap; align-items:center; width:100%; max-width:100%; overflow:visible; }
  .table td:last-child .actions button { flex:0 0 auto; padding:7px 8px; white-space:nowrap; }
  .student-filter-grid,.manager-filter-grid,.repairer-filter-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
  .building-room-create-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
@@ -481,6 +511,9 @@ body:has(.repair-status-tabs) .table td:last-child .actions button { flex:0 1 au
 .unread-badge { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; margin-left:auto; padding:0 5px; border-radius:10px; background:#d64745; color:#fff; font-size:11px; line-height:18px; }
 .message-filter-tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 12px; }
 .message-filter-tabs .active { background:#24424c; color:#fff; }
+.checkbox-choice-toggle { width:100%; margin:0 0 6px; padding:7px 9px; border:0; border-radius:4px; background:#edf4f3; color:#245a57; text-align:left; }
+.dashboard-chart-note { margin:8px 0 0; color:#66767d; font-size:12px; line-height:1.5; }
+.dashboard-accommodation-counts { margin:0 0 12px; color:#40545a; font-size:13px; text-align:center; }
 .message-building-picker { min-width:0; margin:8px 0 14px; padding:10px 12px; border:1px solid #dce3e7; border-radius:6px; }
 .message-building-picker legend { padding:0 5px; color:#40515a; font-size:13px; }
 .message-building-picker > label,.message-building-picker > div label { display:inline-flex; align-items:center; gap:6px; margin:3px 14px 3px 0; font-size:13px; }
@@ -488,24 +521,28 @@ body:has(.repair-status-tabs) .table td:last-child .actions button { flex:0 1 au
 .message-table { overflow-x:hidden; }
 .message-table .table { width:100%; min-width:0; table-layout:fixed; }
 .message-table th,.message-table td { min-width:0; overflow-wrap:anywhere; }
-.message-table .select-col { width:2%; padding-inline:5px; text-align:center; }
+.message-table .table th:nth-child(1),.message-table .table td:nth-child(1) { width:3%; }
+.message-table .table th:nth-child(2),.message-table .table td:nth-child(2) { width:7%; }
+.message-table .table th:nth-child(3),.message-table .table td:nth-child(3) { width:7%; }
+.message-table .table th:nth-child(4),.message-table .table td:nth-child(4) { width:8%; }
+.message-table .table th:nth-child(5),.message-table .table td:nth-child(5) { width:10%; }
+.message-table .table th:nth-child(6),.message-table .table td:nth-child(6) { width:12%; }
+.message-table .table th:nth-child(7),.message-table .table td:nth-child(7) { width:9%; }
+.message-table .table th:nth-child(8),.message-table .table td:nth-child(8) { width:12%; }
+.message-table .table th:nth-child(9),.message-table .table td:nth-child(9) { width:9%; }
+.message-table .table th:nth-child(10),.message-table .table td:nth-child(10) { width:21%; }
+.message-table .select-col { padding-inline:5px; text-align:center; }
 .message-table .select-col input { width:16px; height:16px; margin:0; accent-color:#d86b35; }
 .message-table td[data-label="楼栋"] { white-space:pre-line; }
 .message-table td[data-label="时间"] { white-space:nowrap; }
-.message-table td[data-label="操作"] { width:12%; }
-.message-table td[data-label="操作"] .actions { display:flex; flex-flow:row wrap; align-items:center; gap:5px; width:100%; max-width:100%; overflow:visible; }
-.message-table td[data-label="操作"] .actions button { flex:0 1 auto; min-width:0; padding:6px 8px; white-space:normal; }
-.admin-shell .message-table .table td:last-child .actions { display:flex; flex-flow:row wrap; align-items:center; gap:5px; width:100%; max-width:100%; overflow:visible; }
-.admin-shell .message-table .table td:last-child .actions button { flex:0 1 auto; min-width:0; padding:6px 8px; white-space:normal; }
-.admin-shell:has(.message-filter-tabs) .message-table th:nth-child(2),.admin-shell:has(.message-filter-tabs) .message-table td:nth-child(2) { width:8%; }
-.admin-shell:has(.message-filter-tabs) .message-table th:nth-child(3),.admin-shell:has(.message-filter-tabs) .message-table td:nth-child(3) { width:8%; }
-.admin-shell:has(.message-filter-tabs) .message-table th:nth-child(4),.admin-shell:has(.message-filter-tabs) .message-table td:nth-child(4) { width:12%; }
-.admin-shell:has(.message-filter-tabs) .message-table th:nth-child(5),.admin-shell:has(.message-filter-tabs) .message-table td:nth-child(5) { width:11%; }
-.admin-shell:has(.message-filter-tabs) .message-table th:nth-child(6),.admin-shell:has(.message-filter-tabs) .message-table td:nth-child(6) { width:17%; }
-.admin-shell:has(.message-filter-tabs) .message-table th:nth-child(7),.admin-shell:has(.message-filter-tabs) .message-table td:nth-child(7) { width:10%; }
-.admin-shell:has(.message-filter-tabs) .message-table th:nth-child(8),.admin-shell:has(.message-filter-tabs) .message-table td:nth-child(8) { width:12%; }
-.admin-shell:has(.message-filter-tabs) .message-table th:nth-child(9),.admin-shell:has(.message-filter-tabs) .message-table td:nth-child(9) { width:6%; }
-.admin-shell:has(.message-filter-tabs) .message-table th:nth-child(10),.admin-shell:has(.message-filter-tabs) .message-table td:nth-child(10) { width:14%; }
+.message-table td[data-label="操作"] { min-width:0; white-space:nowrap; }
+.message-table td[data-label="操作"] .actions { display:flex; flex-flow:row nowrap; align-items:center; justify-content:flex-end; gap:4px; width:100%; max-width:100%; overflow:visible; }
+.message-table td[data-label="操作"] .actions button { flex:0 0 auto; min-width:0; padding:5px 6px; font-size:12px; white-space:nowrap; }
+.message-table td[data-label="时间"] { padding-right:14px; }
+.message-table td[data-label="阅读状态"] { padding-inline:12px; }
+.message-table td[data-label="操作"] { padding-left:12px; }
+.admin-shell .message-table .table td:last-child .actions { display:flex; flex-flow:row nowrap; align-items:center; justify-content:flex-end; gap:4px; width:100%; max-width:100%; overflow:visible; }
+.admin-shell .message-table .table td:last-child .actions button { flex:0 0 auto; min-width:0; padding:5px 6px; font-size:12px; white-space:nowrap; }
 .message-detail-content { margin:18px 0; padding:14px 16px; border:1px solid #e3e8ec; border-radius:6px; }
 .message-detail-content h3 { margin:0 0 8px; font-size:15px; }
 .message-detail-content p { margin:0; white-space:pre-wrap; overflow-wrap:anywhere; }
@@ -523,3 +560,19 @@ body:has(.repair-status-tabs) .table td:last-child .actions button { flex:0 1 au
 @media(max-width:850px) { .dashboard-status-groups { grid-template-columns:minmax(0,1fr); } .dashboard-chart-filters { justify-content:flex-start; } }
 @media(max-width:850px) { .dashboard-chart-grid { grid-template-columns:minmax(0,1fr); } .accommodation-chart-panel { grid-column:auto; } }
 @media(max-width:600px) { .dashboard-chart { height:260px; } .accommodation-chart-layout { grid-template-columns:minmax(0,1fr); gap:0; } .accommodation-chart-metrics { gap:4px 14px; } }
+@media(max-width:1150px) {
+ .shell:has(.repair-status-tabs) .table-wrap,.message-table { overflow:visible; }
+ .shell:has(.repair-status-tabs) .table,.message-table .table { display:block; width:100%; min-width:0; table-layout:fixed; }
+ .shell:has(.repair-status-tabs) .table thead,.shell:has(.repair-status-tabs) .table thead tr,.message-table .table thead,.message-table .table thead tr { display:block; }
+ .shell:has(.repair-status-tabs) .table thead th,.message-table .table thead th { display:none; }
+ .shell:has(.repair-status-tabs) .table thead th.select-col,.message-table .table thead th.select-col { display:block; width:auto; padding:6px 8px 8px; }
+ .shell:has(.repair-status-tabs) .table tbody,.message-table .table tbody { display:grid; gap:8px; }
+ .shell:has(.repair-status-tabs) .table tbody tr,.message-table .table tbody tr { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); min-width:0; border:1px solid #e3e8ec; border-radius:6px; }
+ .shell:has(.repair-status-tabs) .table tbody td,.message-table .table tbody td { display:flex; flex-direction:column; gap:3px; width:auto; min-width:0; max-width:none; padding:8px; border:0; font-size:13px; overflow-wrap:anywhere; }
+ .shell:has(.repair-status-tabs) .table tbody td::before,.message-table .table tbody td::before { content:attr(data-label); color:#71808c; font-size:12px; }
+ .shell:has(.repair-status-tabs) .table tbody td.select-col,.message-table .table tbody td.select-col { grid-column:1/-1; display:block; padding:8px; border-bottom:1px solid #edf0f2; }
+ .shell:has(.repair-status-tabs) .table tbody td.select-col::before,.message-table .table tbody td.select-col::before { content:none; }
+ .shell:has(.repair-status-tabs) .table tbody td:last-child,.message-table .table tbody td:last-child { grid-column:1/-1; border-top:1px solid #edf0f2; }
+ .shell:has(.repair-status-tabs) .table tbody td:last-child .actions,.message-table td .actions { display:grid; grid-template-columns:repeat(auto-fit,minmax(84px,1fr)); align-items:center; justify-content:stretch; gap:6px; width:100%; max-width:100%; overflow:visible; }
+ .shell:has(.repair-status-tabs) .table tbody td:last-child .actions button,.message-table td .actions button { min-width:0; width:100%; padding:6px 5px; font-size:12px; white-space:nowrap; }
+}

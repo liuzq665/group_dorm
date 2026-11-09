@@ -38,6 +38,11 @@ public class ManagementController {
    counts.put("repairMonthly",repair.monthlyStats(currentUser));
    counts.put("stayMonthly",stay.monthlyStats(currentUser));
   }
+  if(currentUser.role().equals("DORM_MANAGER")){
+   counts.put("accommodationStats",management.accommodationStats(currentUser));
+   counts.put("repairMonthly",repair.monthlyStats(currentUser));
+   counts.put("stayMonthly",stay.monthlyStats(currentUser));
+  }
   if(currentUser.role().equals("REPAIRER")){counts.put("stayApproved",0);counts.put("stayCompleted",0);}
   else{var stays=stay.list(currentUser);
    counts.put("stayApproved",stays.stream().filter(x->"APPROVED".equals(x.get("current_status"))).map(x->x.get("student_id")).distinct().count());
@@ -73,6 +78,7 @@ public class ManagementController {
  @PostMapping("/messages/read") public ApiResponse<?> readMessages(@RequestAttribute CurrentUser currentUser,@RequestBody Map<String,Object>b){Object raw=b.get("ids");if(!(raw instanceof List<?> ids))throw new BizException(400,"请选择要标为已读的消息");notice.readSelected(currentUser,ids.stream().map(Input::id).toList());return ApiResponse.ok();}
  @DeleteMapping("/messages") public ApiResponse<?> deleteMessages(@RequestAttribute CurrentUser currentUser,@RequestBody Map<String,Object>b){Object raw=b.get("ids");if(!(raw instanceof List<?> ids))throw new BizException(400,"请选择要删除的消息");return ApiResponse.ok(Map.of("deletedCount",notice.deleteSelected(currentUser,ids.stream().map(Input::id).toList())));}
  @DeleteMapping("/messages/{id}") public ApiResponse<?> deleteMessage(@RequestAttribute CurrentUser currentUser,@PathVariable long id){return ApiResponse.ok(Map.of("deletedCount",notice.deleteSelected(currentUser,List.of(id))));}
+ @PostMapping("/messages/{id}/withdraw") public ApiResponse<?> withdrawMessage(@RequestAttribute CurrentUser currentUser,@PathVariable long id){notice.withdraw(currentUser,id);return ApiResponse.ok();}
  @PostMapping("/files") public ApiResponse<?> upload(@RequestAttribute CurrentUser currentUser,@RequestParam MultipartFile file)throws IOException{return ApiResponse.ok(files.upload(currentUser,file));}
  @GetMapping("/files/{id}") public ResponseEntity<byte[]> file(@RequestAttribute CurrentUser currentUser,@PathVariable long id)throws IOException{var file=files.get(currentUser,id);return ResponseEntity.ok().contentType(MediaType.parseMediaType(file.get("content_type").toString())).header("X-Content-Type-Options","nosniff").body(files.bytes(file));}
  @GetMapping("/admin/users") public ApiResponse<?> users(@RequestAttribute CurrentUser currentUser,@RequestParam Map<String,String> filters){return ApiResponse.ok(management.users(currentUser,filters));}

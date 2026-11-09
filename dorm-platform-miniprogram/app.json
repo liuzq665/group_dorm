@@ -10,7 +10,10 @@
     "pages/repair-form/index",
     "pages/repair-detail/index",
     "pages/stay-form/index",
-    "pages/stay-detail/index"
+    "pages/stay-detail/index",
+    "pages/dorm/index",
+    "pages/admin/index",
+    "pages/repairer-stats/index"
   ],
   "window": {
     "navigationBarTitleText": "宿舍事务",
@@ -19,18 +22,13 @@
     "backgroundColor": "#F3F7F6",
     "backgroundTextStyle": "light"
   },
-  "tabBar": {
-    "color": "#6C7A7A",
-    "selectedColor": "#0C8075",
-    "backgroundColor": "#FFFFFF",
-    "borderStyle": "white",
-    "list": [
-      { "pagePath": "pages/home/index", "text": "工作台" },
-      { "pagePath": "pages/repairs/index", "text": "报修" },
-      { "pagePath": "pages/stays/index", "text": "留宿" },
-      { "pagePath": "pages/mine/index", "text": "我的" }
-    ]
-  },
+  "tabBar": { "custom": true, "color": "#657579", "selectedColor": "#117c74", "backgroundColor": "#ffffff", "list": [
+    { "pagePath": "pages/home/index", "text": "工作台" },
+    { "pagePath": "pages/repairs/index", "text": "业务" },
+    { "pagePath": "pages/stays/index", "text": "留宿" },
+    { "pagePath": "pages/messages/index", "text": "消息" },
+    { "pagePath": "pages/mine/index", "text": "我的" }
+  ] },
   "style": "v2",
   "sitemapLocation": "sitemap.json"
 }

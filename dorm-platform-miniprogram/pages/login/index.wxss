@@ -1,8 +1,9 @@
-.login-page { padding-top: 150rpx; }
-.login-mark { width:110rpx; height:110rpx; line-height:110rpx; text-align:center; color:#fff; font-weight:700; font-size:54rpx; border-radius:30rpx; background:#0C8075; box-shadow:0 16rpx 30rpx rgba(12,128,117,.25); }
-.login-title { display:block; margin-top:34rpx; font-size:52rpx; font-weight:700; color:#123E4A; }
-.login-copy { display:block; margin-top:12rpx; color:#718080; }
-.login-form { margin-top:64rpx; }
-.login-button { margin-top:30rpx; line-height:86rpx; }
-.login-tip { display:block; text-align:center; margin-top:32rpx; color:#718080; font-size:24rpx; }
-
+.login-page { display: flex; flex-direction: column; justify-content: center; padding-top: 56rpx; padding-bottom: 56rpx; }
+.login-mark { width: 82rpx; height: 82rpx; flex: none; color: #fff; background: #286f61; border-radius: 8rpx; text-align: center; line-height: 82rpx; font-size: 40rpx; font-weight: 650; }
+.login-title { display: block; margin-top: 22rpx; color: #203c39; font-size: 40rpx; line-height: 1.3; font-weight: 650; }
+.login-copy { display: block; max-width: 100%; margin-top: 8rpx; color: #65736f; font-size: 24rpx; line-height: 1.6; overflow-wrap: anywhere; }
+.login-form { width: 100%; margin-top: 28rpx; }
+.login-form .field { min-width: 0; }
+.login-form .input { min-height: 72rpx; }
+.login-button { width: 100%; min-height: 70rpx; margin: 18rpx auto 0; }
+.login-tip { display: block; max-width: 100%; margin-top: 18rpx; color: #65736f; text-align: center; font-size: 22rpx; line-height: 1.5; }
