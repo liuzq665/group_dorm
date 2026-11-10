@@ -16,20 +16,31 @@ public class NoticeService {
  public NoticeService(SqlStore db,DataScope scope){this.db=db;this.scope=scope;}
 
  @Transactional public void send(Collection<Long> users,String title,String content){
-  send(users,title,content,null);
- }
-
- @Transactional public void sendForBuilding(Collection<Long> users,long building,String title,String content){
-  send(users,title,content,building);
- }
-
- private void send(Collection<Long> users,String title,String content,Long building){
   if(users.isEmpty())return;
   long message=db.insert("INSERT INTO site_message(target_role,title,content,delivered_at) VALUES('DIRECT',?,?,NOW())",title,content);
-  if(building!=null)db.update("INSERT INTO message_building_target(message_id,building_id) VALUES(?,?)",message,building);
   for(long user:new HashSet<>(users)){
    db.update("INSERT IGNORE INTO message_target(message_id,user_id) VALUES(?,?)",message,user);
    db.update("INSERT IGNORE INTO message_receipt(message_id,user_id) VALUES(?,?)",message,user);
+  }
+ }
+
+ @Transactional public void sendFrom(CurrentUser publisher,Collection<Long> users,String title,String content){
+  if(users.isEmpty())return;
+  long message=db.insert("INSERT INTO site_message(target_role,title,content,publisher_user_id,delivered_at) VALUES('DIRECT',?,?,?,NOW())",title,content,publisher.id());
+  for(long user:new HashSet<>(users)){
+   db.update("INSERT IGNORE INTO message_target(message_id,user_id) VALUES(?,?)",message,user);
+   db.update("INSERT IGNORE INTO message_receipt(message_id,user_id,read_at) VALUES(?,?,NOW())",message,user);
+  }
+ }
+
+ @Transactional public void sendFrom(CurrentUser publisher,Collection<Long> users,String title,String content,Collection<Long> buildings,Collection<Long> attachments){
+  if(users.isEmpty())return;
+  long message=db.insert("INSERT INTO site_message(target_role,title,content,publisher_user_id,delivered_at) VALUES('DIRECT',?,?,?,NOW())",title,content,publisher.id());
+  for(long building:new LinkedHashSet<>(buildings))db.update("INSERT IGNORE INTO message_building_target(message_id,building_id) VALUES(?,?)",message,building);
+  for(long file:new LinkedHashSet<>(attachments))db.update("INSERT IGNORE INTO message_attachment(message_id,file_id) VALUES(?,?)",message,file);
+  for(long user:new HashSet<>(users)){
+   db.update("INSERT IGNORE INTO message_target(message_id,user_id) VALUES(?,?)",message,user);
+   db.update("INSERT IGNORE INTO message_receipt(message_id,user_id,read_at) VALUES(?,?,NOW())",message,user);
   }
  }
 
@@ -37,76 +48,99 @@ public class NoticeService {
   send(db.rows("SELECT user_id FROM v_user_identity WHERE role_code='ADMIN' AND enabled=1").stream().map(x->id(x.get("user_id"))).toList(),title,content);
  }
 
- @Transactional public void admins(long building,String title,String content){
+ public void admins(long building,String title,String content){
   var admins=db.rows("SELECT user_id FROM v_user_identity WHERE role_code='ADMIN' AND enabled=1").stream().map(x->id(x.get("user_id"))).toList();
-  send(admins,title,content,building);
+  if(admins.isEmpty())return;
+  long message=db.insert("INSERT INTO site_message(target_role,title,content,delivered_at) VALUES('DIRECT',?,?,NOW())",title,content);
+  db.update("INSERT INTO message_building_target(message_id,building_id) VALUES(?,?)",message,building);
+  for(long user:new HashSet<>(admins)){
+   db.update("INSERT IGNORE INTO message_target(message_id,user_id) VALUES(?,?)",message,user);
+   db.update("INSERT IGNORE INTO message_receipt(message_id,user_id) VALUES(?,?)",message,user);
+  }
  }
 
- @Transactional public void managers(long building,String title,String content){
-  send(db.rows("SELECT manager_user_id user_id FROM manager_building_scope WHERE building_id=?",building).stream().map(x->id(x.get("user_id"))).toList(),title,content,building);
+ public void managers(long building,String title,String content){
+  var managers=db.rows("SELECT manager_user_id user_id FROM manager_building_scope WHERE building_id=?",building).stream().map(x->id(x.get("user_id"))).toList();
+  if(managers.isEmpty())return;
+  long message=db.insert("INSERT INTO site_message(target_role,title,content,delivered_at) VALUES('DIRECT',?,?,NOW())",title,content);
+  db.update("INSERT INTO message_building_target(message_id,building_id) VALUES(?,?)",message,building);
+  for(long user:new HashSet<>(managers)){
+   db.update("INSERT IGNORE INTO message_target(message_id,user_id) VALUES(?,?)",message,user);
+   db.update("INSERT IGNORE INTO message_receipt(message_id,user_id) VALUES(?,?)",message,user);
+  }
  }
 
- /** 通知某楼栋的宿管与全部系统管理员（待人工处理等异常场景使用）。 */
- @Transactional public void managersAndAdmins(long building,String title,String content){
-  LinkedHashSet<Long> users=new LinkedHashSet<>();
-  db.rows("SELECT manager_user_id user_id FROM manager_building_scope WHERE building_id=?",building).forEach(x->users.add(id(x.get("user_id"))));
-  db.rows("SELECT user_id FROM v_user_identity WHERE role_code='ADMIN' AND enabled=1").forEach(x->users.add(id(x.get("user_id"))));
-  send(users,title,content,building);
- }
-
- public long unreadCount(CurrentUser u){return u.role().equals("ADMIN")?db.count("SELECT COUNT(*) FROM message_receipt r JOIN site_message m ON m.message_id=r.message_id WHERE r.user_id=? AND r.read_at IS NULL AND m.withdrawn_at IS NULL AND m.publisher_user_id IS NULL AND EXISTS(SELECT 1 FROM message_target t JOIN v_user_identity i ON i.user_id=t.user_id WHERE t.message_id=m.message_id AND i.role_code='ADMIN')",u.id()):db.count("SELECT COUNT(*) FROM message_receipt r JOIN site_message m ON m.message_id=r.message_id WHERE r.user_id=? AND r.read_at IS NULL AND r.deleted_at IS NULL AND m.withdrawn_at IS NULL",u.id());}
+ public long unreadCount(CurrentUser u){return u.role().equals("ADMIN")?db.count("SELECT COUNT(*) FROM message_receipt r JOIN site_message m ON m.message_id=r.message_id WHERE r.user_id=? AND r.read_at IS NULL AND m.publisher_user_id IS NULL AND EXISTS(SELECT 1 FROM message_target t JOIN v_user_identity i ON i.user_id=t.user_id WHERE t.message_id=m.message_id AND i.role_code='ADMIN')",u.id()):db.count("SELECT COUNT(*) FROM message_receipt WHERE user_id=? AND read_at IS NULL",u.id());}
 
  public List<Map<String,Object>> list(CurrentUser u,Map<String,String> filters){
   boolean admin=u.role().equals("ADMIN");
   String readLabel=admin?"IF(p.role_code='DORM_MANAGER' OR m.publisher_user_id IS NOT NULL,'已读',IF(r.message_id IS NULL,'已读',IF(r.read_at IS NULL,'未读','已读')))":"IF(r.message_id IS NULL,'发送给他人',IF(r.read_at IS NULL,'未读','已读'))";
-  String source="CASE WHEN m.publisher_user_id IS NULL THEN '系统通知' WHEN m.publisher_user_id=? THEN '我发布的' WHEN p.role_code='ADMIN' THEN '系统管理员发布' WHEN p.role_code='DORM_MANAGER' THEN '宿管发布' ELSE '系统通知' END";
-  StringBuilder sql=new StringBuilder("SELECT m.message_id,m.title,m.content,m.created_at,r.read_at,"+readLabel+" read_label,IF(r.message_id IS NULL,0,1) is_recipient,m.publisher_user_id,COALESCE(p.real_name,'系统') publisher_name,p.role_code publisher_role,"+source+" source_label,m.target_role,");
-  sql.append("COALESCE((SELECT CASE WHEN COUNT(DISTINCT x.building_id)=(SELECT COUNT(*) FROM building) THEN '全部楼栋' ELSE GROUP_CONCAT(DISTINCT b.building_name ORDER BY b.building_name SEPARATOR '|') END FROM message_building_target x JOIN building b ON b.building_id=x.building_id WHERE x.message_id=m.message_id),(SELECT GROUP_CONCAT(DISTINCT b.building_name ORDER BY b.building_name SEPARATOR '|') FROM message_target mt2 JOIN v_accommodation_current a2 ON a2.student_id=mt2.user_id JOIN building b ON b.building_id=a2.building_id WHERE mt2.message_id=m.message_id),(SELECT GROUP_CONCAT(DISTINCT b.building_name ORDER BY b.building_name SEPARATOR '|') FROM repair_order o2 JOIN dorm_room r2 ON r2.room_id=o2.room_id JOIN building b ON b.building_id=r2.building_id WHERE m.publisher_user_id IS NULL AND m.content LIKE CONCAT('%',o2.order_no,'%')),'未指定') building_names,");
-  sql.append("COALESCE((SELECT GROUP_CONCAT(DISTINCT CASE i2.role_code WHEN 'STUDENT' THEN '学生' WHEN 'DORM_MANAGER' THEN '宿管' WHEN 'REPAIRER' THEN '维修人员' WHEN 'ADMIN' THEN '系统管理员' END ORDER BY i2.role_code SEPARATOR '、') FROM message_target mt3 JOIN v_user_identity i2 ON i2.user_id=mt3.user_id WHERE mt3.message_id=m.message_id),'未指定') recipient_roles");
+  StringBuilder sql=new StringBuilder("SELECT m.message_id,m.title,m.content,m.created_at,r.read_at,"+readLabel+" read_label,IF(r.message_id IS NULL,0,1) is_recipient,m.publisher_user_id,COALESCE(p.real_name,'系统') publisher_name,p.role_code publisher_role,CASE WHEN m.publisher_user_id=? THEN '我发布的' WHEN p.role_code='DORM_MANAGER' THEN '宿管发布' WHEN p.role_code='ADMIN' THEN '系统管理员发布' WHEN m.publisher_user_id IS NULL AND EXISTS(SELECT 1 FROM message_target smt JOIN v_user_identity su ON su.user_id=smt.user_id WHERE smt.message_id=m.message_id AND su.role_code='ADMIN') THEN '系统通知' ELSE '系统通知' END source_label,(SELECT GROUP_CONCAT(DISTINCT CASE i.role_code WHEN 'STUDENT' THEN '学生' WHEN 'DORM_MANAGER' THEN '宿管' WHEN 'REPAIRER' THEN '维修人员' WHEN 'ADMIN' THEN '系统管理员' END ORDER BY i.role_code SEPARATOR '、') FROM message_target mt2 JOIN v_user_identity i ON i.user_id=mt2.user_id WHERE mt2.message_id=m.message_id) recipient_roles");
   sql.append(" FROM site_message m ");
-  if(admin)sql.append("LEFT JOIN message_receipt r ON r.message_id=m.message_id AND r.user_id=? LEFT JOIN v_user_identity p ON p.user_id=m.publisher_user_id LEFT JOIN message_target mt ON mt.message_id=m.message_id WHERE (p.role_code='DORM_MANAGER' OR (p.role_code='ADMIN' AND r.message_id IS NOT NULL) OR m.publisher_user_id=? OR (m.publisher_user_id IS NULL AND EXISTS(SELECT 1 FROM message_target smt JOIN v_user_identity su ON su.user_id=smt.user_id WHERE smt.message_id=m.message_id AND su.role_code='ADMIN'))) AND r.deleted_at IS NULL AND m.withdrawn_at IS NULL");
-  else sql.append("LEFT JOIN message_receipt r ON r.message_id=m.message_id AND r.user_id=? LEFT JOIN v_user_identity p ON p.user_id=m.publisher_user_id WHERE m.delivered_at IS NOT NULL AND (r.message_id IS NOT NULL OR m.publisher_user_id=?) AND (r.deleted_at IS NULL OR r.message_id IS NULL) AND m.withdrawn_at IS NULL");
-  List<Object> args=new ArrayList<>();args.add(u.id());args.add(u.id());args.add(u.id());
+  if(admin)sql.append("LEFT JOIN message_receipt r ON r.message_id=m.message_id AND r.user_id=? LEFT JOIN v_user_identity p ON p.user_id=m.publisher_user_id");
+  else sql.append("JOIN message_receipt r ON r.message_id=m.message_id AND r.user_id=? LEFT JOIN v_user_identity p ON p.user_id=m.publisher_user_id");
+  if(admin)sql.append(" WHERE (p.role_code='DORM_MANAGER' OR m.publisher_user_id=? OR (m.publisher_user_id IS NULL AND EXISTS(SELECT 1 FROM message_target smt JOIN v_user_identity su ON su.user_id=smt.user_id WHERE smt.message_id=m.message_id AND su.role_code='ADMIN'))) AND r.deleted_at IS NULL");
+  else sql.append(" WHERE m.delivered_at IS NOT NULL AND r.deleted_at IS NULL");
+  List<Object> args=new ArrayList<>();args.add(u.id());args.add(u.id());if(admin)args.add(u.id());
   String sender=Objects.toString(filters.get("sender"),"").trim();
   String read=Objects.toString(filters.get("read"),"").trim();
-  if(!(sender.equals("MINE")||(admin&&sender.equals("DORM_MANAGER")))){
-   if(read.equals("read")){sql.append(" AND (r.read_at IS NOT NULL OR (m.publisher_user_id=?))");args.add(u.id());}
+  if(!(admin&&Set.of("DORM_MANAGER","MINE").contains(sender))){
+   if(read.equals("read"))sql.append(" AND (r.read_at IS NOT NULL OR (m.publisher_user_id IS NOT NULL AND "+(admin?"1=1":"1=0")+"))");
    else if(read.equals("unread")){sql.append(" AND r.message_id IS NOT NULL AND r.read_at IS NULL");if(admin)sql.append(" AND m.publisher_user_id IS NULL AND EXISTS(SELECT 1 FROM message_target smt JOIN v_user_identity su ON su.user_id=smt.user_id WHERE smt.message_id=m.message_id AND su.role_code='ADMIN')");}
   }
   String from=Objects.toString(filters.get("from"),"").trim(),to=Objects.toString(filters.get("to"),"").trim();
   if(!from.isEmpty()){sql.append(" AND m.created_at>=?");args.add(from+" 00:00:00");}
   if(!to.isEmpty()){sql.append(" AND m.created_at<DATE_ADD(?,INTERVAL 1 DAY)");args.add(to);}
-  if(sender.equals("SYSTEM"))sql.append(" AND m.publisher_user_id IS NULL");
-  else if(sender.equals("ADMIN")){sql.append(" AND p.role_code='ADMIN' AND m.publisher_user_id<>?");args.add(u.id());}
-  else if(sender.equals("DORM_MANAGER")){sql.append(" AND p.role_code='DORM_MANAGER' AND m.publisher_user_id<>?");args.add(u.id());}
-  else if(sender.equals("MINE")){sql.append(" AND m.publisher_user_id=?");args.add(u.id());}
   if(admin){
+   if(sender.equals("SYSTEM"))sql.append(" AND m.publisher_user_id IS NULL AND EXISTS(SELECT 1 FROM message_target smt JOIN v_user_identity su ON su.user_id=smt.user_id WHERE smt.message_id=m.message_id AND su.role_code='ADMIN')");
+   else if(sender.equals("DORM_MANAGER"))sql.append(" AND p.role_code='DORM_MANAGER'");
+   else if(sender.equals("MINE")){sql.append(" AND m.publisher_user_id=?");args.add(u.id());}
    String publisher=Objects.toString(filters.get("publisher"),"").trim();if(!publisher.isEmpty()){sql.append(" AND p.real_name LIKE ?");args.add("%"+publisher+"%");}
-  }
-  String building=Objects.toString(filters.get("building"),"").trim();
-  if(!building.isEmpty()&&Set.of("ADMIN","REPAIRER").contains(u.role())){
-   sql.append(" AND (EXISTS(SELECT 1 FROM message_building_target x WHERE x.message_id=m.message_id AND x.building_id=?) OR m.target_role=CONCAT('BUILDING:',?) OR EXISTS(SELECT 1 FROM message_target x JOIN v_accommodation_current h ON h.student_id=x.user_id WHERE x.message_id=m.message_id AND h.building_id=?) OR EXISTS(SELECT 1 FROM repair_order ro JOIN dorm_room rr ON rr.room_id=ro.room_id WHERE m.content LIKE CONCAT('%',ro.order_no,'%') AND rr.building_id=?))");
-   args.add(id(building));args.add(building);args.add(id(building));args.add(id(building));
-  }
-  sql.append(" GROUP BY m.message_id,r.read_at,r.message_id,p.real_name,p.role_code ORDER BY m.message_id DESC LIMIT 500");
-  List<Map<String,Object>> rows=db.rows(sql.toString(),args.toArray());
-  for(var row:rows){
-   var attachments=db.rows("SELECT f.file_id,f.original_name,f.content_type,f.size_bytes FROM message_attachment a JOIN file_resource f ON f.file_id=a.file_id WHERE a.message_id=? ORDER BY f.original_name",row.get("message_id"));
-   row.put("attachments",attachments);row.put("attachment_names",String.join("、",attachments.stream().map(x->Objects.toString(x.get("original_name"),"")).toList()));
-   String buildings=Objects.toString(row.get("building_names"),"").replace("|","\n");
-   if(buildings.isBlank()||buildings.equals("未指定")){
-    var managerBuildings=db.rows("SELECT DISTINCT b.building_name FROM message_target t JOIN manager_building_scope s ON s.manager_user_id=t.user_id JOIN building b ON b.building_id=s.building_id WHERE t.message_id=? ORDER BY b.building_name",row.get("message_id"));
-    if(!managerBuildings.isEmpty())buildings=String.join("\n",managerBuildings.stream().map(x->Objects.toString(x.get("building_name"),"")).toList());
+   String building=Objects.toString(filters.get("building"),"").trim();
+   if(!building.isEmpty()){
+    sql.append(" AND (EXISTS(SELECT 1 FROM message_building_target x WHERE x.message_id=m.message_id AND x.building_id=?) OR m.target_role=CONCAT('BUILDING:',?) OR EXISTS(SELECT 1 FROM message_target x JOIN v_accommodation_current h ON h.student_id=x.user_id WHERE x.message_id=m.message_id AND h.building_id=?) OR EXISTS(SELECT 1 FROM repair_order ro JOIN dorm_room rr ON rr.room_id=ro.room_id WHERE m.content LIKE CONCAT('%',ro.order_no,'%') AND rr.building_id=?))");
+    args.add(id(building));args.add(building);args.add(id(building));args.add(id(building));
    }
-   row.put("building_names",buildings);
+  }else if(sender.equals("SYSTEM"))sql.append(" AND m.publisher_user_id IS NULL");
+  else if(sender.equals("ADMIN"))sql.append(" AND p.role_code='ADMIN'");
+  else if(sender.equals("DORM_MANAGER"))sql.append(" AND p.role_code='DORM_MANAGER'");
+  else if(sender.equals("MINE")){sql.append(" AND m.publisher_user_id=?");args.add(u.id());
   }
+  sql.append(" ORDER BY m.message_id DESC LIMIT 500");
+  List<Map<String,Object>> rows=db.rows(sql.toString(),args.toArray());
+  enrichListRows(rows);
   return rows;
  }
 
- @Transactional public void withdraw(CurrentUser u,long message){
-  int changed=db.update("UPDATE site_message SET withdrawn_at=NOW() WHERE message_id=? AND publisher_user_id=? AND delivered_at IS NOT NULL AND withdrawn_at IS NULL",message,u.id());
-  BizException.require(changed==1,"消息不存在、尚未发布或已撤回");
-  db.log(u.id(),"notice","withdraw",message);
+ private void enrichListRows(List<Map<String,Object>> rows){
+  if(rows.isEmpty())return;
+  List<Long> messageIds=rows.stream().map(row->id(row.get("message_id"))).toList();
+  String placeholders=String.join(",",Collections.nCopies(messageIds.size(),"?"));
+  Object[] ids=messageIds.toArray();
+  Map<Long,List<Map<String,Object>>> attachmentsByMessage=new HashMap<>();
+  for(var file:db.rows("SELECT a.message_id,f.file_id,f.original_name,f.content_type,f.size_bytes FROM message_attachment a JOIN file_resource f ON f.file_id=a.file_id WHERE a.message_id IN ("+placeholders+") ORDER BY a.message_id,f.original_name",ids))attachmentsByMessage.computeIfAbsent(id(file.get("message_id")),key->new ArrayList<>()).add(file);
+
+  Map<Long,String> buildingsByMessage=new HashMap<>();
+  Map<Long,Long> buildingCountByMessage=new HashMap<>();
+  for(var row:db.rows("SELECT t.message_id,COUNT(DISTINCT t.building_id) building_count,GROUP_CONCAT(DISTINCT b.building_name ORDER BY b.building_name SEPARATOR '|') building_names FROM message_building_target t JOIN building b ON b.building_id=t.building_id WHERE t.message_id IN ("+placeholders+") GROUP BY t.message_id",ids)){
+   long messageId=id(row.get("message_id"));buildingsByMessage.put(messageId,Objects.toString(row.get("building_names"),""));buildingCountByMessage.put(messageId,id(row.get("building_count")));
+  }
+  String recipientBuildingSql="SELECT scoped.message_id,COUNT(DISTINCT scoped.building_id) building_count,GROUP_CONCAT(DISTINCT b.building_name ORDER BY b.building_name SEPARATOR '|') building_names FROM ("
+   +"SELECT mt.message_id,ac.building_id FROM message_target mt JOIN v_accommodation_current ac ON ac.student_id=mt.user_id WHERE mt.message_id IN ("+placeholders+") "
+   +"UNION SELECT mt.message_id,s.building_id FROM message_target mt JOIN manager_building_scope s ON s.manager_user_id=mt.user_id WHERE mt.message_id IN ("+placeholders+") "
+   +"UNION SELECT mt.message_id,s.building_id FROM message_target mt JOIN repairer_building_scope s ON s.repairer_user_id=mt.user_id WHERE mt.message_id IN ("+placeholders+") "
+   +"UNION SELECT m.message_id,r.building_id FROM site_message m JOIN repair_order o ON m.content LIKE CONCAT('%',o.order_no,'%') JOIN dorm_room r ON r.room_id=o.room_id WHERE m.publisher_user_id IS NULL AND m.message_id IN ("+placeholders+")"
+   +") scoped JOIN building b ON b.building_id=scoped.building_id GROUP BY scoped.message_id";
+  List<Object> scopeArgs=new ArrayList<>();for(int i=0;i<4;i++)scopeArgs.addAll(messageIds);
+  for(var row:db.rows(recipientBuildingSql,scopeArgs.toArray())){long messageId=id(row.get("message_id"));if(buildingCountByMessage.containsKey(messageId))continue;buildingsByMessage.put(messageId,Objects.toString(row.get("building_names"),""));buildingCountByMessage.put(messageId,id(row.get("building_count")));}
+
+  long totalBuildings=db.count("SELECT COUNT(*) FROM building");
+  for(var row:rows){
+   long messageId=id(row.get("message_id"));var attachments=attachmentsByMessage.getOrDefault(messageId,List.of());
+   row.put("attachments",attachments);row.put("attachment_names",attachments.isEmpty()?"-":String.join("、",attachments.stream().map(file->Objects.toString(file.get("original_name"),"")).toList()));
+   String names=buildingsByMessage.get(messageId);if(names==null||names.isBlank())names="未指定";else if(totalBuildings>0&&Objects.equals(buildingCountByMessage.get(messageId),totalBuildings))names="全部楼栋";else names=names.replace("|","\n");
+   row.put("building_names",names);
+  }
  }
 
  public List<Map<String,Object>> list(CurrentUser u){return list(u,Map.of());}
@@ -127,7 +161,7 @@ public class NoticeService {
   for(long message:ids){
    long visible=admin
     ?db.count("SELECT COUNT(*) FROM site_message m LEFT JOIN v_user_identity p ON p.user_id=m.publisher_user_id WHERE m.message_id=? AND (p.role_code='DORM_MANAGER' OR m.publisher_user_id=? OR (m.publisher_user_id IS NULL AND EXISTS(SELECT 1 FROM message_receipt r JOIN message_target t ON t.message_id=r.message_id JOIN v_user_identity i ON i.user_id=t.user_id WHERE r.message_id=m.message_id AND r.user_id=? AND i.role_code='ADMIN')))",message,u.id(),u.id())
-    :db.count("SELECT COUNT(*) FROM site_message m LEFT JOIN message_receipt r ON r.message_id=m.message_id AND r.user_id=? WHERE m.message_id=? AND m.delivered_at IS NOT NULL AND (r.message_id IS NULL OR r.deleted_at IS NULL) AND (r.message_id IS NOT NULL OR m.publisher_user_id=?)",u.id(),message,u.id());
+    :db.count("SELECT COUNT(*) FROM site_message m JOIN message_receipt r ON r.message_id=m.message_id WHERE m.message_id=? AND m.delivered_at IS NOT NULL AND r.user_id=? AND r.deleted_at IS NULL",message,u.id());
    BizException.require(visible>0,"所选消息不存在或无权操作");
    db.update("INSERT INTO message_receipt(message_id,user_id,read_at,deleted_at) VALUES(?,?,NOW(),NOW()) ON DUPLICATE KEY UPDATE read_at=COALESCE(read_at,NOW()),deleted_at=NOW()",message,u.id());
    db.log(u.id(),"notice","delete",message);
@@ -165,10 +199,6 @@ public class NoticeService {
   long message=db.insert("INSERT INTO site_message(target_role,title,content,publisher_user_id,publish_at) VALUES('BUILDINGS',?,?,?,?)",required(b,"title"),required(b,"content"),u.id(),at);
   for(long building:selected)db.update("INSERT INTO message_building_target(message_id,building_id) VALUES(?,?)",message,building);
   for(long user:recipients)db.update("INSERT INTO message_target(message_id,user_id) VALUES(?,?)",message,user);
-  if(u.role().equals("DORM_MANAGER")){
-   db.update("INSERT IGNORE INTO message_target(message_id,user_id) VALUES(?,?)",message,u.id());
-   db.update("INSERT IGNORE INTO message_receipt(message_id,user_id,read_at) VALUES(?,?,NOW())",message,u.id());
-  }
   Object filesRaw=b.get("attachmentIds");
   List<?> attachmentIds=filesRaw instanceof List<?> files?files:List.of();
   BizException.require(attachmentIds.size()<=8,"最多添加8个附件");

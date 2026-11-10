@@ -2,7 +2,6 @@ package com.dorm.platform.system.service;
 
 import com.dorm.platform.common.*;
 import com.dorm.platform.security.*;
-import com.dorm.platform.repair.service.RepairService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.*;
@@ -14,23 +13,14 @@ import static com.dorm.platform.common.BizException.require;
 public class ManagementService {
  private final SqlStore db;
  private final DataScope scope;
- private final RepairService repairs;
- public ManagementService(SqlStore db,DataScope scope,RepairService repairs){
+ public ManagementService(SqlStore db,DataScope scope){
   this.db=db;
   this.scope=scope;
-  this.repairs=repairs;
  }
  public List<Map<String,Object>> homes(CurrentUser u,boolean history){role(u,"STUDENT","DORM_MANAGER","ADMIN");String filter=u.role().equals("STUDENT")?"a.student_id="+u.id():scope.buildingFilter(u,"r.building_id");return db.rows("SELECT a.*,s.student_name,s.student_no,s.login_account,s.phone,s.gender,sc.class_id,sc.class_name,sc.enrollment_year,m.major_id,m.major_name,d.department_id,d.department_name,b.building_id,b.building_name,r.room_id,r.room_no,bd.bed_no FROM accommodation_assignment a JOIN student s ON s.student_id=a.student_id LEFT JOIN student_class sc ON sc.class_id=s.class_id LEFT JOIN major m ON m.major_id=sc.major_id LEFT JOIN department d ON d.department_id=m.department_id JOIN bed bd ON bd.bed_id=a.bed_id JOIN dorm_room r ON r.room_id=bd.room_id JOIN building b ON b.building_id=r.building_id WHERE "+filter+(history?"":" AND a.check_in_date<=CURRENT_DATE() AND (a.check_out_date IS NULL OR a.check_out_date>CURRENT_DATE())")+" ORDER BY a.assignment_id DESC");}
  public Map<String,Object> accommodationStats(CurrentUser u){return accommodationStats(u,LocalDate.now().getYear());}
  public Map<String,Object> accommodationStats(CurrentUser u,int year){
   role(u,"ADMIN","DORM_MANAGER");String scopeFilter=u.role().equals("ADMIN")?"1=1":scope.buildingFilter(u,"r.building_id");
-  if(u.role().equals("DORM_MANAGER")){
-   long housed=db.count("SELECT COUNT(DISTINCT a.student_id) FROM v_accommodation_current a JOIN dorm_room r ON r.room_id=a.room_id WHERE "+scopeFilter);
-   long beds=db.count("SELECT COUNT(*) FROM bed bd JOIN dorm_room r ON r.room_id=bd.room_id WHERE "+scopeFilter);
-   long occupied=db.count("SELECT COUNT(DISTINCT a.bed_id) FROM v_accommodation_current a JOIN dorm_room r ON r.room_id=a.room_id WHERE "+scopeFilter);
-   long available=db.count("SELECT COUNT(*) FROM bed bd JOIN dorm_room r ON r.room_id=bd.room_id WHERE bd.management_status='AVAILABLE' AND "+scopeFilter+" AND NOT EXISTS(SELECT 1 FROM v_accommodation_current a WHERE a.bed_id=bd.bed_id)");
-   return Map.of("year",LocalDate.now().getYear(),"students",housed,"housed",housed,"unhoused",0,"beds",beds,"occupiedBeds",occupied,"availableBeds",available,"scope","负责楼栋当前住宿");
-  }
   LocalDate yearStart=LocalDate.of(year,1,1),yearEnd=LocalDate.of(year,12,31);
   long students=db.count("SELECT COUNT(*) FROM v_student_profile WHERE enrollment_year<=?",year);
   long housed=db.count("SELECT COUNT(DISTINCT a.student_id) FROM accommodation_assignment a JOIN bed bd ON bd.bed_id=a.bed_id JOIN dorm_room r ON r.room_id=bd.room_id WHERE a.check_in_date<=? AND (a.check_out_date IS NULL OR a.check_out_date>=?) AND "+scopeFilter,yearEnd,yearStart);
@@ -40,21 +30,18 @@ public class ManagementService {
  }
  public List<Map<String,Object>> roommates(CurrentUser u){role(u,"STUDENT");return db.rows("SELECT student_name,bed_no FROM v_accommodation_current WHERE room_id IN (SELECT room_id FROM v_accommodation_current WHERE student_id=?) AND student_id<>?",u.id(),u.id());}
  public List<Map<String,Object>> buildings(CurrentUser u){
-  role(u,"STUDENT","DORM_MANAGER","REPAIRER","ADMIN");
-  String filter=switch(u.role()){
-   case "STUDENT" -> "b.building_id IN (SELECT building_id FROM v_accommodation_current WHERE student_id="+u.id()+")";
-   case "REPAIRER" -> "(b.building_id IN (SELECT building_id FROM repairer_building_scope WHERE repairer_user_id="+u.id()+") OR b.building_id IN (SELECT r.building_id FROM repair_order o JOIN dorm_room r ON r.room_id=o.room_id JOIN repair_dispatch d ON d.order_id=o.order_id WHERE d.repairer_user_id="+u.id()+"))";
-   default -> scope.buildingFilter(u,"b.building_id");
-  };
+  role(u,"STUDENT","DORM_MANAGER","ADMIN");
+  String filter=u.role().equals("STUDENT")?"b.building_id IN (SELECT building_id FROM v_accommodation_current WHERE student_id="+u.id()+")":scope.buildingFilter(u,"b.building_id");
   return db.rows("SELECT b.*,COALESCE(r.room_count,0) room_count,COALESCE(bs.bed_count,0) bed_count,COALESCE(bs.available_bed_count,0) available_bed_count,COALESCE(o.occupied_count,0) occupied_count FROM building b LEFT JOIN (SELECT building_id,COUNT(*) room_count FROM dorm_room GROUP BY building_id) r ON r.building_id=b.building_id LEFT JOIN (SELECT r.building_id,COUNT(DISTINCT bd.bed_id) bed_count,COUNT(DISTINCT CASE WHEN bd.management_status='AVAILABLE' AND a.bed_id IS NULL THEN bd.bed_id END) available_bed_count FROM dorm_room r LEFT JOIN bed bd ON bd.room_id=r.room_id LEFT JOIN (SELECT DISTINCT bed_id FROM v_accommodation_current) a ON a.bed_id=bd.bed_id GROUP BY r.building_id) bs ON bs.building_id=b.building_id LEFT JOIN (SELECT building_id,COUNT(DISTINCT student_id) occupied_count FROM v_accommodation_current GROUP BY building_id) o ON o.building_id=b.building_id WHERE "+filter+" ORDER BY b.building_code");
  }
  public List<Map<String,Object>> rooms(CurrentUser u){role(u,"DORM_MANAGER","ADMIN");return db.rows("SELECT r.*,b.building_name,b.gender_limit building_gender_limit,COUNT(DISTINCT bd.bed_id) bed_count,COUNT(DISTINCT CASE WHEN bd.management_status='AVAILABLE' AND a.bed_id IS NULL THEN bd.bed_id END) available_bed_count FROM dorm_room r JOIN building b ON b.building_id=r.building_id LEFT JOIN bed bd ON bd.room_id=r.room_id LEFT JOIN (SELECT DISTINCT bed_id FROM v_accommodation_current) a ON a.bed_id=bd.bed_id WHERE "+scope.buildingFilter(u,"r.building_id")+" GROUP BY r.room_id ORDER BY r.building_id,r.room_no");}
  public List<Map<String,Object>> beds(CurrentUser u){role(u,"DORM_MANAGER","ADMIN");return db.rows("SELECT bd.*,r.building_id,r.room_no,r.floor_no,r.gender_limit,r.gender_limit room_gender_limit,b.building_name,b.gender_limit building_gender_limit,a.student_name,a.student_id,s.student_no,s.gender student_gender,s.birth_date student_birth_date,s.phone student_phone,s.enrollment_status,sc.class_name,sc.enrollment_year grade,m.major_name,d.department_name FROM bed bd JOIN dorm_room r ON r.room_id=bd.room_id JOIN building b ON b.building_id=r.building_id LEFT JOIN v_accommodation_current a ON a.bed_id=bd.bed_id LEFT JOIN student s ON s.student_id=a.student_id LEFT JOIN student_class sc ON sc.class_id=s.class_id LEFT JOIN major m ON m.major_id=sc.major_id LEFT JOIN department d ON d.department_id=m.department_id WHERE "+scope.buildingFilter(u,"r.building_id")+" ORDER BY b.building_id,r.floor_no,r.room_no,bd.bed_no");}
  public List<Map<String,Object>> users(CurrentUser u){return users(u,Map.of());}
  public List<Map<String,Object>> users(CurrentUser u,Map<String,String> filters){
-  role(u,"ADMIN");
+  role(u,"ADMIN","DORM_MANAGER");
   StringBuilder sql=new StringBuilder("SELECT u.user_id,u.login_account,u.student_no,u.real_name,u.gender,u.birth_date,u.employee_no,u.hire_date,u.phone,u.role_code,u.enabled,u.created_at,u.updated_at,sp.department_id,sp.department_name,sp.major_id,sp.major_name,sp.class_id,sp.class_code,sp.class_name,sp.enrollment_year,sp.grade,sp.enrollment_status,ac.building_name current_building,ac.room_no current_room,ac.bed_id current_bed_id,ac.bed_no current_bed,mp.manager_buildings,mp.on_duty manager_on_duty,rp.on_duty,rp.max_active_orders,rp.repairer_buildings,rp.work_types,rp.active_orders FROM v_user_identity u LEFT JOIN v_student_profile sp ON sp.student_id=u.user_id LEFT JOIN v_accommodation_current ac ON ac.student_id=u.user_id LEFT JOIN v_dorm_manager_profile mp ON mp.manager_user_id=u.user_id LEFT JOIN v_repairer_profile rp ON rp.repairer_user_id=u.user_id WHERE 1=1");
   List<Object> args=new ArrayList<>();
+  if(u.role().equals("DORM_MANAGER")){sql.append(" AND u.role_code='STUDENT' AND ").append(scope.buildingFilter(u,"ac.building_id"));}
   String roleCode=filters.getOrDefault("roleCode","").trim();
   if(!roleCode.isEmpty()){
    require(Set.of("STUDENT","DORM_MANAGER","REPAIRER","ADMIN").contains(roleCode),"角色无效");
@@ -107,8 +94,9 @@ public class ManagementService {
  private void addScopedName(StringBuilder sql,List<Object> args,String raw,String existsSql){String value=Objects.toString(raw,"").trim();if(!value.isEmpty()){sql.append(" AND EXISTS(").append(existsSql).append(")");args.add("%"+value+"%");}}
  private void exact(StringBuilder sql,List<Object> args,String column,String raw){String value=Objects.toString(raw,"").trim();if(!value.isEmpty()){sql.append(" AND ").append(column).append("=?");args.add(value);}}
  public Map<String,Object> userDetail(CurrentUser u,long userId){
-  role(u,"ADMIN");
+  role(u,"ADMIN","DORM_MANAGER");
   Map<String,Object> result=new LinkedHashMap<>(db.one("SELECT user_id,login_account,student_no,real_name,gender,birth_date,employee_no,hire_date,phone,role_code,enabled,created_at,updated_at FROM v_user_identity WHERE user_id=?",userId));
+  if(u.role().equals("DORM_MANAGER")){require("STUDENT".equals(result.get("role_code")),"宿管仅可查看负责楼栋学生资料");require(db.count("SELECT COUNT(*) FROM v_accommodation_current a WHERE a.student_id=? AND "+scope.buildingFilter(u,"a.building_id"),userId)>0,"该学生不在负责楼栋范围内");}
   switch(Objects.toString(result.get("role_code"),"")){
    case "STUDENT"->{
     result.putAll(db.one("SELECT * FROM v_student_profile WHERE student_id=?",userId));
@@ -155,18 +143,21 @@ public class ManagementService {
  }
  @Transactional public void profile(CurrentUser u,Map<String,Object>b){
   Map<String,Object> current=profile(u);
-  String phone=contact(b,"phone");
+  String phone=text(b,"phone");require(phone.isBlank()||phone.matches("[+0-9 -]{5,30}"),"联系方式格式不正确");
   String name=text(b,"realName");if(name.isBlank())name=Objects.toString(current.get("real_name"),"");
   String gender=b.containsKey("gender")?text(b,"gender"):Objects.toString(current.get("gender"),"");
-  require(gender.isBlank()||Set.of("MALE","FEMALE").contains(gender),"性别无效");
+  require(gender.isBlank()||Set.of("MALE","FEMALE","OTHER").contains(gender),"性别无效");
   Object birthDate=b.containsKey("birthDate")?nullableDate(b,"birthDate"):current.get("birth_date");
   switch(u.role()){
    case "STUDENT"->db.update("UPDATE student SET phone=?,student_name=?,gender=?,birth_date=? WHERE student_id=?",phone.isBlank()?null:phone,name,emptyNull(gender),birthDate,u.id());
    case "DORM_MANAGER"->db.update("UPDATE dorm_manager_profile SET phone=?,manager_name=?,gender=?,birth_date=? WHERE manager_user_id=?",phone.isBlank()?null:phone,name,emptyNull(gender),birthDate,u.id());
    case "REPAIRER"->db.update("UPDATE repairer_profile SET phone=?,repairer_name=?,gender=?,birth_date=? WHERE repairer_user_id=?",phone.isBlank()?null:phone,name,emptyNull(gender),birthDate,u.id());
    case "ADMIN"->{
+    String employeeNo=b.containsKey("employeeNo")?text(b,"employeeNo"):Objects.toString(current.get("employee_no"),"");
     Object hireDate=b.containsKey("hireDate")?nullableDate(b,"hireDate"):current.get("hire_date");
-    db.update("UPDATE system_admin_profile SET phone=?,admin_name=?,gender=?,birth_date=?,hire_date=? WHERE admin_user_id=?",phone.isBlank()?null:phone,name,emptyNull(gender),birthDate,hireDate,u.id());
+    require(employeeNo.matches("SA\\d{6}"),"管理员工号格式为SA加6位数字");
+    require(employeeNo.isBlank()||employeeNumberAvailable("ADMIN",employeeNo,u.id()),"工号已存在");
+    db.update("UPDATE system_admin_profile SET phone=?,admin_name=?,gender=?,birth_date=?,employee_no=?,hire_date=? WHERE admin_user_id=?",phone.isBlank()?null:phone,name,emptyNull(gender),birthDate,emptyNull(employeeNo),hireDate,u.id());
    }
    default->throw BizException.forbidden();
   }
@@ -179,25 +170,29 @@ public class ManagementService {
    require(Set.of("STUDENT","DORM_MANAGER","REPAIRER","ADMIN").contains(roleCode),"角色无效");
    String name=required(b,"realName"),studentNo=roleCode.equals("STUDENT")?text(b,"studentNo"):null;
    String employeeNo=roleCode.equals("STUDENT")?"":text(b,"employeeNo"),gender=text(b,"gender");
-   require(gender.isBlank()||Set.of("MALE","FEMALE").contains(gender),"性别无效");
+   require(gender.isBlank()||Set.of("MALE","FEMALE","OTHER").contains(gender),"性别无效");
+   require(studentNo==null||studentNo.isBlank()||studentNo.matches("\\d{10}"),"学号必须为10位数字");
+   String employeePattern=switch(roleCode){case "DORM_MANAGER"->"DM\\d{6}";case "REPAIRER"->"RP\\d{6}";case "ADMIN"->"SA\\d{6}";default->"";};
+   require(employeeNo.isBlank()||employeePattern.isEmpty()||employeeNo.matches(employeePattern),roleCode.equals("DORM_MANAGER")?"宿管工号格式为DM加6位数字":roleCode.equals("REPAIRER")?"维修人员工号格式为RP加6位数字":"管理员工号格式为SA加6位数字");
    String enrollmentStatus=text(b,"enrollmentStatus");
    if(roleCode.equals("STUDENT")){
+    require(!studentNo.isBlank(),"学号不能为空");
     if(enrollmentStatus.isBlank())enrollmentStatus="ENROLLED";
     require(Set.of("ENROLLED","SUSPENDED","GRADUATED","WITHDRAWN","UNKNOWN").contains(enrollmentStatus),"学籍状态无效");
    }
-   String phone=contact(b,"phone"),account=required(b,"account");
+   String phone=text(b,"phone"),account=required(b,"account");
+   require(phone.isBlank()||phone.matches("[+0-9 -]{5,30}"),"联系方式格式不正确");
    require(account.length()<=60,"账号最多60位");
    Object birthDate=nullableDate(b,"birthDate");
    long user;
    if(userId==null){
     String password=required(b,"password");
     require(password.length()>=6&&password.length()<=100,"密码长度必须为6到100位");
+    if(!roleCode.equals("STUDENT"))require(!employeeNo.isBlank(),"工号不能为空");
     require(db.count("SELECT COUNT(*) FROM v_user_identity WHERE login_account=?",account)==0,"账号已存在");
+    if(studentNo!=null)require(db.count("SELECT COUNT(*) FROM student WHERE student_no=?",studentNo)==0,"学号已存在");
+    require(employeeNo.isBlank()||employeeNumberAvailable(roleCode,employeeNo,null),"工号已存在");
     user=db.insert("INSERT INTO person() VALUES ()");
-    String identityNo=generatedIdentityNumber(roleCode,user,b.get("classId"));
-    require(db.count(roleCode.equals("STUDENT")?"SELECT COUNT(*) FROM student WHERE student_no=?":"SELECT COUNT(*) FROM "+identityTable(roleCode)+" WHERE employee_no=?",identityNo)==0,"编号生成冲突，请重试");
-    studentNo=roleCode.equals("STUDENT")?identityNo:null;
-    employeeNo=roleCode.equals("STUDENT")?"":identityNo;
     createRoleProfile(roleCode,user,b,name,studentNo,employeeNo,gender,birthDate,enrollmentStatus,account,AuthService.sha256(password),emptyNull(phone));
    }else{
     user=userId;
@@ -205,27 +200,25 @@ public class ManagementService {
     var old=db.one("SELECT * FROM v_user_identity WHERE user_id=?",user);
     require(roleCode.equals(old.get("role_code")),"不能通过角色资料修改人员角色");
     Map<String,Object> oldProfile=profileByRole(roleCode,user);
-    String currentIdentity=Objects.toString(roleCode.equals("STUDENT")?oldProfile.get("student_no"):oldProfile.get("employee_no"),"").trim();
-    require(!currentIdentity.isBlank(),"编号缺失，请联系系统维护人员");
-    requireIdentityUnchanged(b,roleCode,currentIdentity);
-    studentNo=roleCode.equals("STUDENT")?currentIdentity:null;
-    employeeNo=roleCode.equals("STUDENT")?"":currentIdentity;
     if(account.isBlank())account=text(old,"login_account");
     require(db.count("SELECT COUNT(*) FROM v_user_identity WHERE login_account=? AND user_id<>?",account,user)==0,"账号已存在");
+    require(studentNo==null||studentNo.isBlank()||db.count("SELECT COUNT(*) FROM student WHERE student_no=? AND student_id<>?",studentNo,user)==0,"学号已存在");
+    require(employeeNo.isBlank()||employeeNumberAvailable(roleCode,employeeNo,user),"工号已存在");
     String profileGender=b.containsKey("gender")?gender:Objects.toString(oldProfile.get("gender"),"");
     Object profileBirthDate=b.containsKey("birthDate")?birthDate:oldProfile.get("birth_date");
     switch(roleCode){
      case "STUDENT"->{
-      String number=currentIdentity;
+      String number=studentNo.isBlank()?Objects.toString(oldProfile.get("student_no"),""):studentNo;
+      require(!number.isBlank(),"学号不能为空");
       Object classId=b.containsKey("classId")?nullableId(b,"classId"):oldProfile.get("class_id");
       validateClass(classId,oldProfile.get("class_id"));
       if(enrollmentStatus.isBlank())enrollmentStatus=Objects.toString(oldProfile.get("enrollment_status"),"UNKNOWN");
       require(Set.of("ENROLLED","SUSPENDED","GRADUATED","WITHDRAWN","UNKNOWN").contains(enrollmentStatus),"学籍状态无效");
       db.update("UPDATE student SET login_account=?,phone=?,student_no=?,student_name=?,gender=?,birth_date=?,class_id=?,enrollment_status=? WHERE student_id=?",account,emptyNull(phone),number,name,emptyNull(profileGender),profileBirthDate,classId,enrollmentStatus,user);
      }
-     case "DORM_MANAGER"->db.update("UPDATE dorm_manager_profile SET login_account=?,phone=?,employee_no=?,manager_name=?,gender=?,birth_date=?,hire_date=?,on_duty=? WHERE manager_user_id=?",account,emptyNull(phone),currentIdentity,name,emptyNull(profileGender),profileBirthDate,b.containsKey("hireDate")?nullableDate(b,"hireDate"):oldProfile.get("hire_date"),b.containsKey("onDuty")?flag(b,"onDuty"):oldProfile.get("on_duty"),user);
-     case "REPAIRER"->db.update("UPDATE repairer_profile SET login_account=?,phone=?,employee_no=?,repairer_name=?,gender=?,birth_date=?,hire_date=? WHERE repairer_user_id=?",account,emptyNull(phone),currentIdentity,name,emptyNull(profileGender),profileBirthDate,b.containsKey("hireDate")?nullableDate(b,"hireDate"):oldProfile.get("hire_date"),user);
-     case "ADMIN"->db.update("UPDATE system_admin_profile SET login_account=?,phone=?,employee_no=?,admin_name=?,gender=?,birth_date=?,hire_date=? WHERE admin_user_id=?",account,emptyNull(phone),currentIdentity,name,emptyNull(profileGender),profileBirthDate,b.containsKey("hireDate")?nullableDate(b,"hireDate"):oldProfile.get("hire_date"),user);
+     case "DORM_MANAGER"->db.update("UPDATE dorm_manager_profile SET login_account=?,phone=?,employee_no=?,manager_name=?,gender=?,birth_date=?,hire_date=?,on_duty=? WHERE manager_user_id=?",account,emptyNull(phone),employeeNo.isBlank()?oldProfile.get("employee_no"):employeeNo,name,emptyNull(profileGender),profileBirthDate,b.containsKey("hireDate")?nullableDate(b,"hireDate"):oldProfile.get("hire_date"),b.containsKey("onDuty")?flag(b,"onDuty"):oldProfile.get("on_duty"),user);
+     case "REPAIRER"->db.update("UPDATE repairer_profile SET login_account=?,phone=?,employee_no=?,repairer_name=?,gender=?,birth_date=?,hire_date=? WHERE repairer_user_id=?",account,emptyNull(phone),employeeNo.isBlank()?oldProfile.get("employee_no"):employeeNo,name,emptyNull(profileGender),profileBirthDate,b.containsKey("hireDate")?nullableDate(b,"hireDate"):oldProfile.get("hire_date"),user);
+     case "ADMIN"->db.update("UPDATE system_admin_profile SET login_account=?,phone=?,employee_no=?,admin_name=?,gender=?,birth_date=?,hire_date=? WHERE admin_user_id=?",account,emptyNull(phone),employeeNo.isBlank()?oldProfile.get("employee_no"):employeeNo,name,emptyNull(profileGender),profileBirthDate,b.containsKey("hireDate")?nullableDate(b,"hireDate"):oldProfile.get("hire_date"),user);
     }
     if(!text(b,"password").isBlank()){
      require(text(b,"password").length()>=6&&text(b,"password").length()<=100,"密码长度必须为6到100位");
@@ -253,35 +246,6 @@ public class ManagementService {
   long repairerExcluded=roleCode.equals("REPAIRER")?excluded:-1;
   long adminExcluded=roleCode.equals("ADMIN")?excluded:-1;
   return db.count("SELECT (SELECT COUNT(*) FROM dorm_manager_profile WHERE employee_no=? AND manager_user_id<>?)+(SELECT COUNT(*) FROM repairer_profile WHERE employee_no=? AND repairer_user_id<>?)+(SELECT COUNT(*) FROM system_admin_profile WHERE employee_no=? AND admin_user_id<>?)",employeeNo,managerExcluded,employeeNo,repairerExcluded,employeeNo,adminExcluded)==0;
- }
- /** 学号/工号预览：按库内人员主键自增值生成固定格式编号，供新增页面只读展示。 */
- public Map<String,Object> nextIdentityNumber(CurrentUser u,String roleCode,String classId){
-  role(u,"ADMIN");
-  require(Set.of("STUDENT","DORM_MANAGER","REPAIRER","ADMIN").contains(roleCode),"角色无效");
-  long next=nextPersonId();
-  String number=generatedIdentityNumber(roleCode,next,classId);
-  return Map.of("roleCode",roleCode,"number",number,"label",roleCode.equals("STUDENT")?"学号":"工号");
- }
- private long nextPersonId(){
-  var rows=db.rows("SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='person'");
-  Object auto=rows.isEmpty()?null:rows.get(0).get("AUTO_INCREMENT");
-  if(auto instanceof Number number&&number.longValue()>0)return number.longValue();
-  return db.count("SELECT COALESCE(MAX(person_id),0)+1 FROM person");
- }
- private String generatedIdentityNumber(String roleCode,long user,Object classId){
-  if(roleCode.equals("STUDENT"))return String.format("%d%06d",enrollmentYear(classId),user);
-  return employeePrefix(roleCode)+String.format("%06d",user);
- }
- private String employeePrefix(String roleCode){return switch(roleCode){case "DORM_MANAGER"->"DM";case "REPAIRER"->"RP";case "ADMIN"->"SA";default->throw new BizException(400,"角色无效");};}
- private int enrollmentYear(Object classId){
-  if(classId==null||Objects.toString(classId,"").isBlank())return Year.now().getValue();
-  var rows=db.rows("SELECT enrollment_year FROM student_class WHERE class_id=?",id(classId));
-  Object year=rows.isEmpty()?null:rows.get(0).get("enrollment_year");
-  return year instanceof Number number?number.intValue():Year.now().getValue();
- }
- private void requireIdentityUnchanged(Map<String,Object>b,String roleCode,String current){
-  String submitted=text(b,roleCode.equals("STUDENT")?"studentNo":"employeeNo");
-  require(submitted.isBlank()||submitted.equals(current),"学号/工号由系统自动生成，不可修改");
  }
   private String identityTable(String roleCode){return switch(roleCode){case "STUDENT"->"student";case "DORM_MANAGER"->"dorm_manager_profile";case "REPAIRER"->"repairer_profile";case "ADMIN"->"system_admin_profile";default->throw BizException.forbidden();};}
   private String identityKey(String roleCode){return switch(roleCode){case "STUDENT"->"student_id";case "DORM_MANAGER"->"manager_user_id";case "REPAIRER"->"repairer_user_id";case "ADMIN"->"admin_user_id";default->throw BizException.forbidden();};}
@@ -421,7 +385,7 @@ public class ManagementService {
  @Transactional public void checkout(CurrentUser u,long assignment){role(u,"ADMIN");require(db.update("UPDATE accommodation_assignment SET check_out_date=CURRENT_DATE() WHERE assignment_id=? AND check_out_date IS NULL",assignment)==1,"当前记录已退宿");db.log(u.id(),"dorm","checkout",assignment);}
  private boolean genderMatchesRoom(String studentGender,String roomGender){return ("MALE".equals(studentGender)&&"男生".equals(roomGender))||("FEMALE".equals(studentGender)&&"女生".equals(roomGender));}
  public Map<String,Object> academicStructure(CurrentUser u){
-  role(u,"ADMIN");
+  role(u,"ADMIN","DORM_MANAGER");
   return Map.of("departments",db.rows("SELECT * FROM department ORDER BY department_name"),"majors",db.rows("SELECT m.*,d.department_name FROM major m JOIN department d ON d.department_id=m.department_id ORDER BY d.department_name,m.major_name"),"classes",db.rows("SELECT c.*,m.major_name,d.department_name FROM student_class c JOIN major m ON m.major_id=c.major_id JOIN department d ON d.department_id=m.department_id ORDER BY c.enrollment_year DESC,c.class_name"));
  }
  @Transactional public long academicResource(CurrentUser u,String type,Long resourceId,Map<String,Object>b){
@@ -435,7 +399,7 @@ public class ManagementService {
   db.log(u.id(),"student",resourceId==null?"academic_create":"academic_update",result);return result;
  }
  public Map<String,Object> config(CurrentUser u){role(u,"ADMIN");var workers=db.rows("SELECT repairer_user_id,employee_no,repairer_name real_name,on_duty,max_active_orders FROM v_repairer_profile ORDER BY repairer_user_id");for(var w:workers){w.put("workTypeIds",db.rows("SELECT work_type_id FROM repairer_work_type WHERE repairer_user_id=?",w.get("repairer_user_id")).stream().map(x->x.get("work_type_id")).toList());w.put("buildingIds",db.rows("SELECT building_id FROM repairer_building_scope WHERE repairer_user_id=?",w.get("repairer_user_id")).stream().map(x->x.get("building_id")).toList());}return Map.of("rule",db.one("SELECT * FROM repair_rule ORDER BY rule_id DESC LIMIT 1"),"workers",workers,"categories",db.rows("SELECT * FROM fault_category"),"workTypes",db.rows("SELECT * FROM repair_work_type"));}
- @Transactional public void saveRule(CurrentUser u,Map<String,Object>b){role(u,"ADMIN");for(String key:List.of("accept_minutes","normal_minutes","urgent_minutes","confirm_days"))require(id(b.get(key))>0,"时限必须大于0");long confirmDays=id(b.get("confirm_days"));long editDays=text(b,"edit_days").isBlank()?confirmDays:id(b.get("edit_days"));require(editDays>0,"待修改关闭时限必须大于0");Object max=text(b,"max_rework_count").isBlank()?null:id(b.get("max_rework_count"));require(max==null||id(max)>=0,"重修次数不能小于0");long n=db.insert("INSERT INTO repair_rule(accept_minutes,normal_minutes,urgent_minutes,confirm_days,edit_days,max_rework_count) VALUES(?,?,?,?,?,?)",id(b.get("accept_minutes")),id(b.get("normal_minutes")),id(b.get("urgent_minutes")),confirmDays,editDays,max);db.log(u.id(),"repair","rule_version",n);}
+ @Transactional public void saveRule(CurrentUser u,Map<String,Object>b){role(u,"ADMIN");for(String key:List.of("accept_minutes","normal_minutes","urgent_minutes","confirm_days"))require(id(b.get(key))>0,"时限必须大于0");long confirmDays=id(b.get("confirm_days"));Object max=text(b,"max_rework_count").isBlank()?null:id(b.get("max_rework_count"));require(max==null||id(max)>=0,"重修次数不能小于0");long n=db.insert("INSERT INTO repair_rule(accept_minutes,normal_minutes,urgent_minutes,confirm_days,edit_days,max_rework_count) VALUES(?,?,?,?,?,?)",id(b.get("accept_minutes")),id(b.get("normal_minutes")),id(b.get("urgent_minutes")),confirmDays,confirmDays,max);db.log(u.id(),"repair","rule_version",n);}
   @Transactional public void managerScope(CurrentUser u,long manager,Map<String,Object>b){
    role(u,"ADMIN");db.one("SELECT manager_user_id FROM dorm_manager_profile WHERE manager_user_id=? FOR UPDATE",manager);
    String raw=text(b,"buildingId").trim();Long building=raw.isEmpty()?null:id(raw);
@@ -447,7 +411,7 @@ public class ManagementService {
    if(building!=null)db.update("INSERT INTO manager_building_scope(manager_user_id,building_id) VALUES(?,?)",manager,building);
    db.log(u.id(),"dorm","manager_scope",manager);
   }
- @Transactional public void worker(CurrentUser u,long worker,Map<String,Object>b){role(u,"ADMIN");db.one("SELECT repairer_user_id FROM repairer_profile WHERE repairer_user_id=? FOR UPDATE",worker);Object max=text(b,"maxActiveOrders").isBlank()?null:id(b.get("maxActiveOrders"));require(max==null||id(max)>0,"最大在办数必须大于0");db.update("UPDATE repairer_profile SET on_duty=?,max_active_orders=? WHERE repairer_user_id=?",flag(b,"onDuty"),max,worker);db.update("DELETE FROM repairer_work_type WHERE repairer_user_id=?",worker);db.update("DELETE FROM repairer_building_scope WHERE repairer_user_id=?",worker);for(Object v:(b.get("workTypeIds") instanceof List<?> a?a:List.of()))db.update("INSERT INTO repairer_work_type(repairer_user_id,work_type_id) VALUES(?,?)",worker,id(v));for(Object v:(b.get("buildingIds") instanceof List<?> a?a:List.of()))db.update("INSERT INTO repairer_building_scope(repairer_user_id,building_id) VALUES(?,?)",worker,id(v));repairs.reassessOverloadedOrders();db.log(u.id(),"repair","worker_scope",worker);}
+ @Transactional public void worker(CurrentUser u,long worker,Map<String,Object>b){role(u,"ADMIN");db.one("SELECT repairer_user_id FROM repairer_profile WHERE repairer_user_id=? FOR UPDATE",worker);Object max=text(b,"maxActiveOrders").isBlank()?null:id(b.get("maxActiveOrders"));require(max==null||id(max)>0,"最大在办数必须大于0");db.update("UPDATE repairer_profile SET on_duty=?,max_active_orders=? WHERE repairer_user_id=?",flag(b,"onDuty"),max,worker);db.update("DELETE FROM repairer_work_type WHERE repairer_user_id=?",worker);db.update("DELETE FROM repairer_building_scope WHERE repairer_user_id=?",worker);for(Object v:(b.get("workTypeIds") instanceof List<?> a?a:List.of()))db.update("INSERT INTO repairer_work_type(repairer_user_id,work_type_id) VALUES(?,?)",worker,id(v));for(Object v:(b.get("buildingIds") instanceof List<?> a?a:List.of()))db.update("INSERT INTO repairer_building_scope(repairer_user_id,building_id) VALUES(?,?)",worker,id(v));db.log(u.id(),"repair","worker_scope",worker);}
  @Transactional public void dictionary(CurrentUser u,String type,Long n,Map<String,Object>b){role(u,"ADMIN");if(type.equals("work-types")){if(n==null)db.update("INSERT INTO repair_work_type(work_type_code,work_type_name) VALUES(?,?)",required(b,"code"),required(b,"name"));else db.update("UPDATE repair_work_type SET work_type_name=?,enabled=? WHERE work_type_id=?",required(b,"name"),flag(b,"enabled"),n);}else if(type.equals("categories")){if(n==null)db.update("INSERT INTO fault_category(work_type_id,category_name) VALUES(?,?)",id(b.get("workTypeId")),required(b,"name"));else db.update("UPDATE fault_category SET category_name=?,work_type_id=?,enabled=? WHERE category_id=?",required(b,"name"),id(b.get("workTypeId")),flag(b,"enabled"),n);}else throw new BizException(404,"未知字典");db.log(u.id(),"repair",type,n==null?0:n);}
  @Transactional public void deleteDictionary(CurrentUser u,String type,long id){role(u,"ADMIN");if(type.equals("work-types")){db.one("SELECT work_type_id FROM repair_work_type WHERE work_type_id=? FOR UPDATE",id);require(db.count("SELECT COUNT(*) FROM fault_category WHERE work_type_id=?",id)==0&&db.count("SELECT COUNT(*) FROM repairer_work_type WHERE work_type_id=?",id)==0,"工种仍被故障分类或维修人员使用，不能删除");db.update("DELETE FROM repair_work_type WHERE work_type_id=?",id);}else if(type.equals("categories")){db.one("SELECT category_id FROM fault_category WHERE category_id=? FOR UPDATE",id);require(db.count("SELECT COUNT(*) FROM repair_order WHERE category_id=?",id)==0&&db.count("SELECT COUNT(*) FROM repair_submission_version WHERE category_id=?",id)==0,"故障分类已被报修工单使用，不能删除");db.update("DELETE FROM fault_category WHERE category_id=?",id);}else throw new BizException(404,"未知字典");db.log(u.id(),"repair",type+"_delete",id);}
  public List<Map<String,Object>> logs(CurrentUser u,Map<String,String> filters){role(u,"ADMIN");StringBuilder sql=new StringBuilder("SELECT l.*,u.real_name,u.role_code,CASE u.role_code WHEN 'STUDENT' THEN '学生' WHEN 'DORM_MANAGER' THEN '宿管' WHEN 'REPAIRER' THEN '维修人员' WHEN 'ADMIN' THEN '系统管理员' ELSE '未知' END role_label,CASE l.module WHEN 'auth' THEN '认证' WHEN 'dorm' THEN '宿舍管理' WHEN 'notice' THEN '通知' WHEN 'repair' THEN '报修' WHEN 'stay' THEN '留宿' WHEN 'system' THEN '系统管理' ELSE l.module END module_label FROM operation_log l LEFT JOIN v_user_identity u ON u.user_id=l.operator_user_id WHERE 1=1");List<Object> args=new ArrayList<>();addLike(sql,args,"u.real_name",filters.get("operator"));String module=Objects.toString(filters.get("module"),"").trim();if(!module.isEmpty()){sql.append(" AND l.module=?");args.add(module);}String roleCode=Objects.toString(filters.get("role"),"").trim();if(!roleCode.isEmpty()){require(Set.of("STUDENT","DORM_MANAGER","REPAIRER","ADMIN").contains(roleCode),"操作角色无效");sql.append(" AND u.role_code=?");args.add(roleCode);}String from=Objects.toString(filters.get("from"),"").trim(),to=Objects.toString(filters.get("to"),"").trim();if(!from.isEmpty()){sql.append(" AND l.occurred_at>=?");args.add(from+" 00:00:00");}if(!to.isEmpty()){sql.append(" AND l.occurred_at<DATE_ADD(?,INTERVAL 1 DAY)");args.add(to);}sql.append(" ORDER BY l.log_id DESC LIMIT 500");return db.rows(sql.toString(),args.toArray());}

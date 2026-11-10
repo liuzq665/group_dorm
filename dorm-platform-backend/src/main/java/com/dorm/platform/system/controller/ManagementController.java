@@ -28,23 +28,23 @@ public class ManagementController {
   counts.put("unread",notice.unreadCount(currentUser));
   counts.put("stayOpen",currentUser.role().equals("REPAIRER")?0:stay.batches(currentUser).size());
   counts.put("averageScore",orders.stream().filter(x->x.get("score")!=null).mapToDouble(x->((Number)x.get("score")).doubleValue()).average().orElse(0));
-  counts.put("repairStatus",repair.dashboardStats(currentUser));
-  if(!currentUser.role().equals("REPAIRER"))counts.put("stayStatus",stay.dashboardStats(currentUser));
-  if(currentUser.role().equals("ADMIN")){
-   int selectedYear=accommodationYear==0?java.time.LocalDate.now().getYear():accommodationYear;
-   if(selectedYear<2000||selectedYear>9999)throw new BizException(400,"住宿统计年份无效");
-   counts.put("accommodationStats",management.accommodationStats(currentUser,selectedYear));
-   counts.put("repairEvaluationStats",repair.evaluationStats(currentUser));
-   counts.put("repairMonthly",repair.monthlyStats(currentUser));
-   counts.put("stayMonthly",stay.monthlyStats(currentUser));
-  }
-  if(currentUser.role().equals("DORM_MANAGER")){
-   counts.put("accommodationStats",management.accommodationStats(currentUser));
-   counts.put("repairMonthly",repair.monthlyStats(currentUser));
-   counts.put("stayMonthly",stay.monthlyStats(currentUser));
-  }
-  if(currentUser.role().equals("REPAIRER")){counts.put("stayApproved",0);counts.put("stayCompleted",0);}
-  else{var stays=stay.list(currentUser);
+  if(Set.of("ADMIN","DORM_MANAGER").contains(currentUser.role())){
+   counts.put("repairStatus",repair.dashboardStats(currentUser));
+   counts.put("stayStatus",stay.dashboardStats(currentUser));
+   if(currentUser.role().equals("ADMIN")){
+    int selectedYear=accommodationYear==0?java.time.LocalDate.now().getYear():accommodationYear;
+    if(selectedYear<2000||selectedYear>9999)throw new BizException(400,"住宿统计年份无效");
+    counts.put("accommodationStats",management.accommodationStats(currentUser,selectedYear));
+    counts.put("repairEvaluationStats",repair.evaluationStats(currentUser));
+    counts.put("repairMonthly",repair.monthlyStats(currentUser));
+    counts.put("stayMonthly",stay.monthlyStats(currentUser));
+   }
+   if(currentUser.role().equals("DORM_MANAGER")){
+    counts.put("accommodationStats",management.accommodationStats(currentUser));
+    counts.put("repairMonthly",repair.monthlyStats(currentUser));
+    counts.put("stayMonthly",stay.monthlyStats(currentUser));
+   }
+   var stays=stay.list(currentUser);
    counts.put("stayApproved",stays.stream().filter(x->"APPROVED".equals(x.get("current_status"))).map(x->x.get("student_id")).distinct().count());
    counts.put("stayCompleted",stays.stream().filter(x->"COMPLETED".equals(x.get("current_status"))).map(x->x.get("student_id")).distinct().count());
   }
@@ -53,7 +53,7 @@ public class ManagementController {
  @GetMapping("/dashboard/stay-analysis") public ApiResponse<?> stayAnalysis(@RequestAttribute CurrentUser currentUser,@RequestParam(defaultValue="year1") String period,@RequestParam(required=false) String batchId,@RequestParam(required=false) String buildingId){return ApiResponse.ok(stay.dashboardAnalysis(currentUser,period,batchId,buildingId));}
  @GetMapping("/dashboard/repair-evaluation") public ApiResponse<?> repairEvaluation(@RequestAttribute CurrentUser currentUser,@RequestParam(defaultValue="year1") String period,@RequestParam(required=false) String repairerIds){
   List<Long> ids=repairerIds==null?null:repairerIds.isBlank()?List.of():Arrays.stream(repairerIds.split(",")).map(String::trim).filter(s->!s.isEmpty()).map(Long::parseLong).toList();
-  return ApiResponse.ok(repair.evaluationAnalysis(currentUser,period,ids));
+  return ApiResponse.ok(currentUser.role().equals("DORM_MANAGER")?repair.managerEvaluationAnalysis(currentUser,period):repair.evaluationAnalysis(currentUser,period,ids));
  }
  @GetMapping("/accommodations/current") public ApiResponse<?> homes(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(management.homes(currentUser,false));}
  @GetMapping("/accommodations/history") public ApiResponse<?> history(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(management.homes(currentUser,true));}
@@ -78,11 +78,9 @@ public class ManagementController {
  @PostMapping("/messages/read") public ApiResponse<?> readMessages(@RequestAttribute CurrentUser currentUser,@RequestBody Map<String,Object>b){Object raw=b.get("ids");if(!(raw instanceof List<?> ids))throw new BizException(400,"请选择要标为已读的消息");notice.readSelected(currentUser,ids.stream().map(Input::id).toList());return ApiResponse.ok();}
  @DeleteMapping("/messages") public ApiResponse<?> deleteMessages(@RequestAttribute CurrentUser currentUser,@RequestBody Map<String,Object>b){Object raw=b.get("ids");if(!(raw instanceof List<?> ids))throw new BizException(400,"请选择要删除的消息");return ApiResponse.ok(Map.of("deletedCount",notice.deleteSelected(currentUser,ids.stream().map(Input::id).toList())));}
  @DeleteMapping("/messages/{id}") public ApiResponse<?> deleteMessage(@RequestAttribute CurrentUser currentUser,@PathVariable long id){return ApiResponse.ok(Map.of("deletedCount",notice.deleteSelected(currentUser,List.of(id))));}
- @PostMapping("/messages/{id}/withdraw") public ApiResponse<?> withdrawMessage(@RequestAttribute CurrentUser currentUser,@PathVariable long id){notice.withdraw(currentUser,id);return ApiResponse.ok();}
  @PostMapping("/files") public ApiResponse<?> upload(@RequestAttribute CurrentUser currentUser,@RequestParam MultipartFile file)throws IOException{return ApiResponse.ok(files.upload(currentUser,file));}
  @GetMapping("/files/{id}") public ResponseEntity<byte[]> file(@RequestAttribute CurrentUser currentUser,@PathVariable long id)throws IOException{var file=files.get(currentUser,id);return ResponseEntity.ok().contentType(MediaType.parseMediaType(file.get("content_type").toString())).header("X-Content-Type-Options","nosniff").body(files.bytes(file));}
  @GetMapping("/admin/users") public ApiResponse<?> users(@RequestAttribute CurrentUser currentUser,@RequestParam Map<String,String> filters){return ApiResponse.ok(management.users(currentUser,filters));}
- @GetMapping("/admin/users/next-number") public ApiResponse<?> nextIdentityNumber(@RequestAttribute CurrentUser currentUser,@RequestParam String roleCode,@RequestParam(required=false) String classId){return ApiResponse.ok(management.nextIdentityNumber(currentUser,roleCode,classId));}
  @GetMapping("/admin/users/{id}") public ApiResponse<?> userDetail(@RequestAttribute CurrentUser currentUser,@PathVariable long id){return ApiResponse.ok(management.userDetail(currentUser,id));}
  @GetMapping("/admin/academic-structure") public ApiResponse<?> academicStructure(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(management.academicStructure(currentUser));}
  @PostMapping("/admin/users") public ApiResponse<?> user(@RequestAttribute CurrentUser currentUser,@RequestBody Map<String,Object>b){return ApiResponse.ok(management.saveUser(currentUser,null,b));}
