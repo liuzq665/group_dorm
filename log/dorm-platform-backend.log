@@ -34245,3 +34245,18 @@ org.springframework.web.servlet.resource.NoResourceFoundException: No static res
 2026-11-10T20:51:27.952+08:00  INFO 30208 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
 2026-11-10T20:51:27.952+08:00  INFO 30208 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
 2026-11-10T20:51:27.953+08:00  INFO 30208 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-11-10T21:06:40.727+08:00  INFO 44420 --- [main] c.dorm.platform.DormPlatformApplication  : Starting DormPlatformApplication using Java 17.0.16 with PID 44420 (E:\workspace\group_dorm\dorm-platform\dorm-platform-backend\target\classes started by liu in E:\workspace\group_dorm\dorm-platform\dorm-platform-backend)
+2026-11-10T21:06:40.731+08:00  INFO 44420 --- [main] c.dorm.platform.DormPlatformApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-11-10T21:06:50.107+08:00  INFO 44420 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-11-10T21:06:50.131+08:00  INFO 44420 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-10T21:06:50.132+08:00  INFO 44420 --- [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.31]
+2026-11-10T21:06:50.230+08:00  INFO 44420 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-11-10T21:06:50.244+08:00  INFO 44420 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 9453 ms
+2026-11-10T21:06:51.023+08:00  INFO 44420 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-11-10T21:06:51.038+08:00  INFO 44420 --- [main] c.dorm.platform.DormPlatformApplication  : Started DormPlatformApplication in 10.94 seconds (process running for 11.401)
+2026-11-10T21:06:53.059+08:00  INFO 44420 --- [scheduling-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-11-10T21:06:53.276+08:00  INFO 44420 --- [scheduling-1] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@569f9503
+2026-11-10T21:06:53.280+08:00  INFO 44420 --- [scheduling-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-11-10T21:07:33.752+08:00  INFO 44420 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-10T21:07:33.752+08:00  INFO 44420 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-10T21:07:33.753+08:00  INFO 44420 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
