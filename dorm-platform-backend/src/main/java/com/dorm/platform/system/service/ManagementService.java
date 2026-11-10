@@ -38,9 +38,10 @@ public class ManagementService {
  public List<Map<String,Object>> beds(CurrentUser u){role(u,"DORM_MANAGER","ADMIN");return db.rows("SELECT bd.*,r.building_id,r.room_no,r.floor_no,r.gender_limit,r.gender_limit room_gender_limit,b.building_name,b.gender_limit building_gender_limit,a.student_name,a.student_id,s.student_no,s.gender student_gender,s.birth_date student_birth_date,s.phone student_phone,s.enrollment_status,sc.class_name,sc.enrollment_year grade,m.major_name,d.department_name FROM bed bd JOIN dorm_room r ON r.room_id=bd.room_id JOIN building b ON b.building_id=r.building_id LEFT JOIN v_accommodation_current a ON a.bed_id=bd.bed_id LEFT JOIN student s ON s.student_id=a.student_id LEFT JOIN student_class sc ON sc.class_id=s.class_id LEFT JOIN major m ON m.major_id=sc.major_id LEFT JOIN department d ON d.department_id=m.department_id WHERE "+scope.buildingFilter(u,"r.building_id")+" ORDER BY b.building_id,r.floor_no,r.room_no,bd.bed_no");}
  public List<Map<String,Object>> users(CurrentUser u){return users(u,Map.of());}
  public List<Map<String,Object>> users(CurrentUser u,Map<String,String> filters){
-  role(u,"ADMIN");
+  role(u,"ADMIN","DORM_MANAGER");
   StringBuilder sql=new StringBuilder("SELECT u.user_id,u.login_account,u.student_no,u.real_name,u.gender,u.birth_date,u.employee_no,u.hire_date,u.phone,u.role_code,u.enabled,u.created_at,u.updated_at,sp.department_id,sp.department_name,sp.major_id,sp.major_name,sp.class_id,sp.class_code,sp.class_name,sp.enrollment_year,sp.grade,sp.enrollment_status,ac.building_name current_building,ac.room_no current_room,ac.bed_id current_bed_id,ac.bed_no current_bed,mp.manager_buildings,mp.on_duty manager_on_duty,rp.on_duty,rp.max_active_orders,rp.repairer_buildings,rp.work_types,rp.active_orders FROM v_user_identity u LEFT JOIN v_student_profile sp ON sp.student_id=u.user_id LEFT JOIN v_accommodation_current ac ON ac.student_id=u.user_id LEFT JOIN v_dorm_manager_profile mp ON mp.manager_user_id=u.user_id LEFT JOIN v_repairer_profile rp ON rp.repairer_user_id=u.user_id WHERE 1=1");
   List<Object> args=new ArrayList<>();
+  if(u.role().equals("DORM_MANAGER")){sql.append(" AND u.role_code='STUDENT' AND ").append(scope.buildingFilter(u,"ac.building_id"));}
   String roleCode=filters.getOrDefault("roleCode","").trim();
   if(!roleCode.isEmpty()){
    require(Set.of("STUDENT","DORM_MANAGER","REPAIRER","ADMIN").contains(roleCode),"角色无效");
@@ -93,8 +94,9 @@ public class ManagementService {
  private void addScopedName(StringBuilder sql,List<Object> args,String raw,String existsSql){String value=Objects.toString(raw,"").trim();if(!value.isEmpty()){sql.append(" AND EXISTS(").append(existsSql).append(")");args.add("%"+value+"%");}}
  private void exact(StringBuilder sql,List<Object> args,String column,String raw){String value=Objects.toString(raw,"").trim();if(!value.isEmpty()){sql.append(" AND ").append(column).append("=?");args.add(value);}}
  public Map<String,Object> userDetail(CurrentUser u,long userId){
-  role(u,"ADMIN");
+  role(u,"ADMIN","DORM_MANAGER");
   Map<String,Object> result=new LinkedHashMap<>(db.one("SELECT user_id,login_account,student_no,real_name,gender,birth_date,employee_no,hire_date,phone,role_code,enabled,created_at,updated_at FROM v_user_identity WHERE user_id=?",userId));
+  if(u.role().equals("DORM_MANAGER")){require("STUDENT".equals(result.get("role_code")),"宿管仅可查看负责楼栋学生资料");require(db.count("SELECT COUNT(*) FROM v_accommodation_current a WHERE a.student_id=? AND "+scope.buildingFilter(u,"a.building_id"),userId)>0,"该学生不在负责楼栋范围内");}
   switch(Objects.toString(result.get("role_code"),"")){
    case "STUDENT"->{
     result.putAll(db.one("SELECT * FROM v_student_profile WHERE student_id=?",userId));
@@ -383,7 +385,7 @@ public class ManagementService {
  @Transactional public void checkout(CurrentUser u,long assignment){role(u,"ADMIN");require(db.update("UPDATE accommodation_assignment SET check_out_date=CURRENT_DATE() WHERE assignment_id=? AND check_out_date IS NULL",assignment)==1,"当前记录已退宿");db.log(u.id(),"dorm","checkout",assignment);}
  private boolean genderMatchesRoom(String studentGender,String roomGender){return ("MALE".equals(studentGender)&&"男生".equals(roomGender))||("FEMALE".equals(studentGender)&&"女生".equals(roomGender));}
  public Map<String,Object> academicStructure(CurrentUser u){
-  role(u,"ADMIN");
+  role(u,"ADMIN","DORM_MANAGER");
   return Map.of("departments",db.rows("SELECT * FROM department ORDER BY department_name"),"majors",db.rows("SELECT m.*,d.department_name FROM major m JOIN department d ON d.department_id=m.department_id ORDER BY d.department_name,m.major_name"),"classes",db.rows("SELECT c.*,m.major_name,d.department_name FROM student_class c JOIN major m ON m.major_id=c.major_id JOIN department d ON d.department_id=m.department_id ORDER BY c.enrollment_year DESC,c.class_name"));
  }
  @Transactional public long academicResource(CurrentUser u,String type,Long resourceId,Map<String,Object>b){

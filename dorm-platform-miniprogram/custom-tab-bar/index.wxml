@@ -1,0 +1,6 @@
+<view class="tabbar">
+  <view class="tab-item {{selected===index?'selected':''}}" wx:for="{{tabs}}" wx:key="pagePath" data-index="{{index}}" data-path="{{item.pagePath}}" bindtap="switchTab">
+    <text class="tab-icon">{{item.icon}}</text><text class="tab-label">{{item.text}}</text>
+    <text wx:if="{{item.pagePath==='pages/messages/index' && unread>0}}" class="tab-badge">{{unread>99?'99+':unread}}</text>
+  </view>
+</view>

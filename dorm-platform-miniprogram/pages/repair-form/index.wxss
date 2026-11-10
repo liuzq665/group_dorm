@@ -1,0 +1,5 @@
+.file-row { display: flex; align-items: center; justify-content: space-between; gap: 14rpx; padding-top: 10rpx; color: #52635f; font-size: 23rpx; }
+.file-row text:first-child { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-remove { flex: none; color: #a43d3b; font-size: 23rpx; }
+.form-card > .button-row { padding-top: 12rpx; }
+.form-card > .button-row button { flex: 1; min-width: 0; }

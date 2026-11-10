@@ -1,0 +1,31 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="loading">正在加载留宿业务…</view>
+  <block wx:else>
+    <view wx:if="{{role==='ADMIN'}}" class="section-heading"><text class="section-title">留宿批次设置</text><button class="primary small-button" bindtap="openBatchForm">新增批次</button></view>
+    <view wx:elif="{{role==='DORM_MANAGER'}}" class="section-title">负责楼栋开放批次</view>
+    <view wx:else class="section-title">开放批次</view>
+    <view wx:if="{{!batches.length}}" class="card muted">当前没有可申请或管理的留宿批次</view>
+    <view wx:for="{{batches}}" wx:key="batch_id" class="batch-card">
+      <view class="row"><text class="batch-title">{{item.batch_name}}</text><text class="status">{{item.vacation_type==='WINTER'?'寒假':'暑假'}} · {{item.current_status==='OPEN'?'开放中':'草稿'}}</text></view>
+      <text class="muted">开放：{{item.open_start_date}} 至 {{item.open_end_date}}</text>
+      <text class="muted">申请截止：{{item.student_deadline || item.application_deadline}}</text>
+      <view wx:if="{{item.materials.length}}" class="material-list"><text wx:for="{{item.materials}}" wx:for-item="material" wx:key="file_id">材料：{{material.original_name}}</text></view>
+      <button wx:if="{{role==='STUDENT'}}" class="primary apply-button" data-id="{{item.batch_id}}" bindtap="apply">填写申请</button>
+      <view wx:if="{{role==='ADMIN'}}" class="button-row"><button wx:if="{{item.current_status==='DRAFT'}}" class="primary" data-id="{{item.batch_id}}" bindtap="publishBatch">发布开放</button><button class="outline" data-id="{{item.batch_id}}" bindtap="uploadMaterial">上传申请材料示例</button><button wx:if="{{item.current_status==='OPEN'}}" class="secondary" data-id="{{item.batch_id}}" bindtap="openSupplement">人工补录</button></view>
+    </view>
+
+    <view class="section-title">{{role==='STUDENT'?'我的申请':role==='DORM_MANAGER'?'负责楼栋申请':'全校申请名单'}}</view>
+    <view wx:if="{{!applications.length}}" class="card muted">暂无留宿申请</view>
+    <view wx:for="{{applications}}" wx:key="application_id" class="batch-card">
+      <view class="row" data-id="{{item.application_id}}" bindtap="detail"><text class="batch-title">{{item.student_name || '我的申请'}} · {{item.batch_name}}</text><text class="status {{item.statusStyle}}">{{item.statusLabel}}</text></view>
+      <text class="muted">{{item.student_no}} {{item.department_name}} {{item.major_name}} {{item.class_name}}</text>
+      <text class="muted">{{item.dateRangeText || '尚未填写日期'}} · {{item.reason || item.review_reason || '无补充说明'}}</text>
+      <view wx:if="{{item.attachments.length}}" class="material-list"><text wx:for="{{item.attachments}}" wx:for-item="attachment" wx:key="file_id">附件：{{attachment.original_name}}</text></view>
+      <view wx:if="{{role==='DORM_MANAGER' && item.current_status==='PENDING_REVIEW'}}" class="button-row"><button class="secondary" data-id="{{item.application_id}}" catchtap="lock">进入审核</button></view>
+      <view wx:if="{{item.canReview}}" class="button-row"><button class="primary" data-id="{{item.application_id}}" catchtap="review">审核申请</button></view>
+    </view>
+  </block>
+
+  <view wx:if="{{batchForm}}" class="modal-mask"><view class="form-panel"><text class="section-title">配置留宿批次</text><input class="input" placeholder="批次编号" data-key="batchCode" value="{{batchForm.batchCode}}" bindinput="batchInput"/><input class="input" placeholder="批次名称" data-key="batchName" value="{{batchForm.batchName}}" bindinput="batchInput"/><input class="input" type="number" placeholder="学年" data-key="academicYear" value="{{batchForm.academicYear}}" bindinput="batchInput"/><view class="button-row"><button class="{{batchForm.vacationType==='SUMMER'?'primary':'outline'}}" data-value="SUMMER" bindtap="vacation">暑假</button><button class="{{batchForm.vacationType==='WINTER'?'primary':'outline'}}" data-value="WINTER" bindtap="vacation">寒假</button></view><picker mode="date" data-key="openStartDate" value="{{batchForm.openStartDate}}" bindchange="batchDate"><view class="input">开放开始：{{batchForm.openStartDate || '选择日期'}}</view></picker><picker mode="date" data-key="openEndDate" value="{{batchForm.openEndDate}}" bindchange="batchDate"><view class="input">开放结束：{{batchForm.openEndDate || '选择日期'}}</view></picker><picker mode="date" data-key="applicationDeadline" value="{{batchForm.applicationDeadline}}" bindchange="batchDate"><view class="input">申请截止：{{batchForm.applicationDeadline || '选择日期'}}</view></picker><textarea class="textarea" placeholder="留宿注意事项" data-key="instructions" value="{{batchForm.instructions}}" bindinput="batchInput"/><view class="button-row"><button class="outline" bindtap="closeBatchForm">取消</button><button class="primary" bindtap="saveBatch">保存批次</button></view></view></view>
+  <view wx:if="{{supplementForm}}" class="modal-mask"><view class="form-panel"><text class="section-title">人工补录留宿人员</text><picker range="{{students}}" range-key="real_name" value="{{supplementForm.studentIndex}}" bindchange="chooseSupplementStudent"><view class="input">{{students[supplementForm.studentIndex].real_name || '选择在住宿学生'}} · {{students[supplementForm.studentIndex].student_no || ''}}</view></picker><input class="input" placeholder="补录原因" data-key="reason" value="{{supplementForm.reason}}" bindinput="supplementInput"/><picker mode="date" data-key="startDate" value="{{supplementForm.startDate}}" bindchange="supplementDate"><view class="input">留宿开始：{{supplementForm.startDate || '选择日期'}}</view></picker><picker mode="date" data-key="endDate" value="{{supplementForm.endDate}}" bindchange="supplementDate"><view class="input">留宿结束：{{supplementForm.endDate || '选择日期'}}</view></picker><view class="button-row"><button class="outline" bindtap="closeSupplement">取消</button><button class="primary" bindtap="saveSupplement">直接通过并补录</button></view></view></view>
+</view>

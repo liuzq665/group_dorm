@@ -1,0 +1,32 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="loading">正在加载工单…</view>
+  <block wx:elif="{{detail}}">
+    <view class="hero"><text class="hero-kicker">{{detail.order_no}}</text><text class="hero-title">{{detail.title}}</text><text class="hero-copy">{{detail.statusLabel}}</text></view>
+    <view class="card"><text class="section-inline">工单信息</text><text class="detail-copy">{{detail.description}}</text><view class="divider"></view><view class="row"><text class="label">申请学生</text><text>{{detail.student_name}}</text></view><view class="row"><text class="label">位置</text><text>{{detail.building_name}} {{detail.room_no}}</text></view><view class="row"><text class="label">维修人员</text><text>{{detail.repairer_name || '暂无派单'}}</text></view><view class="row"><text class="label">维修结果</text><text>{{detail.result_text || '暂未提交'}}</text></view><view class="row"><text class="label">审核意见</text><text>{{detail.reject_reason || '-'}}</text></view><view class="row" wx:if="{{detail.manual_reason}}"><text class="label">人工处理原因</text><text>{{detail.manual_reason}}</text></view></view>
+    <view class="card" wx:if="{{detail.files.length}}"><text class="section-inline">附件与现场照片</text><view class="row" wx:for="{{detail.files}}" wx:key="file_id" data-file="{{item}}" bindtap="preview"><text>{{item.original_name}}</text><text class="link">预览</text></view></view>
+    <view class="card" wx:if="{{detail.dispatches.length}}"><text class="section-inline">派单记录</text><view class="row" wx:for="{{detail.dispatches}}" wx:key="dispatch_id"><text>{{item.repairer_name}} · {{item.dispatch_status}}</text><text class="muted">{{item.created_at}}</text></view></view>
+    <view class="card" wx:if="{{detail.audits.length}}"><text class="section-inline">审核记录</text><view class="row" wx:for="{{detail.audits}}" wx:key="audit_id"><text>{{item.result}} · {{item.reason || '-'}}</text><text class="muted">{{item.created_at}}</text></view></view>
+    <view class="card" wx:if="{{detail.delays.length}}"><text class="section-inline">延期记录</text><view class="row" wx:for="{{detail.delays}}" wx:key="request_id"><text>{{item.current_status}} · {{item.reason}}</text><text class="muted">{{item.expected_finish_at}}</text></view></view>
+    <view class="card" wx:if="{{detail.reworkRequests.length}}"><text class="section-inline">重修申请记录</text><view class="history-entry" wx:for="{{detail.reworkRequests}}" wx:key="request_id"><view class="row"><text class="status {{item.request_status==='APPROVED'?'done':item.request_status==='REJECTED'?'danger':'warning'}}">{{item.request_status==='APPROVED'?'已通过':item.request_status==='REJECTED'?'已驳回':'审核中'}}</text><text class="muted">{{item.created_at}}</text></view><text class="detail-copy">申请原因：{{item.reason}}</text><text wx:if="{{item.review_reason}}" class="muted">审核意见：{{item.review_reason}}</text></view></view>
+    <view class="card" wx:if="{{detail.resultHistory.length}}"><text class="section-inline">历次维修结果</text><view class="history-entry" wx:for="{{detail.resultHistory}}" wx:key="history_id"><view class="row"><text>第 {{item.round_no}} 轮 · {{item.repairer_name}}</text><text class="muted">{{item.created_at}}</text></view><text class="detail-copy">{{item.result_text}}</text></view></view>
+    <view class="card" wx:if="{{detail.score}}"><text class="section-inline">学生评价</text><view class="row"><text>评分</text><text class="rating-value">{{detail.score}} / 5</text></view><text class="detail-copy">{{detail.comment || '未填写评价内容'}}</text></view>
+    <view class="button-row">
+      <button wx:if="{{role==='STUDENT' && (detail.current_status==='DRAFT'||detail.current_status==='PENDING_EDIT')}}" class="secondary" bindtap="edit">编辑</button>
+      <button wx:if="{{role==='STUDENT' && (detail.current_status==='DRAFT'||detail.current_status==='PENDING_EDIT')}}" class="primary" data-action="submit" bindtap="simple">提交审核</button>
+      <button wx:if="{{role==='STUDENT' && (detail.current_status==='DRAFT'||detail.current_status==='PENDING_EDIT'||detail.current_status==='PENDING_REVIEW')}}" class="danger" data-action="cancel" bindtap="simple">撤销</button>
+      <button wx:if="{{role==='STUDENT' && detail.current_status==='CANCELLED'}}" class="primary" data-action="resubmit" bindtap="simple">重新提交</button>
+      <button wx:if="{{(role==='DORM_MANAGER'||role==='ADMIN') && detail.current_status==='PENDING_REVIEW'}}" class="primary" bindtap="review">审核</button>
+      <button wx:if="{{(role==='DORM_MANAGER'||role==='ADMIN') && (detail.current_status==='PENDING_ASSIGN'||detail.current_status==='PENDING_MANUAL')}}" class="primary" bindtap="dispatch">派单</button>
+      <button wx:if="{{(role==='DORM_MANAGER'||role==='ADMIN') && detail.current_status==='PENDING_MANUAL' && !detail.urgent && !detail.abnormal && !detail.parent_order_id}}" class="outline" bindtap="retry">重新自动派单</button>
+      <button wx:if="{{role==='REPAIRER' && detail.current_status==='PENDING_ACCEPT'}}" class="primary" data-accept="true" bindtap="decision">接单</button>
+      <button wx:if="{{role==='REPAIRER' && detail.current_status==='PENDING_ACCEPT'}}" class="danger" data-accept="false" bindtap="decision">拒单</button>
+      <button wx:if="{{role==='REPAIRER' && (detail.current_status==='ACCEPTED'||detail.current_status==='DELAYED')}}" class="primary" bindtap="submitResult">提交维修结果</button>
+      <button wx:if="{{role==='REPAIRER' && detail.current_status==='ACCEPTED'}}" class="outline" bindtap="delay">申请延期</button>
+      <button wx:if="{{(role==='DORM_MANAGER'||role==='ADMIN') && detail.current_status==='DELAYED'}}" class="primary" data-pass="true" bindtap="delayReview">通过延期</button>
+      <button wx:if="{{(role==='DORM_MANAGER'||role==='ADMIN') && detail.current_status==='DELAYED'}}" class="danger" data-pass="false" bindtap="delayReview">驳回延期</button>
+      <button wx:if="{{role==='STUDENT' && detail.current_status==='REPAIRED'}}" class="secondary" bindtap="confirmRepair" loading="{{actionBusy}}" disabled="{{actionBusy}}">确认完成并评分（默认5分）</button>
+      <button wx:if="{{role==='STUDENT' && detail.current_status==='REPAIRED'}}" class="outline" bindtap="rework">申请重修</button>
+      <button wx:if="{{role==='STUDENT' && detail.current_status==='CONFIRMED'}}" class="primary" bindtap="evaluate">评价</button>
+    </view>
+  </block>
+</view>

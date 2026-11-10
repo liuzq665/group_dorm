@@ -1,0 +1,83 @@
+.role-hero {
+  position: relative;
+  min-height: 192rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+  border-left: 8rpx solid #63b99b;
+}
+.role-hero .hero-title, .role-hero .hero-copy, .role-hero .hero-kicker, .hero-unread { position: relative; z-index: 1; }
+.role-hero.role-STUDENT { background: #244f70; border-left-color: #63c0d2; }
+.role-hero.role-DORM_MANAGER { background: #315d51; border-left-color: #d6ad58; }
+.role-hero.role-REPAIRER { background: #344f70; border-left-color: #70c2af; }
+.role-hero.role-ADMIN { background: #344f58; border-left-color: #e19a62; }
+.hero-unread { align-self: flex-start; margin-top: 14rpx; padding: 6rpx 12rpx; color: #fff; background: rgba(255,255,255,.12); border-radius: 4rpx; font-size: 23rpx; }
+
+.page > .card { margin-top: 18rpx; }
+.home-address { display: block; margin-top: 14rpx; color: #234441; font-size: 31rpx; line-height: 1.45; font-weight: 650; }
+.metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12rpx; margin-top: 16rpx; }
+.metric-card {
+  min-width: 0;
+  min-height: 126rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 18rpx 20rpx;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1rpx solid #e0e8e5;
+  border-top: 5rpx solid #3c8c77;
+  border-radius: 6rpx;
+}
+.metric-card:nth-child(2) { border-top-color: #b87942; }
+.metric-card:nth-child(3) { border-top-color: #547f9b; }
+.metric-card:nth-child(4) { border-top-color: #a65d59; }
+.metric-wide { grid-column: 1 / -1; min-height: 104rpx; }
+.metric-number { color: #203c3a; font-size: 38rpx; line-height: 1.15; font-weight: 700; }
+.metric-label { margin-top: 8rpx; color: #63716f; font-size: 23rpx; line-height: 1.35; }
+
+.section-title { margin-top: 28rpx; margin-bottom: 12rpx; }
+.service-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10rpx; }
+.service-card {
+  position: relative;
+  min-width: 0;
+  min-height: 174rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10rpx;
+  padding: 16rpx;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1rpx solid #e1e8e5;
+  border-radius: 6rpx;
+}
+.service-mark {
+  width: 50rpx;
+  height: 50rpx;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #176fc1;
+  background: #e8f2fa;
+  border-radius: 5rpx;
+  font-size: 23rpx;
+  font-weight: 650;
+}
+.service-copy { width: 100%; min-width: 0; padding-right: 18rpx; box-sizing: border-box; }
+.service-title { display: block; color: #293d3b; font-size: 27rpx; line-height: 1.4; font-weight: 650; }
+.service-copy .muted { display: block; margin-top: 4rpx; font-size: 21rpx; line-height: 1.4; overflow-wrap: anywhere; }
+.service-arrow { position: absolute; top: 20rpx; right: 14rpx; color: #8a9894; font-size: 31rpx; }
+.service-card:nth-child(4n+2) .service-mark { color: #a85b44; background: #f8eee9; }
+.service-card:nth-child(4n+3) .service-mark { color: #4d7452; background: #edf4e9; }
+.service-card:nth-child(4n) .service-mark { color: #8a671e; background: #f8f2e3; }
+.home-workload { margin-top: 18rpx; padding: 20rpx; background: #fff; border: 1rpx solid #e0e8e5; border-radius: 6rpx; }
+.home-workload-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12rpx; margin-bottom: 12rpx; }
+.home-workload-heading .muted { text-align: right; font-size: 21rpx; }
+.status-group + .status-group { margin-top: 14rpx; padding-top: 12rpx; border-top: 1rpx solid #e8edeb; }
+.status-group-title { display: block; margin-bottom: 8rpx; color: #566864; font-size: 23rpx; font-weight: 600; }
+.status-chip-list { display: flex; flex-wrap: wrap; gap: 8rpx; }
+.status-chip { display: inline-flex; align-items: center; gap: 8rpx; max-width: 100%; padding: 7rpx 10rpx; color: #435853; background: #f1f5f3; border-radius: 4rpx; font-size: 21rpx; }
+.status-chip-count { color: #176d62; font-weight: 700; }
