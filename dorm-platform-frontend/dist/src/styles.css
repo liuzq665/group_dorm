@@ -393,7 +393,6 @@ body:has(.repair-status-tabs) .bulk-table .table td:last-child .actions button {
 .shell:has(.repair-status-tabs) .repair-orders-table { overflow-x:hidden; overflow-y:visible; }
 .shell:has(.repair-status-tabs) .repair-orders-table .table { width:100%; min-width:0; table-layout:fixed; }
 .shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table th,.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table td { padding-inline:5px; }
-.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table th:nth-child(2),.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table td:nth-child(2) { width:8%; }
 .shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table th:nth-child(2),.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table td:nth-child(2) { width:10%; }
 .shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table th:nth-child(3),.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table td:nth-child(3) { width:11.5%; }
 .shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table th:nth-child(4),.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table td:nth-child(4) { width:7.5%; }
