@@ -1,5 +1,0 @@
-.card .row { align-items: flex-start; padding: 10rpx 0; border-bottom: 1rpx solid #e8edeb; }
-.card .row:last-child { border-bottom: 0; }
-.card .row > text:last-child { max-width: 65%; color: #334743; text-align: right; overflow-wrap: anywhere; }
-.detail-copy { display: block; margin: 14rpx 0; color: #3c504c; line-height: 1.65; white-space: pre-wrap; }
-.button-row button { flex: 1 1 180rpx; }

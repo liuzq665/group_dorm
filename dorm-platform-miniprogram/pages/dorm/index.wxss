@@ -1,9 +1,0 @@
-.page-heading { align-items: center; margin-bottom: 16rpx; }
-.page-heading .muted { display: block; margin-top: 4rpx; }
-.segmented { display: flex; gap: 4rpx; margin-bottom: 14rpx; padding: 4rpx; background: #e5ebe8; border-radius: 6rpx; }
-.segment { flex: 1; padding: 12rpx 8rpx; color: #5a6a66; text-align: center; font-size: 24rpx; }
-.segment.selected { color: #fff; background: #286f61; border-radius: 4rpx; font-weight: 600; }
-.record-list { display: flex; flex-direction: column; gap: 9rpx; }
-.record-row { min-width: 0; padding: 18rpx; background: #fff; border: 1rpx solid #e1e8e5; border-radius: 6rpx; }
-.record-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12rpx; }
-.record-location, .record-time { display: block; margin-top: 7rpx; color: #62716e; font-size: 23rpx; line-height: 1.45; overflow-wrap: anywhere; }

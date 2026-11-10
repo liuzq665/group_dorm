@@ -11,6 +11,7 @@ import java.io.IOException;
 public class StayController {
  private final StayService service; private final FileService files;
  public StayController(StayService service,FileService files){this.service=service;this.files=files;}
+ @PostMapping("/batches/{id}/lock") public ApiResponse<?> lockBatch(@RequestAttribute CurrentUser currentUser,@PathVariable long id){service.lockBatch(currentUser,id);return ApiResponse.ok();}
  @GetMapping("/current") public ApiResponse<?> batches(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(service.batches(currentUser));}
  @GetMapping("/all-batches") public ApiResponse<?> allBatches(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(service.allBatches(currentUser));}
  @GetMapping("/applications") public ApiResponse<?> list(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(service.list(currentUser));}
@@ -25,7 +26,6 @@ public class StayController {
  @PutMapping("/batches/{id}") public ApiResponse<?> configure(@RequestAttribute CurrentUser currentUser,@PathVariable long id,@RequestBody Map<String,Object>b){return ApiResponse.ok(service.configure(currentUser,id,b));}
  @DeleteMapping("/batches/{id}") public ApiResponse<?> deleteBatch(@RequestAttribute CurrentUser currentUser,@PathVariable long id){service.deleteBatch(currentUser,id);return ApiResponse.ok();}
  @PostMapping("/batches/{id}/publish") public ApiResponse<?> publish(@RequestAttribute CurrentUser currentUser,@PathVariable long id,@RequestBody Map<String,Object>b){service.publish(currentUser,id,b);return ApiResponse.ok();}
- @PutMapping("/batches/{id}/building-rule") public ApiResponse<?> configureBuildingRule(@RequestAttribute CurrentUser currentUser,@PathVariable long id,@RequestBody Map<String,Object>b){service.configureBuildingRule(currentUser,id,b);return ApiResponse.ok();}
  @PostMapping("/batches/{id}/materials") public ApiResponse<?> uploadMaterial(@RequestAttribute CurrentUser currentUser,@PathVariable long id,@RequestParam MultipartFile file)throws IOException{var uploaded=files.uploadStayMaterial(currentUser,file);service.attachMaterial(currentUser,id,((Number)uploaded.get("fileId")).longValue());return ApiResponse.ok(uploaded);}
  @DeleteMapping("/batches/{id}/materials/{fileId}") public ApiResponse<?> removeMaterial(@RequestAttribute CurrentUser currentUser,@PathVariable long id,@PathVariable long fileId){service.removeMaterial(currentUser,id,fileId);return ApiResponse.ok();}
 }

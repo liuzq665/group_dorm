@@ -1,2 +1,0 @@
-const { request, showError } = require('../../utils/request');
-Page({ data:{ loading:true, home:null, roommates:[] }, onShow(){if(getApp().requireStudent())this.load();}, async load(){this.setData({loading:true});try{const [homes,roommates]=await Promise.all([request('/accommodations/current'),request('/accommodations/roommates')]);this.setData({home:homes[0]||null,roommates});}catch(e){showError(e);}finally{this.setData({loading:false});}} });

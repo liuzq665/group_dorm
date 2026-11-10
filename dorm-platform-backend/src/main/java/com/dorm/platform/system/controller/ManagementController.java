@@ -39,11 +39,6 @@ public class ManagementController {
     counts.put("repairMonthly",repair.monthlyStats(currentUser));
     counts.put("stayMonthly",stay.monthlyStats(currentUser));
    }
-   if(currentUser.role().equals("DORM_MANAGER")){
-    counts.put("accommodationStats",management.accommodationStats(currentUser));
-    counts.put("repairMonthly",repair.monthlyStats(currentUser));
-    counts.put("stayMonthly",stay.monthlyStats(currentUser));
-   }
    var stays=stay.list(currentUser);
    counts.put("stayApproved",stays.stream().filter(x->"APPROVED".equals(x.get("current_status"))).map(x->x.get("student_id")).distinct().count());
    counts.put("stayCompleted",stays.stream().filter(x->"COMPLETED".equals(x.get("current_status"))).map(x->x.get("student_id")).distinct().count());
@@ -53,7 +48,7 @@ public class ManagementController {
  @GetMapping("/dashboard/stay-analysis") public ApiResponse<?> stayAnalysis(@RequestAttribute CurrentUser currentUser,@RequestParam(defaultValue="year1") String period,@RequestParam(required=false) String batchId,@RequestParam(required=false) String buildingId){return ApiResponse.ok(stay.dashboardAnalysis(currentUser,period,batchId,buildingId));}
  @GetMapping("/dashboard/repair-evaluation") public ApiResponse<?> repairEvaluation(@RequestAttribute CurrentUser currentUser,@RequestParam(defaultValue="year1") String period,@RequestParam(required=false) String repairerIds){
   List<Long> ids=repairerIds==null?null:repairerIds.isBlank()?List.of():Arrays.stream(repairerIds.split(",")).map(String::trim).filter(s->!s.isEmpty()).map(Long::parseLong).toList();
-  return ApiResponse.ok(currentUser.role().equals("DORM_MANAGER")?repair.managerEvaluationAnalysis(currentUser,period):repair.evaluationAnalysis(currentUser,period,ids));
+  return ApiResponse.ok(repair.evaluationAnalysis(currentUser,period,ids));
  }
  @GetMapping("/accommodations/current") public ApiResponse<?> homes(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(management.homes(currentUser,false));}
  @GetMapping("/accommodations/history") public ApiResponse<?> history(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(management.homes(currentUser,true));}

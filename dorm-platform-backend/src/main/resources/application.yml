@@ -1,4 +1,4 @@
-﻿server:
+server:
   port: 8080
 logging:
   file:
@@ -18,7 +18,3 @@ spring:
   jackson:
     time-zone: Asia/Shanghai
     date-format: yyyy-MM-dd HH:mm:ss
-
-backup:
-  executable: E:/develop/mysql/files/MySQL Server 8.0/bin/mysqldump.exe
-
