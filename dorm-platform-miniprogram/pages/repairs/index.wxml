@@ -11,6 +11,7 @@
       <text class="record-no">{{item.order_no}} · {{item.category_name || '未分类'}}</text>
       <text wx:if="{{role!=='STUDENT'}}" class="record-location">{{item.building_name}} {{item.room_no}} · {{item.student_name}}</text>
       <text wx:if="{{role==='REPAIRER'}}" class="record-location">{{item.current_status==='PENDING_ACCEPT'?'请查看详情并决定是否接单':item.repair_deadline?'维修期限：'+item.repair_deadline:'待处理维修任务'}}</text>
+      <text wx:if="{{item.isHistory && role!=='STUDENT'}}" class="record-location">评分：{{item.score == null || item.score === '' ? '-' : item.score + ' 分'}}{{item.comment ? ' · ' + item.comment : ''}}</text>
       <text wx:if="{{role==='ADMIN' && item.dispatchText}}" class="dispatch-hint">{{item.dispatchText}}</text>
       <text class="record-time">更新于 {{item.updated_at}}</text>
     </view>

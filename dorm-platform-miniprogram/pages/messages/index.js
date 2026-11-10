@@ -9,7 +9,7 @@ Page({
   async load() {
     this.setData({ loading: true });
     try {
-      const sourceOptions = this.data.role === 'ADMIN' ? [['SYSTEM', '系统通知'], ['DORM_MANAGER', '宿管发布'], ['MINE', '我发布的']] : this.data.role === 'DORM_MANAGER' ? [['SYSTEM', '系统通知'], ['ADMIN', '系统管理员发布'], ['MINE', '我发布的']] : [['SYSTEM', '系统通知'], ['ADMIN', '系统管理员发布'], ['DORM_MANAGER', '宿管发布']];
+      const sourceOptions = this.data.role === 'ADMIN' ? [['ALL', '全部'], ['SYSTEM', '系统通知'], ['DORM_MANAGER', '宿管发布'], ['MINE', '我发布的']] : this.data.role === 'DORM_MANAGER' ? [['ALL', '全部'], ['SYSTEM', '系统通知'], ['ADMIN', '系统管理员发布'], ['MINE', '我发布的']] : [['ALL', '全部'], ['SYSTEM', '系统通知'], ['ADMIN', '系统管理员发布'], ['DORM_MANAGER', '宿管发布']];
       const source = sourceOptions.some(([key]) => key === this.data.source) ? this.data.source : 'SYSTEM';
       const query = `sender=${encodeURIComponent(source)}&read=${encodeURIComponent(this.data.read)}` + (this.data.role === 'REPAIRER' && this.data.buildingId ? `&building=${encodeURIComponent(this.data.buildingId)}` : '');
       const [items, unread] = await Promise.all([request(`/messages?${query}`), request('/messages/unread-count')]);

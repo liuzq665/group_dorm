@@ -17,6 +17,7 @@ Page({
       const items = applications.map(item => ({ ...item, statusLabel: statusText(item.current_status), statusStyle: statusClass(item.current_status), dateRangeText: (item.dateRanges || []).map(range => `${range.startDate || range.start_date} 至 ${range.endDate || range.end_date}`).join('、'), canReview: ['DORM_MANAGER', 'ADMIN'].includes(this.data.role) && (this.data.role === 'ADMIN' ? ['PENDING_REVIEW', 'UNDER_REVIEW'].includes(item.current_status) : item.current_status === 'UNDER_REVIEW') }));
       this.setData({ batches, applications: items });
       if (this.data.role === 'ADMIN') this.setData({ students: await request('/admin/users?roleCode=STUDENT&accommodation=ASSIGNED&enabled=true') });
+      else if (this.data.role === 'DORM_MANAGER') this.setData({ students: (await request('/accommodations/current')).map(item => ({ user_id: item.student_id, real_name: item.student_name, student_no: item.student_no, building_name: item.building_name, room_no: item.room_no })) });
     } catch (error) { showError(error); } finally { this.setData({ loading: false }); }
   },
   apply(e) { wx.navigateTo({ url: `/pages/stay-form/index?batchId=${e.currentTarget.dataset.id}` }); },

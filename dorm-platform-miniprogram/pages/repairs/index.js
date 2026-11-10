@@ -20,7 +20,7 @@ Page({
       const path = history ? '/repair-history' : '/repair-orders';
       const keyword = this.data.filters.keyword.trim();
       const [rows, catalog] = await Promise.all([request(path + (keyword ? `?orderNo=${encodeURIComponent(keyword)}` : '')), request('/repair-catalog')]);
-      const items = rows.map(item => ({ ...item, statusLabel: statusText(item.current_status), statusStyle: statusClass(item.current_status), dispatchText: item.dispatch_availability || '' }));
+      const items = rows.map(item => ({ ...item, isHistory: history, statusLabel: statusText(item.current_status), statusStyle: statusClass(item.current_status), dispatchText: item.dispatch_availability || '' }));
       const selectedStatuses = statusesByTab[tab] || [];
       const active = items.filter(x => {
         if (role === 'STUDENT' && tab === 'history') return ['ARCHIVED', 'CLOSED', 'CANCELLED'].includes(x.current_status);
