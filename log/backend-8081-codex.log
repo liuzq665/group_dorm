@@ -417,3 +417,4 @@ com.dorm.platform.common.BizException: 编号格式无效
 2026-11-07T16:06:52.829+08:00  WARN 18444 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17h57m1s700ms253?s600ns).
 2026-11-07T19:29:10.158+08:00  WARN 18444 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m23s836ms132?s400ns).
 2026-11-09T08:32:48.183+08:00  WARN 18444 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=8h23m24s711ms287?s99ns).
+2026-11-10T09:57:35.689+08:00  WARN 18444 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=10h58m14s574ms948?s799ns).

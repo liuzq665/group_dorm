@@ -386,19 +386,33 @@ button:disabled { cursor:wait; opacity:.6; }
 .error-toast { background:#b7473e; }
 body:has(.repair-status-tabs) .table { width:100%; min-width:0; table-layout:fixed; }
 body:has(.repair-status-tabs) .bulk-table .table { width:100%; min-width:0; table-layout:fixed; }
-body:has(.repair-status-tabs) .bulk-table .table th.select-col,body:has(.repair-status-tabs) .bulk-table .table td.select-col { width:34px; min-width:34px; padding-inline:5px; text-align:center; }
+body:has(.repair-status-tabs) .bulk-table .table th.select-col,body:has(.repair-status-tabs) .bulk-table .table td.select-col { width:28px; min-width:28px; padding-inline:2px; text-align:left; }
 body:has(.repair-status-tabs) .bulk-table .table td:last-child { width:21%; min-width:0; white-space:nowrap; }
 body:has(.repair-status-tabs) .bulk-table .table td:last-child .actions { display:flex; flex-flow:row nowrap; justify-content:flex-start; width:100%; max-width:100%; overflow:visible; gap:4px; }
 body:has(.repair-status-tabs) .bulk-table .table td:last-child .actions button { flex:0 1 auto; min-width:0; padding:5px 5px; font-size:12px; white-space:nowrap; }
-.repair-orders-student .table th.select-col,.repair-orders-student .table td.select-col,.repair-orders-repairer .table th.select-col,.repair-orders-repairer .table td.select-col { width:34px; min-width:34px; padding-inline:5px; text-align:center; }
-.repair-orders-student .table th:nth-child(2),.repair-orders-student .table td:nth-child(2),.repair-orders-repairer .table th:nth-child(2),.repair-orders-repairer .table td:nth-child(2) { width:9.5%; }
-.repair-orders-student .table th:nth-child(3),.repair-orders-student .table td:nth-child(3),.repair-orders-repairer .table th:nth-child(3),.repair-orders-repairer .table td:nth-child(3) { width:10.5%; }
-.repair-orders-student .table th:nth-child(4),.repair-orders-student .table td:nth-child(4),.repair-orders-repairer .table th:nth-child(4),.repair-orders-repairer .table td:nth-child(4) { width:8.5%; }
-.repair-orders-student .table th:nth-child(5),.repair-orders-student .table td:nth-child(5),.repair-orders-repairer .table th:nth-child(5),.repair-orders-repairer .table td:nth-child(5) { width:7.5%; }
-.repair-orders-student .table th:nth-child(6),.repair-orders-student .table td:nth-child(6),.repair-orders-repairer .table th:nth-child(6),.repair-orders-repairer .table td:nth-child(6) { width:5.7%; }
-.repair-orders-student .table th:nth-child(7),.repair-orders-student .table td:nth-child(7),.repair-orders-repairer .table th:nth-child(7),.repair-orders-repairer .table td:nth-child(7) { width:8.7%; }
-.repair-orders-student .table th:nth-child(8),.repair-orders-student .table td:nth-child(8),.repair-orders-repairer .table th:nth-child(8),.repair-orders-repairer .table td:nth-child(8) { width:9.8%; }
-.repair-orders-student .table th:nth-child(9),.repair-orders-student .table td:nth-child(9),.repair-orders-repairer .table th:nth-child(9),.repair-orders-repairer .table td:nth-child(9) { width:8.8%; }
+.shell:has(.repair-status-tabs) .repair-orders-table { overflow-x:hidden; overflow-y:visible; }
+.shell:has(.repair-status-tabs) .repair-orders-table .table { width:100%; min-width:0; table-layout:fixed; }
+.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table th,.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table td { padding-inline:5px; }
+.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table th:nth-child(2),.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table td:nth-child(2) { width:8%; }
+.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table th:nth-child(3),.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table td:nth-child(3) { width:11.5%; }
+.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table th:nth-child(4),.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table td:nth-child(4) { width:7.5%; }
+.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table th:nth-child(5),.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table td:nth-child(5) { width:6.5%; }
+.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table th:nth-child(6),.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table td:nth-child(6) { width:4.5%; }
+.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table th:nth-child(7),.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table td:nth-child(7) { width:8%; }
+.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table th:nth-child(8),.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table td:nth-child(8) { width:8.5%; }
+.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table th:nth-child(9),.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table td:nth-child(9) { width:7.5%; }
+.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table th:last-child,.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table td:last-child { width:30%; min-width:0; white-space:nowrap; }
+.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table td:last-child .actions { display:flex; flex-flow:row nowrap; align-items:center; justify-content:flex-start; gap:4px; width:100%; max-width:100%; overflow:visible; }
+.shell:has(.repair-status-tabs) .repair-orders-dorm_manager .table td:last-child .actions button { flex:0 0 auto; min-width:0; padding:5px 5px; font-size:12px; white-space:nowrap; }
+.repair-orders-student .table th.select-col,.repair-orders-student .table td.select-col,.repair-orders-repairer .table th.select-col,.repair-orders-repairer .table td.select-col { width:36px; min-width:36px; padding-inline:8px 4px; text-align:left; }
+.repair-orders-student .table th:nth-child(2),.repair-orders-student .table td:nth-child(2),.repair-orders-repairer .table th:nth-child(2),.repair-orders-repairer .table td:nth-child(2) { width:9%; }
+.repair-orders-student .table th:nth-child(3),.repair-orders-student .table td:nth-child(3),.repair-orders-repairer .table th:nth-child(3),.repair-orders-repairer .table td:nth-child(3) { width:11%; }
+.repair-orders-student .table th:nth-child(4),.repair-orders-student .table td:nth-child(4),.repair-orders-repairer .table th:nth-child(4),.repair-orders-repairer .table td:nth-child(4) { width:8%; }
+.repair-orders-student .table th:nth-child(5),.repair-orders-student .table td:nth-child(5),.repair-orders-repairer .table th:nth-child(5),.repair-orders-repairer .table td:nth-child(5) { width:7%; }
+.repair-orders-student .table th:nth-child(6),.repair-orders-student .table td:nth-child(6),.repair-orders-repairer .table th:nth-child(6),.repair-orders-repairer .table td:nth-child(6) { width:5%; }
+.repair-orders-student .table th:nth-child(7),.repair-orders-student .table td:nth-child(7),.repair-orders-repairer .table th:nth-child(7),.repair-orders-repairer .table td:nth-child(7) { width:8%; }
+.repair-orders-student .table th:nth-child(8),.repair-orders-student .table td:nth-child(8),.repair-orders-repairer .table th:nth-child(8),.repair-orders-repairer .table td:nth-child(8) { width:9%; }
+.repair-orders-student .table th:nth-child(9),.repair-orders-student .table td:nth-child(9),.repair-orders-repairer .table th:nth-child(9),.repair-orders-repairer .table td:nth-child(9) { width:8%; }
 .repair-orders-student .table th:nth-child(10),.repair-orders-student .table td:nth-child(10),.repair-orders-repairer .table th:nth-child(10),.repair-orders-repairer .table td:nth-child(10) { width:4.5%; }
 body:has(.repair-status-tabs) .bulk-table.repair-orders-student .table th:last-child,body:has(.repair-status-tabs) .bulk-table.repair-orders-student .table td:last-child,body:has(.repair-status-tabs) .bulk-table.repair-orders-repairer .table th:last-child,body:has(.repair-status-tabs) .bulk-table.repair-orders-repairer .table td:last-child { width:26.5%; min-width:0; white-space:nowrap; }
 body:has(.repair-status-tabs) .bulk-table.repair-orders-student .table td:last-child .actions,body:has(.repair-status-tabs) .bulk-table.repair-orders-repairer .table td:last-child .actions { display:flex; flex-flow:row nowrap; justify-content:flex-start; align-items:center; width:100%; max-width:100%; overflow:visible; gap:4px; }
@@ -492,6 +506,8 @@ body:has(.repair-status-tabs) .bulk-table.repair-orders-student .table td:last-c
 .accommodation-chart-metrics dd { margin:5px 0 0; color:#25343b; font-size:20px; font-weight:600; }
 .dashboard-rating { margin-top:16px; }
 .dashboard-status-groups { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:18px; }
+.repairer-overview-grid { grid-template-columns:repeat(5,minmax(0,1fr)); }
+.repairer-dashboard .dashboard-status-groups { grid-template-columns:repeat(2,minmax(0,1fr)); }
 .dashboard-status-group { min-width:0; padding:14px 16px; border:1px solid #e3e8ec; border-radius:8px; background:#fff; }
 .dashboard-status-group h2 { margin:0 0 10px; font-size:16px; color:#25343b; }
 .dashboard-status-items { display:grid; grid-template-columns:repeat(auto-fit,minmax(105px,1fr)); gap:8px; }
@@ -538,6 +554,8 @@ body:has(.repair-status-tabs) .bulk-table.repair-orders-student .table td:last-c
 .message-table td[data-label="操作"] { min-width:0; white-space:nowrap; }
 .message-table td[data-label="操作"] .actions { display:flex; flex-flow:row nowrap; align-items:center; justify-content:flex-end; gap:4px; width:100%; max-width:100%; overflow:visible; }
 .message-table td[data-label="操作"] .actions button { flex:0 0 auto; min-width:0; padding:5px 6px; font-size:12px; white-space:nowrap; }
+.message-table .table thead th:last-child { text-align:center; }
+.message-table td[data-label="操作"] .actions { justify-content:center; }
 .message-table td[data-label="时间"] { padding-right:14px; }
 .message-table td[data-label="阅读状态"] { padding-inline:12px; }
 .message-table td[data-label="操作"] { padding-left:12px; }
@@ -557,9 +575,68 @@ body:has(.repair-status-tabs) .bulk-table.repair-orders-student .table td:last-c
 .resource-table[data-resource-type="backups"] td:last-child .actions { flex-wrap:nowrap; }
 .resource-table[data-resource-type="backups"] td:last-child .actions button { width:96px; min-width:96px; padding-inline:8px; text-align:center; }
 @media(max-width:520px) { .import-controls { grid-template-columns:minmax(0,1fr); } }
-@media(max-width:850px) { .dashboard-status-groups { grid-template-columns:minmax(0,1fr); } .dashboard-chart-filters { justify-content:flex-start; } }
+@media(max-width:850px) { .dashboard-status-groups { grid-template-columns:minmax(0,1fr); } .dashboard-chart-filters { justify-content:flex-start; } .repairer-overview-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media(max-width:520px) { .repairer-overview-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:850px) { .repairer-dashboard .dashboard-status-groups { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:850px) { .dashboard-chart-grid { grid-template-columns:minmax(0,1fr); } .accommodation-chart-panel { grid-column:auto; } }
 @media(max-width:600px) { .dashboard-chart { height:260px; } .accommodation-chart-layout { grid-template-columns:minmax(0,1fr); gap:0; } .accommodation-chart-metrics { gap:4px 14px; } }
+
+/* Keep action groups aligned to the operation heading and right edge of each table. */
+.table th:last-child { text-align:left; }
+.table { width:100%; table-layout:fixed; }
+.table td:last-child { text-align:left; }
+.table td:last-child > .actions { display:flex; flex-flow:row nowrap; align-items:center; justify-content:flex-start; width:max-content; max-width:none; margin-left:auto; gap:5px; }
+.table td:last-child > .actions button { flex:0 0 auto; min-width:max-content; white-space:nowrap; }
+.message-table .table td:last-child .actions,.admin-shell .message-table .table td:last-child .actions { justify-content:flex-start; }
+.stay-history-footer { display:flex; justify-content:flex-end; margin-top:12px; }
+.stay-school-batch-panel .table { table-layout:fixed; }
+.stay-school-batch-panel .table th:nth-child(1),.stay-school-batch-panel .table td:nth-child(1) { width:22%; }
+.stay-school-batch-panel .table th:nth-child(2),.stay-school-batch-panel .table td:nth-child(2),.stay-school-batch-panel .table th:nth-child(3),.stay-school-batch-panel .table td:nth-child(3) { width:8%; }
+.stay-school-batch-panel .table th:nth-child(4),.stay-school-batch-panel .table td:nth-child(4),.stay-school-batch-panel .table th:nth-child(5),.stay-school-batch-panel .table td:nth-child(5) { width:13%; }
+.stay-school-batch-panel .table th:nth-child(6),.stay-school-batch-panel .table td:nth-child(6) { width:9%; }
+.stay-school-batch-panel .table th:last-child,.stay-school-batch-panel .table td:last-child { width:27%; }
+.stay-school-batch-panel .table td:last-child > .actions { gap:4px; }
+.stay-school-batch-panel .table td:last-child > .actions button { padding-inline:8px; }
+.stay-manager-settings { display:grid; grid-template-columns:minmax(230px,1fr) minmax(0,2fr); align-items:center; gap:12px 20px; margin:14px 0 18px; padding:14px 16px; border:1px solid #e3e8ec; border-radius:8px; background:#f8fafb; }
+.stay-student-search { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.stay-student-results { display:grid; gap:6px; max-height:180px; overflow-y:auto; margin:8px 0; }
+.stay-student-results button { text-align:left; white-space:normal; }
+@media(max-width:600px) { .stay-student-search { grid-template-columns:minmax(0,1fr); } }
+.stay-manager-settings h4 { margin:0 0 4px; font-size:15px; }
+.stay-manager-settings p { margin:0; }
+.stay-manager-deadline-form { display:grid; grid-template-columns:minmax(210px,1fr) minmax(180px,1fr) auto; align-items:end; gap:8px 14px; }
+.stay-manager-deadline-form > .field,.stay-manager-deadline-form > .check { min-width:0; margin:0; }
+.stay-manager-deadline-form > .check { min-height:var(--control-height); }
+.stay-manager-filter-grid { grid-template-columns:minmax(210px,1.2fr) repeat(4,minmax(120px,1fr)) max-content !important; column-gap:10px; }
+.stay-manager-filter-grid > .field { min-width:0; }
+.stay-manager-filter-grid > .filter-actions { grid-column:auto !important; flex-wrap:nowrap; align-self:end; margin:0 !important; }
+.stay-manager-filter-grid > .filter-actions button { padding-inline:10px; }
+@media(max-width:850px) {
+ .stay-manager-filter-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+ .stay-manager-filter-grid > .field:first-child { grid-column:1/-1; }
+ .stay-manager-filter-grid > .filter-actions { grid-column:auto; }
+ .stay-manager-settings { grid-template-columns:minmax(0,1fr); }
+ .stay-manager-deadline-form { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .stay-manager-deadline-form > .actions { grid-column:1/-1; }
+}
+@media(max-width:520px) {
+ .stay-manager-filter-grid { grid-template-columns:minmax(0,1fr) !important; }
+ .stay-manager-filter-grid > .field:first-child { grid-column:auto; }
+ .stay-manager-filter-grid > .filter-actions { grid-column:auto; }
+ .stay-manager-deadline-form { grid-template-columns:minmax(0,1fr); }
+ .stay-manager-deadline-form > .actions { grid-column:auto; }
+}
+@media(max-width:1150px) {
+ .shell:has(.repair-status-tabs) .table td:last-child::before,.message-table .table td:last-child::before { width:100%; text-align:center; }
+ .shell:has(.repair-status-tabs) .table td:last-child .actions,.message-table .table td:last-child .actions { justify-content:center; }
+}
+body .shell .table th:last-child { text-align:left !important; }
+body .shell .table td:last-child > .actions { max-width:none; justify-content:flex-start !important; margin-left:auto !important; }
+@media(max-width:1150px) {
+ body .shell:has(.repair-status-tabs) .table td:last-child::before,body .shell .message-table .table td:last-child::before { text-align:center !important; }
+ body .shell:has(.repair-status-tabs) .table td:last-child > .actions,body .shell .message-table .table td:last-child > .actions { display:flex !important; flex-flow:row nowrap !important; justify-content:flex-start !important; gap:5px; }
+ body .shell:has(.repair-status-tabs) .table td:last-child > .actions button,body .shell .message-table .table td:last-child > .actions button { flex:0 0 auto; min-width:max-content; padding:4px 5px; font-size:11px; white-space:nowrap; }
+}
 @media(max-width:1150px) {
  .shell:has(.repair-status-tabs) .table-wrap,.message-table { overflow:visible; }
  .shell:has(.repair-status-tabs) .table,.message-table .table { display:block; width:100%; min-width:0; table-layout:fixed; }
@@ -575,4 +652,19 @@ body:has(.repair-status-tabs) .bulk-table.repair-orders-student .table td:last-c
  .shell:has(.repair-status-tabs) .table tbody td:last-child,.message-table .table tbody td:last-child { grid-column:1/-1; border-top:1px solid #edf0f2; }
  .shell:has(.repair-status-tabs) .table tbody td:last-child .actions,.message-table td .actions { display:grid; grid-template-columns:repeat(auto-fit,minmax(84px,1fr)); align-items:center; justify-content:stretch; gap:6px; width:100%; max-width:100%; overflow:visible; }
  .shell:has(.repair-status-tabs) .table tbody td:last-child .actions button,.message-table td .actions button { min-width:0; width:100%; padding:6px 5px; font-size:12px; white-space:nowrap; }
+ .shell:has(.repair-status-tabs) .repair-orders-table .table tbody td:last-child { width:auto; min-width:0; }
+ .shell:has(.repair-status-tabs) .repair-orders-table .table tbody td:last-child .actions { display:grid; grid-template-columns:repeat(auto-fit,minmax(84px,1fr)); width:100%; max-width:100%; }
+ .shell:has(.repair-status-tabs) .repair-orders-table .table tbody td:last-child .actions button { width:100%; min-width:0; }
 }
+@media(max-width:850px) {
+ body .shell:has(.repair-status-tabs) .table tbody td:last-child > .actions,body .shell .message-table .table tbody td:last-child > .actions { display:grid !important; grid-template-columns:repeat(auto-fit,minmax(min(100%,84px),1fr)); align-items:center; justify-content:stretch; width:100%; }
+ body .shell:has(.repair-status-tabs) .table tbody td:last-child > .actions button,body .shell .message-table .table tbody td:last-child > .actions button { width:100%; min-width:0; flex:none; white-space:normal; overflow-wrap:anywhere; }
+}
+@media(max-width:1150px) {
+ .shell:has(.repair-orders-repairer) .table tbody tr { grid-template-columns:36px repeat(3,minmax(0,1fr)); }
+ .shell:has(.repair-orders-repairer) .table tbody td.select-col { grid-column:auto; display:flex; align-items:center; justify-content:center; width:36px; min-width:36px; padding:8px 4px; border:0; }
+ .shell:has(.repair-orders-repairer) .table tbody td.select-col::before { content:none; }
+}
+
+.stay-deadline-panel + .stay-manager-list-panel { margin-top:24px; }
+.stay-application-tools > .actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }

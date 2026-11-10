@@ -1015,3 +1015,4 @@ Caused by: java.sql.SQLIntegrityConstraintViolationException: Duplicate entry '4
 
 2026-11-07T19:29:09.446+08:00  WARN 47680 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m23s838ms869?s200ns).
 2026-11-09T08:32:47.131+08:00  WARN 47680 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=8h23m24s706ms665?s799ns).
+2026-11-10T09:57:34.403+08:00  WARN 47680 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=10h58m14s577ms798?s901ns).

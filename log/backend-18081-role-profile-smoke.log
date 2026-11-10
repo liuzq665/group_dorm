@@ -725,3 +725,4 @@ Caused by: java.sql.SQLSyntaxErrorException: Table 'dorm_platform.sys_user' does
 	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:658) ~[spring-jdbc-6.1.14.jar:6.1.14]
 	... 50 common frames omitted
 
+2026-11-10T09:57:36.729+08:00  WARN 28260 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=10h58m14s588ms42?s).

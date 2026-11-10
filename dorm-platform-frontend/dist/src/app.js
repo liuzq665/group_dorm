@@ -1,5 +1,5 @@
-import { repairPage, repairHistoryPage, repairerStatsPage, repairAction, cascadeRepairFilters } from './repairs.js';
-import { stayPage, staySchoolPage, stayHistoryPage, stayAction } from './stay.js';
+import { repairPage, repairHistoryPage, repairerStatsPage, repairerRecordPage, repairAction, cascadeRepairFilters } from './repairs.js';
+import { stayPage, staySchoolPage, stayManagerPage, stayHistoryPage, stayAction } from './stay.js';
 import { adminPages, adminAction, cascadeDirectoryFilters, cascadeResourceFilters, cascadeAccommodationFilters, cascadeAccommodationHistoryFilters, checkboxChoices, bindChoiceDropdown } from './management.js';
 
 export const API = '/api/v1';
@@ -33,8 +33,8 @@ export function check(name,label,checked=false){return `<label class="check"><in
 let tableSequence=0;
 const tablePageSize=8;
 function tableMarkup(rows,columns,actions,idKey,pageId,pageSizeOverride){
-  const pageSize=pageSizeOverride|| (role()==='ADMIN'?tablePageSize:rows.length||tablePageSize);
-  const paginated=role()==='ADMIN'||pageSizeOverride!=null;
+  const pageSize=pageSizeOverride||tablePageSize;
+  const paginated=true;
   const pageCount=Math.max(1,Math.ceil(rows.length/pageSize));
   const activePage=Math.min(state.data.tablePages?.[pageId]||1,pageCount);
   const body=rows.map((row,index)=>`<tr data-row-id="${esc(row[idKey])}" data-table-row-index="${index}" ${index<pageSize*(activePage-1)||index>=pageSize*activePage?'hidden':''}>${columns.map(([key,label])=>{const value=row[key],cell=key==='current_status'?status(value):key==='enabled_toggle'?`<button type="button" class="toggle-switch ${Number(row.enabled)===1?'is-on':''}" role="switch" aria-checked="${Number(row.enabled)===1}" aria-label="${Number(row.enabled)===1?'启用':'禁用'}" data-action="dictionary-enabled" data-id="${esc(row.work_type_id??row.category_id)}" data-type="${row.work_type_id?'work-types':'categories'}"><span></span></button>`:key==='enabled'?(Number(value)===1?'启用':'停用'):['on_duty','manager_on_duty'].includes(key)?(Number(value)===1?'在岗':'离岗'):key==='gender'?({MALE:'男',FEMALE:'女',OTHER:'其他'}[value]||'未填写'):key==='enrollment_status'?({ENROLLED:'在读',SUSPENDED:'休学',GRADUATED:'毕业',WITHDRAWN:'退学',UNKNOWN:'未登记'}[value]||'-'):esc(value??'-');return `<td data-label="${esc(label)}">${cell}</td>`;}).join('')}${actions?`<td data-label="操作"><div class="actions">${actions(row)||'-'}</div></td>`:''}</tr>`).join('');
@@ -107,14 +107,16 @@ export function selectableRowsTable(rows,columns,actions,idKey,type,pageSize){
   .replace(/(<tr data-row-id="([^"]*)"[^>]*>)/g,(_,row,id)=>`${row}<td class="select-col"><input type="checkbox" data-bulk-select-row value="${esc(id)}" aria-label="选择记录"></td>`)
   .replace('<div class="table-wrap table-component"',`<div class="table-wrap table-component bulk-table" data-bulk-type="${esc(type)}"`);
 }
-const titles={dashboard:'工作台',repairs:'全校报修',repairHistory:'报修历史',repairerStats:'维修统计',stay:'假期留宿',staySchool:'全校留宿',stayHistory:'留宿历史',accommodation:'住宿分配',accommodationHistory:'住宿历史',studentAccommodationHistory:'住宿历史',messages:'消息中心',buildings:'楼栋管理',rooms:'宿舍管理',beds:'床位管理',students:'学生管理',managers:'宿管管理',repairers:'维修人员管理',logs:'操作日志',profile:'个人信息',rules:'报修规则',data:'数据备份'};
+const titles={dashboard:'工作台',repairs:'报修管理',repairHistory:'报修历史',repairerStats:'维修记录统计',repairerRejects:'拒单记录',repairerAcceptTimeouts:'接单超时记录',repairerRepairTimeouts:'超时未修好记录',repairerDelays:'延期记录',repairerReworks:'重修工单记录',stay:'假期留宿',staySchool:'全校留宿',stayManager:'全楼留宿',stayHistory:'留宿历史',accommodation:'住宿分配',accommodationHistory:'住宿历史',studentAccommodationHistory:'住宿历史',messages:'消息中心',buildings:'楼栋管理',rooms:'宿舍管理',beds:'床位管理',students:'学生管理',managers:'宿管管理',repairers:'维修人员管理',logs:'操作日志',profile:'个人信息',rules:'报修规则',data:'数据备份'};
 const navExpansion=new Map();
-function menus(){const common=[['messages','消息中心'],['profile','个人信息']];switch(role()){case 'STUDENT':return [...common,['accommodation','我的住宿'],['repairs','我的报修'],['repairHistory','报修历史'],['stay','假期留宿']];case 'DORM_MANAGER':return [['dashboard','工作台'],...common,['repairs','报修审核与派单'],['stay','留宿审核'],['accommodation','楼栋住宿'],['buildings','楼栋床位']];case 'REPAIRER':return [['dashboard','工作台'],...common,['repairs','我的维修任务'],['repairerStats','维修统计'],['repairHistory','报修历史']];default:return [['dashboard','工作台'],...common,{key:'repair',label:'报修管理',children:[['repairs','全校报修'],['repairHistory','报修历史'],['rules','报修规则']]},{key:'stay',label:'留宿管理',children:[['staySchool','全校留宿'],['stayHistory','留宿历史']]},{key:'dorm',label:'宿舍管理',children:[['buildings','楼栋管理'],['rooms','宿舍管理'],['beds','床位管理'],['accommodationHistory','住宿历史']]},{key:'roles',label:'角色管理',children:[['students','学生管理'],['managers','宿管管理'],['repairers','维修人员管理']]},['logs','操作日志'],['data','数据备份']];}}
-function layout(content){document.querySelectorAll('.nav-group').forEach(group=>navExpansion.set(group.dataset.navGroup,group.open));const menu=menus().map(item=>Array.isArray(item)?`<button data-page="${item[0]}" class="${state.page===item[0]?'active':''}">${item[0]==='messages'&&Number(state.data.unreadCount)>0?`${item[1]}<span class="unread-badge">${state.data.unreadCount}</span>`:item[1]}</button>`:`<details class="nav-group" data-nav-group="${item.key}" ${navExpansion.get(item.key)?'open':''}><summary class="${item.children.some(([key])=>state.page===key)?'active':''}">${item.label}</summary><div class="nav-children">${item.children.map(([key,label])=>`<button data-page="${key}" class="${state.page===key?'active':''}">${label}</button>`).join('')}</div></details>`).join('');document.querySelector('#app').innerHTML=`<div class="shell ${role()==='ADMIN'?'admin-shell':''}"><aside class="sidebar"><h2>宿舍事务平台</h2><div class="role-tag">${roles[role()]}</div><nav class="nav">${menu}</nav><button class="logout" id="logout">退出登录</button></aside><main class="content"><div class="topbar"><div><div class="muted">${roles[role()]}</div><h1>${state.page==='repairs'?({STUDENT:'我的报修',DORM_MANAGER:'报修审核与派单',REPAIRER:'我的维修任务',ADMIN:'全校报修'}[role()]||titles[state.page]):titles[state.page]}</h1></div><span>${esc(state.user.name)}</span></div>${content}</main></div><div id="toast" class="toast" role="status" hidden></div>`;
+const originalMenus=menus;
+menus=()=>originalMenus().map(item=>Array.isArray(item)||item.key!=='repair-records'?item:{...item,children:item.children.filter(([key])=>key!=='repairerStats')});
+function menus(){const common=[['messages','消息中心'],['profile','个人信息']];switch(role()){case 'STUDENT':return [...common,{key:'dorm',label:'住宿管理',children:[['accommodation','我的住宿'],['studentAccommodationHistory','住宿历史']]},{key:'repair',label:'报修管理',children:[['repairs','我的报修'],['repairHistory','报修历史']]},['stay','假期留宿']];case 'DORM_MANAGER':return [['dashboard','工作台'],...common,{key:'repair',label:'报修管理',children:[['repairs','全楼报修'],['repairHistory','报修历史']]},{key:'stay',label:'留宿管理',children:[['stayManager','全楼留宿'],['stayHistory','留宿历史']]},{key:'dorm',label:'住宿管理',children:[['rooms','宿舍管理'],['beds','床位管理'],['accommodationHistory','住宿历史']]},['students','学生管理']];case 'REPAIRER':return [['dashboard','工作台'],...common,['repairs','维修任务'],{key:'repair-records',label:'维修记录',children:[['repairerStats','统计概览'],['repairerRejects','拒单记录'],['repairerAcceptTimeouts','接单超时记录'],['repairerRepairTimeouts','超时未修好记录'],['repairerDelays','延期记录'],['repairerReworks','重修工单记录']]},['repairHistory','报修历史']];default:return [['dashboard','工作台'],...common,{key:'repair',label:'报修管理',children:[['repairs','全校报修'],['repairHistory','报修历史'],['rules','报修规则']]},{key:'stay',label:'留宿管理',children:[['staySchool','全校留宿'],['stayHistory','留宿历史']]},{key:'dorm',label:'住宿管理',children:[['buildings','楼栋管理'],['rooms','宿舍管理'],['beds','床位管理'],['accommodationHistory','住宿历史']]},{key:'roles',label:'角色管理',children:[['students','学生管理'],['managers','宿管管理'],['repairers','维修人员管理']]},['logs','操作日志'],['data','数据备份']];}}
+function layout(content){document.querySelectorAll('.nav-group').forEach(group=>navExpansion.set(group.dataset.navGroup,group.open));const menu=menus().map(item=>Array.isArray(item)?`<button data-page="${item[0]}" class="${state.page===item[0]?'active':''}">${item[0]==='messages'&&Number(state.data.unreadCount)>0?`${item[1]}<span class="unread-badge">${state.data.unreadCount}</span>`:item[1]}</button>`:`<details class="nav-group" data-nav-group="${item.key}" ${navExpansion.get(item.key)?'open':''}><summary class="${item.children.some(([key])=>state.page===key)?'active':''}">${item.label}</summary><div class="nav-children">${item.children.map(([key,label])=>`<button data-page="${key}" class="${state.page===key?'active':''}">${label}</button>`).join('')}</div></details>`).join('');document.querySelector('#app').innerHTML=`<div class="shell ${role()==='ADMIN'?'admin-shell':''}"><aside class="sidebar"><h2>宿舍事务平台</h2><div class="role-tag">${roles[role()]}</div><nav class="nav">${menu}</nav><button class="logout" id="logout">退出登录</button></aside><main class="content"><div class="topbar"><div><div class="muted">${roles[role()]}</div><h1>${state.page==='repairs'?({STUDENT:'我的报修',DORM_MANAGER:'全楼报修',REPAIRER:'我的维修任务',ADMIN:'全校报修'}[role()]||titles[state.page]):titles[state.page]}</h1></div><span>${esc(state.user.name)}</span></div>${content}</main></div><div id="toast" class="toast" role="status" hidden></div>`;
  document.querySelectorAll('button[data-page]').forEach(b=>b.onclick=()=>{state.page=b.dataset.page;render();});document.querySelector('#logout').onclick=()=>modal('退出登录','确定退出当前账号吗？',async()=>{try{await post('/auth/logout');}finally{clearSession();}return '已退出登录';},'确认退出');
 }
 function login(error=''){document.querySelector('#app').innerHTML=`<div class="login"><form class="login-panel" id="login-form"><div class="brand-mark">宿</div><h1>宿舍事务平台</h1>${field('loginAccount','账号','text','')}${field('password','密码','password','')}<p class="error" role="alert">${esc(error)}</p><button class="primary full">登录</button></form></div>`;document.querySelector('#login-form').onsubmit=async e=>{e.preventDefault();const button=e.currentTarget.querySelector('button');button.disabled=true;try{const data=await post('/auth/login',Object.fromEntries(new FormData(e.currentTarget)));state.token=data.token;state.user=data.user;sessionStorage.setItem('dorm_token',data.token);sessionStorage.setItem('dorm_user',JSON.stringify(data.user));state.page=data.user.role==='STUDENT'?'repairs':'dashboard';await render();}catch(e){login(e.message);}};}
-const pages={...adminPages,repairs:repairPage,repairHistory:repairHistoryPage,repairerStats:repairerStatsPage,stay:stayPage,staySchool:staySchoolPage,stayHistory:stayHistoryPage,
+const pages={...adminPages,repairs:repairPage,repairHistory:repairHistoryPage,repairerStats:repairerStatsPage,repairerRejects:repairerRecordPage,repairerAcceptTimeouts:repairerRecordPage,repairerRepairTimeouts:repairerRecordPage,repairerDelays:repairerRecordPage,repairerReworks:repairerRecordPage,stay:stayPage,staySchool:staySchoolPage,stayManager:stayManagerPage,stayHistory:stayHistoryPage,
  async dashboard(){
   const d=await api('/dashboard');state.data.dashboard=d;state.data.unreadCount=d.unread;let charts='';
   if(role()==='ADMIN'){
@@ -129,11 +131,11 @@ const pages={...adminPages,repairs:repairPage,repairHistory:repairHistoryPage,re
     `<article id="repair-status" class="dashboard-chart-panel"><h2>报修工单状态</h2><p class="dashboard-chart-note">柱状图：统计全校工单的当前状态，每张工单计1单；草稿、待修改不计入，已撤销、已关闭并入已归档。月度图：统计本年度按创建月份计入的非草稿、非撤销工单数。</p><div id="repair-status-chart" class="dashboard-chart" role="img" aria-label="全校报修工单当前状态数量"></div><div id="repair-monthly-chart" class="dashboard-chart dashboard-monthly-chart" role="img" aria-label="全校本年度每月新建有效报修工单数量"></div></article>`;
    charts=`<div class="dashboard-chart-grid">${charts}</div>`;
   }
-  let managerEval='',managerCharts='',repairerCharts='';
+  let managerEval='',managerCharts='',repairerCharts='',repairerOverview='';
   if(role()==='DORM_MANAGER'){
    const [ev,stayAnalysis]=await Promise.all([api('/dashboard/repair-evaluation?period=year1'),api('/dashboard/stay-analysis?period=year1&batchId=all')]);state.data.managerEvaluation=ev;state.data.stayAnalysis=stayAnalysis;state.data.repairEvaluationAnalysis=ev;state.data.ratingPeriod='year1';
    managerEval=`<section class="dashboard-chart-panel dashboard-wide"><h2>维修评价（负责楼栋）</h2><p class="dashboard-chart-note">仅统计本人负责楼栋内已提交的学生评价；未评价工单不计入平均分。</p><p class="dashboard-rating-summary">近一年综合评分：${Number(ev.averageScore||0).toFixed(2)} / 5，共 ${(ev.repairers||[]).reduce((sum,row)=>sum+Number(row.total||0),0)} 条评价</p><div id="repair-rating-chart" class="dashboard-chart" role="img" aria-label="负责楼栋维修评价统计"></div>${table(ev.repairers||[],[['repairer_name','维修人员'],['total','评价数'],['averageScore','平均分']])}</section>`;
-   managerCharts=`<div class="dashboard-chart-grid"><article class="dashboard-chart-panel"><h2>留宿申请状态</h2><p class="dashboard-chart-note">柱状图：统计本人负责楼栋内申请单的当前状态，每份申请计1单，排除草稿。月度图：统计本年度按创建月份计入的申请单数，排除草稿。</p><div id="stay-status-chart" class="dashboard-chart"></div><div id="stay-monthly-chart" class="dashboard-chart dashboard-monthly-chart"></div></article><article class="dashboard-chart-panel"><h2>报修工单状态</h2><p class="dashboard-chart-note">柱状图：统计本人负责楼栋内工单的当前状态，每张工单计1单；草稿、待修改不计入，已撤销、已关闭并入已归档。月度图：统计本年度按创建月份计入的非草稿、非撤销工单数。</p><div id="repair-status-chart" class="dashboard-chart"></div><div id="repair-monthly-chart" class="dashboard-chart dashboard-monthly-chart"></div></article><article class="dashboard-chart-panel dashboard-wide"><h2>负责楼栋当前住宿</h2><p class="dashboard-chart-note">人数按当前住宿分配统计；床位数按负责楼栋启用的全部床位统计。</p><div id="accommodation-status-chart" class="dashboard-chart"></div><div class="dashboard-accommodation-counts">在住 ${d.accommodationStats.housed} 人 · 已占床位 ${d.accommodationStats.occupiedBeds} 张 · 空闲床位 ${d.accommodationStats.availableBeds} 张</div></article><article class="dashboard-chart-panel dashboard-wide"><h2>留宿人数</h2><p class="dashboard-chart-note">按本人负责楼栋统计已通过及已完成的留宿申请人数，按批次区分。</p><div id="stay-analysis-chart" class="dashboard-chart"></div></article></div>`;
+   managerCharts=`<div class="dashboard-chart-grid"><article class="dashboard-chart-panel"><h2>留宿申请状态</h2><p class="dashboard-chart-note">柱状图：统计本人负责楼栋内申请单的当前状态，每份申请计1单，排除草稿。月度图：统计本年度按创建月份计入的申请单数，排除草稿。</p><div id="stay-status-chart" class="dashboard-chart"></div><div id="stay-monthly-chart" class="dashboard-chart dashboard-monthly-chart"></div></article><article class="dashboard-chart-panel"><h2>报修工单状态</h2><p class="dashboard-chart-note">柱状图：统计本人负责楼栋内工单的当前状态，每张工单计1单；草稿、待修改不计入，已撤销、已关闭并入已归档。月度图：统计本年度按创建月份计入的非草稿、非撤销工单数。</p><div id="repair-status-chart" class="dashboard-chart"></div><div id="repair-monthly-chart" class="dashboard-chart dashboard-monthly-chart"></div></article><article class="dashboard-chart-panel dashboard-wide"><h2>负责楼栋当前住宿</h2><p class="dashboard-chart-note">仅统计本人负责楼栋的床位；环形图分别表示已占床位和空闲床位数量。</p><div id="accommodation-status-chart" class="dashboard-chart"></div><div class="dashboard-accommodation-counts">已占床位 ${d.accommodationStats.occupiedBeds} 张 · 空闲床位 ${d.accommodationStats.availableBeds} 张</div></article><article class="dashboard-chart-panel dashboard-wide"><h2>留宿人数</h2><p class="dashboard-chart-note">按本人负责楼栋统计已通过及已完成的留宿申请人数，按批次区分。</p><div id="stay-analysis-chart" class="dashboard-chart"></div></article></div>`;
   }
   if(role()==='REPAIRER'){
    const currentYear=new Date().getFullYear();
@@ -144,37 +146,96 @@ const pages={...adminPages,repairs:repairPage,repairHistory:repairHistoryPage,re
    if(eventMonth)params.set('eventMonth',eventMonth);
    if(ratingYear)params.set('ratingYear',ratingYear);
    if(ratingMonth)params.set('ratingMonth',ratingMonth);
-   const stats=await api(`/repairer-stats?${params}`);state.data.repairerDashboardStats=stats;
+   const [stats,overviewStats]=await Promise.all([api(`/repairer-stats?${params}`),api('/repairer-stats?eventYear=&ratingYear=')]);state.data.repairerDashboardStats=stats;state.data.repairerOverviewStats=overviewStats;
+   const overviewCards=[['pendingAccept','待接单'],['inRepair','维修中'],['delayedOrders','维修延期'],['pendingConfirm','待确认'],['current','当前工单'],['history','历史工单'],['rejected','拒单次数'],['acceptTimeout','接单超时'],['repairTimeout','超时未修好'],['delays','延期次数'],['reworks','重修次数'],['evaluations','收到评价'],['averageScore','平均评分']];
+   repairerOverview=`<section class="panel repairer-overview"><div class="toolbar"><h2>维修统计概览</h2><span class="muted">当前维修人员关联的工单与评价</span></div><div class="grid repairer-overview-grid">${overviewCards.map(([key,label])=>`<div class="stat"><span class="muted">${label}</span><strong>${key==='averageScore'?Number(overviewStats[key]||0).toFixed(2):Number(overviewStats[key]||0)}</strong></div>`).join('')}</div></section>`;
    const years=[...new Set([currentYear,...(stats.availableYears||[])])].sort((a,b)=>b-a).map(year=>[String(year),`${year}年`]);
    const yearItems=[['','全部年份'],...years],monthItems=[['','全年'],...Array.from({length:12},(_,index)=>[String(index+1),`${index+1}月`])];
    const monthSelect=(name,label,year,value)=>select(name,label,monthItems,value,false,false).replace(`name="${name}"`,`name="${name}"${year?'':' disabled'}`);
    const periodLabel=(year,month)=>year?`${year}年${month?`${month}月`:'全年'}`:'全部年份';
    const recordFilters=`${select('repairerEventYear','年份',yearItems,eventYear,false,false)}${monthSelect('repairerEventMonth','月份',eventYear,eventMonth)}`;
    const ratingFilters=`${select('repairerRatingYear','年份',yearItems,ratingYear,false,false)}${monthSelect('repairerRatingMonth','月份',ratingYear,ratingMonth)}`;
-   repairerCharts=`<div class="dashboard-chart-grid"><article class="dashboard-chart-panel dashboard-wide"><div class="toolbar"><h2>个人工单记录</h2><div class="dashboard-chart-filters">${recordFilters}</div></div><p class="dashboard-chart-note">统计派给当前维修人员的拒单、接单超时、维修超时、延期申请和重修事件；范围：${periodLabel(eventYear,eventMonth)}。</p><div id="repairer-record-chart" class="dashboard-chart"></div></article><article class="dashboard-chart-panel dashboard-wide"><div class="toolbar"><h2>个人维修评价</h2><div class="dashboard-chart-filters">${ratingFilters}</div></div><p class="dashboard-chart-note">只统计当前维修人员收到的已提交评价，未评价工单不计入；按选定年月汇总综合平均评分。</p><p class="dashboard-rating-summary">${stats.ratingSummary.evaluationCount} 条评价 · ${periodLabel(ratingYear,ratingMonth)}综合评分 ${Number(stats.ratingSummary.averageScore||0).toFixed(2)} / 5</p><div id="repairer-evaluation-chart" class="dashboard-chart"></div></article></div>`;
+   repairerCharts=`<div class="dashboard-chart-grid"><article class="dashboard-chart-panel dashboard-wide"><div class="toolbar"><h2>个人工单记录</h2><div class="dashboard-chart-filters">${recordFilters}</div></div><p class="dashboard-chart-note">统计派给当前维修人员的拒单、接单超时、维修超时、延期申请和重修事件；范围：${periodLabel(eventYear,eventMonth)}。</p><div id="repairer-record-chart" class="dashboard-chart"></div></article><article class="dashboard-chart-panel dashboard-wide"><div class="toolbar"><h2>个人维修评价</h2><div class="dashboard-chart-filters">${ratingFilters}</div></div><p class="dashboard-chart-note">只统计当前维修人员收到的已提交评价，未评价工单不计入；按选定年月汇总综合平均评分。</p><p class="dashboard-rating-summary">${(stats.ratingSummary||{evaluationCount:0}).evaluationCount} 条评价 · ${periodLabel(ratingYear,ratingMonth)}综合评分 ${Number((stats.ratingSummary||{averageScore:0}).averageScore||0).toFixed(2)} / 5</p><div id="repairer-evaluation-chart" class="dashboard-chart"></div></article></div>`;
   }
-  const groups=[['repair','报修'],...(role()==='REPAIRER'?[]:[['stay','留宿']]),['message','消息']];const statusGroups=`<section id="dashboard-top" class="dashboard-status-groups">${groups.map(([group,label])=>{const items=group==='repair'?[['PENDING_REVIEW','待审核'],['PENDING_MANUAL','待人工处理'],['PENDING_ACCEPT','待接单'],['IN_REPAIR','维修中'],['PENDING_CONFIRM','待确认'],['COMPLETED','已完成'],['ARCHIVED','已归档']].map(([status,title])=>[title,(d.repairStatus||[]).find(row=>row.status===status)?.total||0]):group==='stay'?[['stayApproved','当前通过'],['stayCompleted','历史完成'],['stayOpen','开放批次']].map(([key,title])=>[title,d[key]??0]):[['未读消息',d.unread??0]];return `<article class="dashboard-status-group"><h2>${label}</h2>${group==='repair'?'<p class="dashboard-chart-note">以下为当前账号数据范围内各工单当前状态数量，排除草稿和待修改工单。</p>':''}${group==='stay'?'<p class="dashboard-chart-note">以下留宿人数按当前账号数据范围统计；开放批次为当前可申请批次数。</p>':''}<div class="dashboard-status-items">${items.map(([title,value])=>`<div class="stat"><span class="muted">${title}</span><strong>${value??0}</strong></div>`).join('')}</div></article>`;}).join('')}</section>`;
-  return `<div class="dashboard-layout"><div class="dashboard-main">${statusGroups}${managerEval}${charts}${managerCharts}${repairerCharts}</div></div>`;
+  const groups=[...(role()==='REPAIRER'?[]:[['repair','报修']]),...(role()==='REPAIRER'?[]:[['stay','留宿']]),['message','消息']];const statusGroups=`<section id="dashboard-top" class="dashboard-status-groups">${groups.map(([group,label])=>{const items=group==='repair'?[['PENDING_REVIEW','待审核'],['PENDING_MANUAL','待人工处理'],['PENDING_ACCEPT','待接单'],['IN_REPAIR','维修中'],['PENDING_CONFIRM','待确认'],['COMPLETED','已完成'],['ARCHIVED','已归档']].map(([status,title])=>[title,(d.repairStatus||[]).find(row=>row.status===status)?.total||0]):group==='stay'?[['stayApproved','当前通过'],['stayCompleted','历史完成'],['stayOpen','开放批次']].map(([key,title])=>[title,d[key]??0]):[['未读消息',d.unread??0]];return `<article class="dashboard-status-group"><h2>${label}</h2>${group==='repair'?'<p class="dashboard-chart-note">以下为当前账号数据范围内各工单当前状态数量，排除草稿和待修改工单。</p>':''}${group==='stay'?'<p class="dashboard-chart-note">以下留宿人数按当前账号数据范围统计；开放批次为当前可申请批次数。</p>':''}<div class="dashboard-status-items">${items.map(([title,value])=>`<div class="stat"><span class="muted">${title}</span><strong>${value??0}</strong></div>`).join('')}</div></article>`;}).join('')}</section>`;
+  return `<div class="dashboard-layout ${role()==='REPAIRER'?'repairer-dashboard':''}"><div class="dashboard-main">${statusGroups}${repairerOverview}${managerEval}${charts}${managerCharts}${repairerCharts}</div></div>`;
  },
  async profile(){const p=await api('/profile');state.data.profile=p;const fields=[['姓名',p.real_name],['账号',p.login_account],['联系电话',p.phone],['性别',({MALE:'男',FEMALE:'女'})[p.gender]||'未填写'],['生日',p.birth_date],...(p.role_code==='STUDENT'?[['学号',p.student_no],['学院',p.department_name],['专业',p.major_name],['年级',p.grade],['班级',p.class_name],['学籍状态',p.enrollment_status]]:[]),...(['DORM_MANAGER','REPAIRER','ADMIN'].includes(p.role_code)?[['工号',p.employee_no],['入职时间',p.hire_date]]:[]),...(p.role_code==='DORM_MANAGER'?[['负责楼栋',p.manager_buildings]]:[]),...(p.role_code==='REPAIRER'?[['负责工种',p.work_types],['负责楼栋',p.repairer_buildings],['在岗状态',Number(p.on_duty)?'在岗':'离岗']]:[]),['账号状态',Number(p.enabled)?'启用':'停用'],['创建时间',p.account_created_at||p.created_at],['更新时间',p.account_updated_at||p.updated_at]];return `<section class="panel"><div class="toolbar"><h3>个人资料</h3><div class="actions">${button('编辑资料','profile-edit')}${button('修改密码','password')}</div></div><dl class="profile-grid">${fields.map(([label,value])=>`<div><dt>${label}</dt><dd>${esc(value??'未填写')}</dd></div>`).join('')}</dl></section>`;},
  async messages(){
   const admin=role()==='ADMIN';
-  const sourceOptions=admin?[['SYSTEM','系统通知'],['DORM_MANAGER','宿管发布'],['MINE','我发布的']]:role()==='DORM_MANAGER'?[['SYSTEM','系统通知'],['ADMIN','系统管理员发布'],['MINE','我发布的']]:[['SYSTEM','系统通知'],['ADMIN','系统管理员发布'],['DORM_MANAGER','宿管发布']];
-  const f=state.data.messageFilters??={read:'unread',sender:'SYSTEM'};
+  const sourceOptions=[['ALL','全部'],...(admin?[['SYSTEM','系统通知'],['DORM_MANAGER','宿管发布'],['MINE','我发布的']]:role()==='DORM_MANAGER'?[['SYSTEM','系统通知'],['ADMIN','系统管理员发布'],['MINE','我发布的']]:[['SYSTEM','系统通知'],['ADMIN','系统管理员发布'],['DORM_MANAGER','宿管发布']])];
+  const f=state.data.messageFilters??={read:'unread',sender:'ALL'};
   if(!Object.hasOwn(f,'read'))f.read='unread';
-  if(!sourceOptions.some(([key])=>key===f.sender))f.sender='SYSTEM';
+  if(!sourceOptions.some(([key])=>key===f.sender))f.sender='ALL';
   const queryFilters={...f};if(f.sender==='MINE'||(admin&&f.sender==='DORM_MANAGER'))delete queryFilters.read;
   const q=new URLSearchParams(Object.entries(queryFilters).filter(([,v])=>v));
   const rows=await api('/messages'+(q.size?'?'+q:''));state.data.messageRowsById=Object.fromEntries(rows.map(row=>[row.message_id,row]));
   const buildings=await api('/buildings').catch(()=>[]);
   const sourceTabs=`<nav class="message-filter-tabs" aria-label="通知来源">${sourceOptions.map(([key,label])=>`<button type="button" class="secondary ${f.sender===key?'active':''}" data-action="message-source" data-id="${key}">${label}</button>`).join('')}</nav>`;
   const showRead=!(f.sender==='MINE'||(admin&&f.sender==='DORM_MANAGER'));
-  const columns=[['source_label','通知来源'],['publisher_name','发布人'],['building_names','楼栋'],['title','标题'],['content','内容'],['attachment_names','附件'],['created_at','时间'],['read_label','阅读状态']];
+  const columns=[['source_label','通知来源'],['publisher_name','发布人'],['building_names','楼栋'],['title','标题'],['attachment_names','附件'],['created_at','时间'],['read_label','阅读状态']];
   let messageTable=table(rows,columns,r=>`${button('查看详情','message-detail',r.message_id)}${r.is_recipient&&!r.read_at&&(!admin||r.source_label==='系统通知')?button('标为已读','read-message',r.message_id):''}${String(r.publisher_user_id)===String(state.user.id)?button('撤回','message-withdraw',r.message_id):''}${button('删除','message-delete',r.message_id)}`,'message_id',8);
   if(rows.length)messageTable=messageTable.replace('<div class="table-wrap table-component"','<div class="table-wrap table-component message-table"').replace('<thead><tr>','<thead><tr><th class="select-col"><input type="checkbox" data-message-select-all aria-label="全选消息"></th>').replace(/(<tr data-row-id="([^"]*)"[^>]*>)/g,(_,row,id)=>`${row}<td class="select-col"><input type="checkbox" data-message-select-row value="${esc(id)}" aria-label="选择消息"></td>`);
   return `<section class="panel"><div class="toolbar"><h3>站内消息</h3><div class="actions">${button('批量标为已读','message-mark-selected')}${button('批量删除','message-delete-selected')}${['ADMIN','DORM_MANAGER'].includes(role())?button('发布消息','publish-message'):''}</div></div>${sourceTabs}<form id="message-filter-form" class="filter-grid">${showRead?select('read','阅读状态',[['unread','未读'],['read','已读'],['','全部']],f.read,false,false):''}${admin&&f.sender==='DORM_MANAGER'?field('publisher','宿管姓名','search',f.publisher||'',false):''}${role()==='REPAIRER'?select('building','楼栋',[['','全部楼栋'],...buildings.map(b=>[b.building_id,b.building_name])],f.building||'',false,false):''}${field('from','开始日期','date',f.from||'',false)}${field('to','结束日期','date',f.to||'',false)}${admin?select('building','楼栋',[['','全部楼栋'],...buildings.map(b=>[b.building_id,b.building_name])],f.building||'',false,false):''}<div class="filter-actions"><button class="primary">查询</button><button type="reset" class="secondary" data-filter-clear="message-filter-form">清空</button></div></form>${messageTable}</section>`;
  }
 };
+function alignTableOperations(root=document){
+ if(window.innerWidth<=850){
+  root.querySelectorAll('.table-component').forEach(component=>{
+   const table=component.querySelector('.table');
+   if(!table)return;
+   for(const cell of table.querySelectorAll('th,tbody td'))for(const property of ['width','min-width','padding-left','padding-right','text-align'])cell.style.removeProperty(property);
+   for(const group of table.querySelectorAll('tbody td:last-child > .actions')){
+    for(const property of ['display','flex-flow','justify-content','width','max-width','margin-left'])group.style.removeProperty(property);
+    for(const button of group.querySelectorAll('button'))for(const property of ['flex','min-width','white-space'])button.style.removeProperty(property);
+   }
+  });
+  return;
+ }
+ root.querySelectorAll('.table-component').forEach(component=>{
+  const table=component.querySelector('.table');
+  if(!table)return;
+  const headerRow=table.tHead?.rows[0];
+  const heading=headerRow?.cells[headerRow.cells.length-1];
+  const cells=[...table.querySelectorAll('tbody tr > td:last-child')];
+  const groups=cells.map(cell=>cell.querySelector(':scope > .actions')).filter(Boolean);
+  if(!heading||!groups.length)return;
+  const headerCells=[...headerRow.cells];
+  const initialWidths=headerCells.map(cell=>cell.getBoundingClientRect().width);
+  const tableWidth=table.getBoundingClientRect().width;
+  for(const group of groups){
+   group.style.setProperty('display','flex','important');
+   group.style.setProperty('flex-flow','row nowrap','important');
+   group.style.setProperty('justify-content','flex-start','important');
+   group.style.setProperty('width','max-content','important');
+   group.style.setProperty('max-width','none','important');
+   group.style.setProperty('margin-left','auto','important');
+   for(const button of group.querySelectorAll('button')){
+    button.style.setProperty('flex','0 0 auto','important');
+    button.style.setProperty('min-width','max-content','important');
+    button.style.setProperty('white-space','nowrap','important');
+   }
+  }
+  const width=Math.ceil(Math.max(...groups.map(group=>group.getBoundingClientRect().width)));
+  const operationColumnWidth=width+16;
+  const repairerSelection=component.classList.contains('repair-orders-repairer')?headerCells.findIndex(cell=>cell.classList.contains('select-col')):-1;
+  const selectionColumnWidth=repairerSelection>=0?36:0;
+  const availableWidth=Math.max(0,tableWidth-operationColumnWidth-selectionColumnWidth);
+  const otherColumnWidthTotal=initialWidths.reduce((total,value,index)=>index===headerCells.length-1||index===repairerSelection?total:total+value,0);
+  headerCells.forEach((cell,index)=>{
+   const nextWidth=index===headerCells.length-1?operationColumnWidth:index===repairerSelection?selectionColumnWidth:availableWidth*initialWidths[index]/otherColumnWidthTotal;
+   cell.style.setProperty('width',`${nextWidth}px`,'important');
+   if(index===headerCells.length-1){cell.style.setProperty('padding-left','8px','important');cell.style.setProperty('padding-right','8px','important');}
+   for(const row of table.tBodies[0]?.rows||[])row.cells[index]?.style.setProperty('width',`${nextWidth}px`,'important');
+   if(index===headerCells.length-1)for(const row of table.tBodies[0]?.rows||[]){row.cells[index]?.style.setProperty('padding-left','8px','important');row.cells[index]?.style.setProperty('padding-right','8px','important');}
+  });
+  heading.style.setProperty('text-align','left','important');
+  for(const cell of cells){
+   cell.style.setProperty('text-align','left','important');
+  }
+  for(const group of groups)group.style.setProperty('width',`${width}px`,'important');
+ });
+}
 let renderId=0;
 export async function render(){
  if(!state.token||!state.user){login();return;}
@@ -190,6 +251,8 @@ export async function render(){
   if(current!==renderId||!state.token)return;
   layout(html);
   document.querySelectorAll('.bulk-table tbody tr,.message-table tbody tr').forEach(row=>{const checkbox=row.querySelector(':scope > td.select-col');if(checkbox)row.prepend(checkbox);});
+  alignTableOperations();
+  window.onresize=()=>alignTableOperations();
   window.scrollTo({top:scrollPosition,left:0,behavior:'auto'});
   if(state.page==='dashboard'&&['ADMIN','DORM_MANAGER'].includes(role()))mountDashboardCharts(state.data.dashboard);
   if(state.page==='dashboard'&&role()==='REPAIRER')mountRepairerDashboardCharts(state.data.repairerDashboardStats);
@@ -199,6 +262,8 @@ export async function render(){
    try{
     const a=b.dataset.action,id=b.dataset.id;
     if(a==='read-message'){await post(`/messages/${id}/read`);await render();}
+    else if(a==='repair-history-back'){state.page='repairs';await render();}
+    else if(a==='stay-history-open'){state.data.stayHistoryReturn=state.page;state.page='stayHistory';await render();}
     else if(a==='message-mark-selected'){const ids=[...document.querySelectorAll('.message-table [data-message-select-row]:checked')].map(input=>Number(input.value));if(!ids.length)throw new Error('请先勾选要标为已读的消息');await post('/messages/read',{ids});await render();notify(`已将 ${ids.length} 条消息标为已读`);}
     else if(a==='message-delete-selected'){const ids=[...document.querySelectorAll('.message-table [data-message-select-row]:checked')].map(input=>Number(input.value));if(!ids.length)throw new Error('请先勾选要删除的消息');modal('批量删除消息',`将选中的 ${ids.length} 条消息从当前账号的消息列表移除。`,async()=>{const result=await api('/messages',{method:'DELETE',body:JSON.stringify({ids})});return `已删除 ${result.deletedCount} 条消息`;},'确认删除');}
     else if(a==='message-delete'){modal('删除消息','将此消息从当前账号的消息列表移除。',async()=>{await api(`/messages/${id}`,{method:'DELETE'});return '消息已删除';},'确认删除');}
@@ -276,7 +341,6 @@ export async function render(){
   const userFilter=document.querySelector('#user-filter-form');
   if(userFilter){
    userFilter.onsubmit=event=>{event.preventDefault();const filters=Object.fromEntries(new FormData(userFilter));for(const [key,value] of Object.entries(filters))if(!value)delete filters[key];state.data.userFilters??={};state.data.userFilters[state.page]=filters;render();};
-   userFilter.addEventListener('change',event=>{if(event.target.matches('[data-gender-toggle]')){userFilter.elements.gender.value=event.target.checked?'FEMALE':'MALE';userFilter.requestSubmit();}});
     userFilter.addEventListener('change',event=>{if(event.target.matches('[data-directory-filter]'))cascadeDirectoryFilters(userFilter,event.target.name);});
   }
   const accommodationFilter=document.querySelector('#accommodation-filter-form');
@@ -293,6 +357,16 @@ export async function render(){
   if(stayHistoryFilter){
    stayHistoryFilter.onsubmit=event=>{event.preventDefault();const filters=Object.fromEntries(new FormData(stayHistoryFilter));for(const [key,value] of Object.entries(filters))if(!value)delete filters[key];state.data.stayHistoryFilters=filters;render();};
   }
+  const stayManagerFilter=document.querySelector('#stay-manager-filter-form');
+  if(stayManagerFilter){
+   const saveBatch=value=>{const [batchId,buildingId]=String(value||'').split(':');state.data.selectedStayBatchId=batchId||'';state.data.selectedStayBuildingId=buildingId||'';};
+   stayManagerFilter.onsubmit=event=>{event.preventDefault();const filters=Object.fromEntries(new FormData(stayManagerFilter));saveBatch(filters.batchId);delete filters.batchId;for(const [key,value] of Object.entries(filters))if(!value)delete filters[key];state.data.stayManagerFilters={...filters,status:state.data.stayManagerFilters?.status||''};render();};
+   stayManagerFilter.querySelector('[data-filter-clear="stay-manager-filter-form"]')?.addEventListener('click',event=>{event.preventDefault();const status=state.data.stayManagerFilters?.status||'';saveBatch(stayManagerFilter.elements.batchId?.value);state.data.stayManagerFilters={status};render();});
+   stayManagerFilter.elements.batchId?.addEventListener('change',event=>{saveBatch(event.target.value);render();});
+  }
+  document.querySelectorAll('.stay-manager-deadline-form').forEach(stayDeadlineForm=>stayDeadlineForm.onsubmit=async event=>{event.preventDefault();const form=new FormData(stayDeadlineForm),batchId=stayDeadlineForm.dataset.batchId,buildingId=stayDeadlineForm.dataset.buildingId;await put(`/stay/batches/${batchId}/building-rule`,{buildingId:Number(buildingId),applicationDeadline:String(form.get('applicationDeadline')).replace('T',' '),autoLock:form.get('autoLock')==='on'});await render();notify('本楼申请截止时间和自动锁定设置已保存');});
+  const studentStayFilter=document.querySelector('#stay-student-filter-form');if(studentStayFilter){studentStayFilter.onsubmit=event=>{event.preventDefault();const filters=Object.fromEntries(new FormData(studentStayFilter));for(const[key,value]of Object.entries(filters))if(!value)delete filters[key];state.data.stayStudentFilters=filters;render();};studentStayFilter.querySelector('[data-filter-clear]')?.addEventListener('click',event=>{event.preventDefault();delete state.data.stayStudentFilters;render();});}
+  const repairerRecordFilter=document.querySelector('#repairer-record-filter-form');if(repairerRecordFilter){repairerRecordFilter.onsubmit=event=>{event.preventDefault();const filters=Object.fromEntries(new FormData(repairerRecordFilter));for(const[key,value]of Object.entries(filters))if(!value)delete filters[key];state.data.repairerRecordFilters??={};state.data.repairerRecordFilters[state.page]=filters;render();};repairerRecordFilter.querySelector('[data-filter-clear="repairer-record-filter-form"]')?.addEventListener('click',event=>{event.preventDefault();state.data.repairerRecordFilters??={};delete state.data.repairerRecordFilters[state.page];render();});}
   for(const [formId,key] of [['repair-filter-form','repairFilters'],['repair-history-filter-form','repairHistoryFilters'],['log-filter-form','logFilters'],['message-filter-form','messageFilters']]){
    const form=document.getElementById(formId);if(!form)continue;
    form.onsubmit=event=>{event.preventDefault();const filters=Object.fromEntries(new FormData(form));if(formId==='message-filter-form')filters.sender=state.data.messageFilters?.sender||'SYSTEM';if(formId==='repair-filter-form'&&state.data.repairFilters?.status)filters.status=state.data.repairFilters.status;for(const [name,value] of Object.entries(filters))if(!value&&!(formId==='message-filter-form'&&name==='read'))delete filters[name];state.data[key]=filters;render();};
@@ -318,7 +392,7 @@ function mountDashboardCharts(data){
  const labels={DRAFT:'草稿',PENDING_REVIEW:'待审核',PENDING_EDIT:'待修改',UNDER_REVIEW:'审核中',PENDING_ASSIGN:'待派单',PENDING_MANUAL:'待人工处理',PENDING_ACCEPT:'待接单',ACCEPTED:'已接单',DELAYED:'延期中',IN_REPAIR:'维修中',REPAIRED:'已维修',PENDING_CONFIRM:'待确认',CONFIRMED:'已确认',COMPLETED:'已完成',ARCHIVED:'已归档',CANCELLED:'已撤销',CLOSED:'已关闭',APPROVED:'已通过'};
  const make=(id,rows,xName,yName,unit)=>{const node=document.getElementById(id);if(!node)return;const chart=window.echarts.init(node),items=(rows||[]).map(row=>({name:labels[row.status]||row.status,value:Number(row.total)}));chart.setOption({color:palette,tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:items=>`${items[0]?.name||''}<br/>${items[0]?.value||0} ${unit}`},grid:{left:64,right:22,top:20,bottom:76,containLabel:true},xAxis:{type:'category',name:xName,nameLocation:'middle',nameGap:42,data:items.map(item=>item.name),axisLabel:{interval:0,rotate:items.length>5?22:0,margin:12},axisTick:{alignWithLabel:true}},yAxis:{type:'value',name:yName,nameLocation:'middle',nameGap:44,nameRotate:90,minInterval:1},series:[{type:'bar',data:items.map(item=>item.value),barMaxWidth:38,label:{show:true,position:'top'},itemStyle:{borderRadius:[4,4,0,0]}}]});dashboardCharts.push(chart);};
  make('stay-status-chart',data.stayStatus,'申请状态','申请数量（份）','份');make('repair-status-chart',data.repairStatus,'工单状态','工单数量（张）','张');
- const housing=document.getElementById('accommodation-status-chart');if(housing){const chart=window.echarts.init(housing);chart.setOption({color:['#168a83','#e39a3b'],tooltip:{trigger:'item',formatter:'{b}<br/>{c} 人 ({d}%)'},series:[{type:'pie',radius:['54%','78%'],center:['50%','50%'],itemStyle:{borderColor:'#fff',borderWidth:3,borderRadius:4},label:{show:true,formatter:'{b} {d}%',color:'#27363d'},data:[{name:'已住宿',value:Number(data.accommodationStats.housed)},{name:'未住宿',value:Number(data.accommodationStats.unhoused)}]}]});dashboardCharts.push(chart);}
+ const housing=document.getElementById('accommodation-status-chart');if(housing){const chart=window.echarts.init(housing),manager=state.user?.role==='DORM_MANAGER';chart.setOption({color:['#168a83','#e39a3b'],tooltip:{trigger:'item',formatter:manager?'{b}<br/>{c} 张床位 ({d}%)':'{b}<br/>{c} 人 ({d}%)'},series:[{type:'pie',radius:['54%','78%'],center:['50%','50%'],itemStyle:{borderColor:'#fff',borderWidth:3,borderRadius:4},label:{show:true,formatter:'{b} {d}%',color:'#27363d'},data:manager?[{name:'已占床位',value:Number(data.accommodationStats.occupiedBeds)},{name:'空闲床位',value:Number(data.accommodationStats.availableBeds)}]:[{name:'已住宿',value:Number(data.accommodationStats.housed)},{name:'未住宿',value:Number(data.accommodationStats.unhoused)}]}]});dashboardCharts.push(chart);}
  const monthly=(id,rows,xName,yName,unit)=>{const node=document.getElementById(id);if(!node)return;const chart=window.echarts.init(node);chart.setOption({color:['#168a83'],tooltip:{trigger:'axis',formatter:items=>`${items[0]?.name||''}<br/>${items[0]?.value||0} ${unit}`},grid:{left:64,right:22,top:18,bottom:54,containLabel:true},xAxis:{type:'category',name:xName,nameLocation:'middle',nameGap:30,data:(rows||[]).map(x=>`${x.month}月`)},yAxis:{type:'value',name:yName,nameLocation:'middle',nameGap:44,nameRotate:90,minInterval:1},series:[{type:'bar',data:(rows||[]).map(x=>Number(x.total)),barMaxWidth:34,label:{show:true,position:'top'}}]});dashboardCharts.push(chart);};
  monthly('stay-monthly-chart',data.stayMonthly,'申请创建月份','申请数量（份）','份');monthly('repair-monthly-chart',data.repairMonthly,'工单创建月份','工单数量（张）','张');
  const stayNode=document.getElementById('stay-analysis-chart');if(stayNode){const chart=window.echarts.init(stayNode),rows=state.data.stayAnalysis?.rows||[],labels=[...new Set(rows.map(x=>x.label))],groups=[...new Set(rows.map(x=>x.series))];chart.setOption({color:palette,tooltip:{trigger:'axis'},legend:{type:'scroll',bottom:0,left:'center'},grid:{left:48,right:22,top:24,bottom:groups.length>1?76:48,containLabel:true},xAxis:{type:'category',data:labels,axisLabel:{interval:0,rotate:labels.length>7?25:0,margin:15},axisTick:{show:true,alignWithLabel:true,length:7,lineStyle:{color:'#75838c',width:1}},axisLine:{lineStyle:{color:'#75838c',width:1}},splitLine:{show:true,lineStyle:{color:'#d7dfe4',type:'dashed',width:1}}},yAxis:{type:'value',minInterval:1},series:groups.map(name=>({name,type:'bar',barMaxWidth:38,data:labels.map(label=>Number(rows.find(x=>x.series===name&&x.label===label)?.total||0)),itemStyle:{borderRadius:[4,4,0,0]}}))});dashboardCharts.push(chart);}
