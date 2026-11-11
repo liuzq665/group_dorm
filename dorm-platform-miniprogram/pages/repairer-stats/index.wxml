@@ -1,33 +1,124 @@
+<import src="../../templates/ui.wxml"/>
 <view class="page">
-  <view wx:if="{{loading}}" class="loading">正在加载维修统计…</view>
+  <view wx:if="{{loading}}" class="loading">正在加载维修记录…</view>
   <block wx:else>
-    <view class="hero repairer-stats-hero">
+    <view class="hero repairer-hero">
       <text class="hero-kicker">维修人员工作台</text>
-      <text class="hero-title">{{profile.real_name || '个人维修统计'}}</text>
-      <text class="hero-copy">工单与评价统计</text>
+      <text class="hero-title">{{profile.real_name || '维修记录'}}</text>
+      <text class="hero-copy">{{heroCopy || '工单记录、异常记录与服务评价'}}</text>
     </view>
-    <view class="metric-grid stats-grid">
-      <view class="metric-card"><text class="metric-number">{{stats.current || 0}}</text><text class="metric-label">当前工单</text></view>
-      <view class="metric-card"><text class="metric-number">{{stats.completed || 0}}</text><text class="metric-label">累计完工</text></view>
-      <view class="metric-card"><text class="metric-number">{{stats.averageScore || 0}}</text><text class="metric-label">综合评分 / 5</text></view>
-      <view class="metric-card"><text class="metric-number">{{stats.evaluations || 0}}</text><text class="metric-label">收到评价</text></view>
-      <view class="metric-card"><text class="metric-number">{{stats.acceptTimeout || 0}}</text><text class="metric-label">接单超时</text></view>
-      <view class="metric-card"><text class="metric-number">{{stats.repairTimeout || 0}}</text><text class="metric-label">维修超时</text></view>
-    </view>
-    <view class="rating-panel">
-      <view class="section-heading"><text class="section-inline">综合评价趋势</text><text class="muted">{{stats.ratingSummary.averageScore || 0}} / 5</text></view>
-      <view wx:if="{{ratingTrend.length}}" class="rating-trend-row" wx:for="{{ratingTrend}}" wx:key="label"><text class="rating-period">{{item.label}}</text><view class="rating-track"><view class="rating-bar" style="width:{{item.barWidth}}"></view></view><text class="rating-score">{{item.scoreLabel}}</text></view>
-      <text wx:if="{{!ratingTrend.length}}" class="muted">暂无评价数据</text>
-    </view>
-    <view wx:for="{{sections}}" wx:key="key" class="stats-section">
-      <view class="section-heading"><text class="section-inline">{{item.title}}</text><text class="muted">{{item.items.length}} 条</text></view>
-      <view wx:if="{{!item.items.length}}" class="empty compact-empty">暂无记录</view>
-      <view wx:else class="record-list">
-        <view wx:for="{{item.items}}" wx:for-item="record" wx:key="order_id" class="record-row stats-record" data-id="{{record.order_id}}" bindtap="openRecord">
-          <text class="record-title">{{record.displayTitle}}</text>
-          <text class="record-location">{{record.displayMeta}}</text>
-        </view>
+
+    <view class="sticky-filter">
+      <view class="filter-row">
+        <picker range="{{yearOptions}}" range-key="label" value="{{yearIndex}}" bindchange="chooseYear">
+          <view class="filter-select">{{yearOptions[yearIndex].label || '全部年份'}}<text class="picker-arrow">⌄</text></view>
+        </picker>
+        <picker range="{{monthOptions}}" range-key="label" value="{{monthIndex}}" bindchange="chooseMonth">
+          <view class="filter-select">{{monthOptions[monthIndex].label || '全部月份'}}<text class="picker-arrow">⌄</text></view>
+        </picker>
+        <button class="outline filter-action" bindtap="resetFilter">重置</button>
+      </view>
+      <view class="tabs">
+        <view class="tab {{tab==='records'?'active':''}}" data-tab="records" bindtap="selectTab">记录</view>
+        <view class="tab {{tab==='rating'?'active':''}}" data-tab="rating" bindtap="selectTab">评价</view>
       </view>
     </view>
+
+    <view class="metric-grid">
+      <view class="metric-card" wx:for="{{metrics}}" wx:key="label">
+        <text class="metric-value">{{item.value}}</text>
+        <text class="metric-label">{{item.label}}</text>
+      </view>
+    </view>
+
+    <block wx:if="{{tab==='records'}}">
+      <view class="collapse">
+        <view class="collapse-head" data-key="work" bindtap="toggleSection">
+          <text class="collapse-title">个人工单记录</text>
+          <text class="collapse-count">{{workView.total}} 条</text>
+          <text class="collapse-arrow">{{open.work ? '▾' : '▸'}}</text>
+        </view>
+        <view wx:if="{{open.work}}" class="collapse-body">
+          <text class="filter-note">统计范围：{{filterLabel}}</text>
+          <template wx:if="{{!workRecords.length}}" is="empty-state" data="{{...workEmptyView}}"/>
+          <block wx:else>
+            <view class="record-list">
+              <view wx:for="{{workPageItems}}" wx:key="order_id" class="record-card" data-id="{{item.order_id}}" bindtap="openRecord">
+                <view class="record-head">
+                  <text class="record-title">{{item.title}}</text>
+                  <text class="tag {{item.statusTone}}">{{item.statusLabel}}</text>
+                </view>
+                <text class="record-meta">{{item.order_no}} · {{item.building_name}} {{item.room_no}}</text>
+                <view class="record-foot">
+                  <text class="score-chip">★ {{item.scoreLabel}}</text>
+                  <text class="record-time">{{item.timeLabel}}</text>
+                </view>
+              </view>
+            </view>
+            <template is="pager" data="{{...workView}}"/>
+          </block>
+        </view>
+      </view>
+
+      <view class="collapse" wx:for="{{sections}}" wx:key="key">
+        <view class="collapse-head" data-key="{{item.key}}" bindtap="toggleSection">
+          <text class="collapse-title">{{item.title}}</text>
+          <text class="collapse-count">{{item.count}} 条</text>
+          <text class="collapse-arrow">{{open[item.key] ? '▾' : '▸'}}</text>
+        </view>
+        <view wx:if="{{open[item.key]}}" class="collapse-body">
+          <view wx:if="{{!item.items.length}}" class="collapse-empty">{{item.empty}}</view>
+          <view wx:else class="record-list">
+            <view wx:for="{{item.items}}" wx:for-item="record" wx:key="order_id" class="record-card" data-id="{{record.order_id}}" bindtap="openRecord">
+              <view class="record-head">
+                <text class="record-title">{{record.line}}</text>
+                <text class="tag {{record.statusTone}}">{{record.statusLabel}}</text>
+              </view>
+              <text class="record-meta">{{record.meta}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <block wx:else>
+      <view class="card">
+        <view class="section-heading">
+          <text class="section-inline">{{ratingLabel}}</text>
+          <text class="muted">共 {{ratingSummary.evaluationCount}} 次评价</text>
+        </view>
+        <view class="rating-total">
+          <text class="rating-number">{{ratingSummary.averageScore}}</text>
+          <text class="rating-unit">/ 5</text>
+        </view>
+        <view wx:if="{{ratingTrend.length}}" class="rating-trend">
+          <view class="rating-row" wx:for="{{ratingTrend}}" wx:key="label">
+            <text class="rating-period">{{item.label}}</text>
+            <view class="rating-track"><view class="rating-bar" style="width:{{item.barWidth}}"></view></view>
+            <text class="rating-score">{{item.scoreLabel}}</text>
+            <text class="rating-count">{{item.countLabel}}</text>
+          </view>
+        </view>
+        <view wx:else class="collapse-empty">暂无评价数据</view>
+      </view>
+
+      <view class="card">
+        <view class="section-heading"><text class="section-inline">评价明细</text><text class="muted">{{evaluationRecords.length}} 条</text></view>
+        <view wx:if="{{!evaluationRecords.length}}" class="collapse-empty">暂无评价记录</view>
+        <view wx:else class="record-list">
+          <view class="record-card" wx:for="{{evaluationRecords}}" wx:key="order_id" data-id="{{item.order_id}}" bindtap="openRecord">
+            <view class="record-head">
+              <text class="record-title">{{item.title}}</text>
+              <text class="tag tag-warning">★ {{item.scoreLabel}}</text>
+            </view>
+            <text class="record-meta comment-clamp">{{item.commentLabel}}</text>
+            <view class="record-foot">
+              <text class="record-time">{{item.order_no}}</text>
+              <text class="record-time">{{item.timeLabel}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
   </block>
 </view>

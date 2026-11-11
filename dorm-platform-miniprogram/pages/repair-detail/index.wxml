@@ -1,32 +1,274 @@
+<import src="../../templates/ui.wxml"/>
 <view class="page">
   <view wx:if="{{loading}}" class="loading">正在加载工单…</view>
   <block wx:elif="{{detail}}">
-    <view class="hero"><text class="hero-kicker">{{detail.order_no}}</text><text class="hero-title">{{detail.title}}</text><text class="hero-copy">{{detail.statusLabel}}</text></view>
-    <view class="card"><text class="section-inline">工单信息</text><text class="detail-copy">{{detail.description}}</text><view class="divider"></view><view class="row"><text class="label">申请学生</text><text>{{detail.student_name}}</text></view><view class="row"><text class="label">位置</text><text>{{detail.building_name}} {{detail.room_no}}</text></view><view class="row"><text class="label">维修人员</text><text>{{detail.repairer_name || '暂无派单'}}</text></view><view class="row"><text class="label">维修结果</text><text>{{detail.result_text || '暂未提交'}}</text></view><view class="row"><text class="label">审核意见</text><text>{{detail.reject_reason || '-'}}</text></view><view class="row" wx:if="{{detail.manual_reason}}"><text class="label">人工处理原因</text><text>{{detail.manual_reason}}</text></view></view>
-    <view class="card" wx:if="{{detail.files.length}}"><text class="section-inline">附件与现场照片</text><view class="row" wx:for="{{detail.files}}" wx:key="file_id" data-file="{{item}}" bindtap="preview"><text>{{item.original_name}}</text><text class="link">预览</text></view></view>
-    <view class="card" wx:if="{{detail.dispatches.length}}"><text class="section-inline">派单记录</text><view class="row" wx:for="{{detail.dispatches}}" wx:key="dispatch_id"><text>{{item.repairer_name}} · {{item.dispatch_status}}</text><text class="muted">{{item.created_at}}</text></view></view>
-    <view class="card" wx:if="{{detail.audits.length}}"><text class="section-inline">审核记录</text><view class="row" wx:for="{{detail.audits}}" wx:key="audit_id"><text>{{item.result}} · {{item.reason || '-'}}</text><text class="muted">{{item.created_at}}</text></view></view>
-    <view class="card" wx:if="{{detail.delays.length}}"><text class="section-inline">延期记录</text><view class="row" wx:for="{{detail.delays}}" wx:key="request_id"><text>{{item.current_status}} · {{item.reason}}</text><text class="muted">{{item.expected_finish_at}}</text></view></view>
-    <view class="card" wx:if="{{detail.reworkRequests.length}}"><text class="section-inline">重修申请记录</text><view class="history-entry" wx:for="{{detail.reworkRequests}}" wx:key="request_id"><view class="row"><text class="status {{item.request_status==='APPROVED'?'done':item.request_status==='REJECTED'?'danger':'warning'}}">{{item.request_status==='APPROVED'?'已通过':item.request_status==='REJECTED'?'已驳回':'审核中'}}</text><text class="muted">{{item.created_at}}</text></view><text class="detail-copy">申请原因：{{item.reason}}</text><text wx:if="{{item.review_reason}}" class="muted">审核意见：{{item.review_reason}}</text></view></view>
-    <view class="card" wx:if="{{detail.resultHistory.length}}"><text class="section-inline">历次维修结果</text><view class="history-entry" wx:for="{{detail.resultHistory}}" wx:key="history_id"><view class="row"><text>第 {{item.round_no}} 轮 · {{item.repairer_name}}</text><text class="muted">{{item.created_at}}</text></view><text class="detail-copy">{{item.result_text}}</text></view></view>
-    <view class="card" wx:if="{{detail.score}}"><text class="section-inline">学生评价</text><view class="row"><text>评分</text><text class="rating-value">{{detail.score}} / 5</text></view><text class="detail-copy">{{detail.comment || '未填写评价内容'}}</text></view>
-    <view class="button-row">
-      <button wx:if="{{role==='STUDENT' && (detail.current_status==='DRAFT'||detail.current_status==='PENDING_EDIT')}}" class="secondary" bindtap="edit">编辑</button>
-      <button wx:if="{{role==='STUDENT' && (detail.current_status==='DRAFT'||detail.current_status==='PENDING_EDIT')}}" class="primary" data-action="submit" bindtap="simple">提交审核</button>
-      <button wx:if="{{role==='STUDENT' && (detail.current_status==='DRAFT'||detail.current_status==='PENDING_EDIT'||detail.current_status==='PENDING_REVIEW')}}" class="danger" data-action="cancel" bindtap="simple">撤销</button>
-      <button wx:if="{{role==='STUDENT' && detail.current_status==='CANCELLED'}}" class="primary" data-action="resubmit" bindtap="simple">重新提交</button>
-      <button wx:if="{{(role==='DORM_MANAGER'||role==='ADMIN') && detail.current_status==='PENDING_REVIEW'}}" class="primary" bindtap="review">审核</button>
-      <button wx:if="{{(role==='DORM_MANAGER'||role==='ADMIN') && (detail.current_status==='PENDING_ASSIGN'||detail.current_status==='PENDING_MANUAL')}}" class="primary" bindtap="dispatch">派单</button>
-      <button wx:if="{{(role==='DORM_MANAGER'||role==='ADMIN') && detail.current_status==='PENDING_MANUAL' && !detail.urgent && !detail.abnormal && !detail.parent_order_id}}" class="outline" bindtap="retry">重新自动派单</button>
-      <button wx:if="{{role==='REPAIRER' && detail.current_status==='PENDING_ACCEPT'}}" class="primary" data-accept="true" bindtap="decision">接单</button>
-      <button wx:if="{{role==='REPAIRER' && detail.current_status==='PENDING_ACCEPT'}}" class="danger" data-accept="false" bindtap="decision">拒单</button>
-      <button wx:if="{{role==='REPAIRER' && (detail.current_status==='ACCEPTED'||detail.current_status==='DELAYED')}}" class="primary" bindtap="submitResult">提交维修结果</button>
-      <button wx:if="{{role==='REPAIRER' && detail.current_status==='ACCEPTED'}}" class="outline" bindtap="delay">申请延期</button>
-      <button wx:if="{{(role==='DORM_MANAGER'||role==='ADMIN') && detail.current_status==='DELAYED'}}" class="primary" data-pass="true" bindtap="delayReview">通过延期</button>
-      <button wx:if="{{(role==='DORM_MANAGER'||role==='ADMIN') && detail.current_status==='DELAYED'}}" class="danger" data-pass="false" bindtap="delayReview">驳回延期</button>
-      <button wx:if="{{role==='STUDENT' && detail.current_status==='REPAIRED'}}" class="secondary" bindtap="confirmRepair" loading="{{actionBusy}}" disabled="{{actionBusy}}">确认完成并评分（默认5分）</button>
-      <button wx:if="{{role==='STUDENT' && detail.current_status==='REPAIRED'}}" class="outline" bindtap="rework">申请重修</button>
-      <button wx:if="{{role==='STUDENT' && detail.current_status==='CONFIRMED'}}" class="primary" bindtap="evaluate">评价</button>
+    <view class="hero">
+      <text class="hero-kicker" bindtap="copyOrderNo">{{detail.order_no}} · 点击复制</text>
+      <text class="hero-title">{{detail.title}}</text>
+      <view class="hero-tags">
+        <text class="tag {{detail.statusTone}}">{{detail.statusLabel}}</text>
+        <text wx:if="{{detail.urgent}}" class="tag tag-danger">紧急</text>
+        <text wx:if="{{detail.abnormal}}" class="tag tag-danger">异常</text>
+      </view>
+    </view>
+
+    <view class="card">
+      <text class="section-inline">工单信息</text>
+      <text class="detail-copy">{{detail.description}}</text>
+      <view class="divider"></view>
+      <view wx:for="{{rows}}" wx:key="label">
+        <template is="detail-field" data="{{...item}}"/>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="section-heading"><text class="section-inline">附件与现场照片</text><text class="muted">{{attachments.length}} 个</text></view>
+      <template is="attachment-list" data="{{...attachmentView}}"/>
+    </view>
+
+    <view wx:if="{{dispatches.length}}" class="collapse">
+      <view class="collapse-head" data-key="dispatches" bindtap="toggleSection">
+        <text class="collapse-title">派单记录</text>
+        <text class="collapse-count">{{dispatches.length}} 条</text>
+        <text class="collapse-arrow">{{open.dispatches ? '▾' : '▸'}}</text>
+      </view>
+      <view wx:if="{{open.dispatches}}" class="collapse-body">
+        <view class="log-item" wx:for="{{dispatches}}" wx:key="dispatch_id">
+          <text class="log-title">{{item.title}}</text>
+          <text class="log-time">{{item.timeLabel}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{audits.length}}" class="collapse">
+      <view class="collapse-head" data-key="audits" bindtap="toggleSection">
+        <text class="collapse-title">审核记录</text>
+        <text class="collapse-count">{{audits.length}} 条</text>
+        <text class="collapse-arrow">{{open.audits ? '▾' : '▸'}}</text>
+      </view>
+      <view wx:if="{{open.audits}}" class="collapse-body">
+        <view class="log-item" wx:for="{{audits}}" wx:key="audit_id">
+          <text class="log-title">{{item.title}}</text>
+          <text class="log-time">{{item.timeLabel}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{delays.length}}" class="collapse">
+      <view class="collapse-head" data-key="delays" bindtap="toggleSection">
+        <text class="collapse-title">延期记录</text>
+        <text class="collapse-count">{{delays.length}} 条</text>
+        <text class="collapse-arrow">{{open.delays ? '▾' : '▸'}}</text>
+      </view>
+      <view wx:if="{{open.delays}}" class="collapse-body">
+        <view class="log-item" wx:for="{{delays}}" wx:key="request_id">
+          <text class="log-title">{{item.title}}</text>
+          <text class="log-time">{{item.timeLabel}}</text>
+          <text wx:if="{{item.review_reason}}" class="log-note">审核意见：{{item.review_reason}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{reworkRequests.length}}" class="collapse">
+      <view class="collapse-head" data-key="rework" bindtap="toggleSection">
+        <text class="collapse-title">重修记录</text>
+        <text class="collapse-count">{{reworkRequests.length}} 条</text>
+        <text class="collapse-arrow">{{open.rework ? '▾' : '▸'}}</text>
+      </view>
+      <view wx:if="{{open.rework}}" class="collapse-body">
+        <view class="log-item" wx:for="{{reworkRequests}}" wx:key="request_id">
+          <view class="log-head"><text class="log-title">重修原因：{{item.reason}}</text><text class="tag {{item.statusTone}}">{{item.statusLabel}}</text></view>
+          <text class="log-time">{{item.timeLabel}}</text>
+          <text wx:if="{{item.review_reason}}" class="log-note">处理说明：{{item.review_reason}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{resultHistory.length}}" class="collapse">
+      <view class="collapse-head" data-key="results" bindtap="toggleSection">
+        <text class="collapse-title">历次维修结果</text>
+        <text class="collapse-count">{{resultHistory.length}} 轮</text>
+        <text class="collapse-arrow">{{open.results ? '▾' : '▸'}}</text>
+      </view>
+      <view wx:if="{{open.results}}" class="collapse-body">
+        <view class="log-item" wx:for="{{resultHistory}}" wx:key="history_id">
+          <view class="log-head"><text class="log-title">{{item.roundLabel}} · {{item.repairer_name || '维修人员'}}</text><text class="log-time">{{item.timeLabel}}</text></view>
+          <text class="detail-copy">{{item.result_text}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{relatedOrders.length}}" class="collapse">
+      <view class="collapse-head" data-key="related" bindtap="toggleSection">
+        <text class="collapse-title">关联工单</text>
+        <text class="collapse-count">{{relatedOrders.length}} 条</text>
+        <text class="collapse-arrow">{{open.related ? '▾' : '▸'}}</text>
+      </view>
+      <view wx:if="{{open.related}}" class="collapse-body">
+        <view class="log-item" wx:for="{{relatedOrders}}" wx:key="order_id">
+          <view class="log-head"><text class="log-title">{{item.order_no}}</text><text class="tag {{item.statusTone}}">{{item.statusLabel}}</text></view>
+          <text class="log-time">{{item.timeLabel}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{evaluation}}" class="card">
+      <view class="section-heading"><text class="section-inline">学生评价</text><text class="muted">已同步到宿管、维修、管理员端</text></view>
+      <view class="score-line">
+        <view class="stars">
+          <text wx:for="{{stars}}" wx:key="*this" class="star {{evaluation.score >= item ? 'on' : ''}}">★</text>
+        </view>
+        <text class="score-value">{{evaluation.score}} / 5</text>
+      </view>
+      <text class="detail-copy">{{evaluation.comment}}</text>
+    </view>
+
+    <view wx:if="{{detail.isRepaired && role==='STUDENT'}}" class="tip-bar warning">维修人员已提交维修结果，请确认完成并填写评分与文字评价；如仍未修好可申请重修（沿用原工单）。</view>
+
+    <view wx:if="{{detail.canEdit || detail.canSubmit || detail.canCancel || detail.canResubmit || detail.canConfirm || detail.canRework || detail.canEvaluate}}" class="action-bar">
+      <button wx:if="{{detail.canEdit}}" class="secondary" bindtap="edit">编辑</button>
+      <button wx:if="{{detail.canSubmit}}" class="primary" bindtap="submit">提交审核</button>
+      <button wx:if="{{detail.canCancel}}" class="danger" bindtap="cancel">撤销</button>
+      <button wx:if="{{detail.canResubmit}}" class="primary" bindtap="resubmit">重新提交</button>
+      <button wx:if="{{detail.canConfirm}}" class="primary wide" data-mode="confirm" bindtap="openScore">确认完成</button>
+      <button wx:if="{{detail.canRework}}" class="outline" bindtap="openRework">申请重修</button>
+      <button wx:if="{{detail.canEvaluate}}" class="primary" data-mode="evaluate" bindtap="openScore">评价</button>
+    </view>
+    <view wx:if="{{detail.canAccept || detail.canSubmitResult || detail.canDelay || detail.canReview || detail.canDispatch || detail.canRetry || detail.canDelayReview}}" class="action-bar">
+      <button wx:if="{{detail.canAccept}}" class="primary" bindtap="accept" loading="{{actionBusy}}" disabled="{{actionBusy}}">接单</button>
+      <button wx:if="{{detail.canAccept}}" class="danger" bindtap="openReject" disabled="{{actionBusy}}">拒单</button>
+      <button wx:if="{{detail.canSubmitResult}}" class="primary" bindtap="openResult">提交维修结果</button>
+      <button wx:if="{{detail.canDelay}}" class="outline" bindtap="openDelay">申请延期</button>
+      <button wx:if="{{detail.canReview}}" class="primary" bindtap="review">审核</button>
+      <button wx:if="{{detail.canDispatch}}" class="primary" bindtap="dispatch">派单</button>
+      <button wx:if="{{detail.canRetry}}" class="outline" bindtap="retry">重新自动派单</button>
+      <button wx:if="{{detail.canDelayReview}}" class="primary" data-pass="true" bindtap="delayReview">通过延期</button>
+      <button wx:if="{{detail.canDelayReview}}" class="danger" data-pass="false" bindtap="delayReview">驳回延期</button>
     </view>
   </block>
+
+  <!-- 确认完成 / 评价 -->
+  <view wx:if="{{scoreModal}}" class="modal-mask">
+    <view class="modal-panel">
+      <view class="modal-head">
+        <text class="section-title">{{scoreModal==='evaluate' ? '提交评价' : '确认维修完成'}}</text>
+        <text class="modal-close" bindtap="closeScore">关闭</text>
+      </view>
+      <text class="field-label">评分（必填，默认 5 分）</text>
+      <view class="stars stars-input">
+        <text wx:for="{{stars}}" wx:key="*this" class="star {{scoreForm.score >= item ? 'on' : ''}}" data-score="{{item}}" bindtap="setScore">★</text>
+        <text class="score-value">{{scoreForm.score}} 分</text>
+      </view>
+      <view class="field">
+        <text class="field-label">文字评价（必填）</text>
+        <textarea class="textarea" value="{{scoreForm.comment}}" bindinput="scoreComment" placeholder="请填写维修效果、服务态度等评价内容" maxlength="500"/>
+        <text class="field-hint">评价将同步到维修人员、宿管与系统管理员端。</text>
+      </view>
+      <view class="action-bar">
+        <button class="outline" bindtap="closeScore">取消</button>
+        <button class="primary" loading="{{actionBusy}}" disabled="{{actionBusy}}" bindtap="submitScore">提交</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 申请重修 -->
+  <view wx:if="{{reworkModal}}" class="modal-mask">
+    <view class="modal-panel">
+      <view class="modal-head">
+        <text class="section-title">申请重修</text>
+        <text class="modal-close" bindtap="closeRework">关闭</text>
+      </view>
+      <text class="tip-bar warning">重修沿用原工单，不新建工单；提交后工单重新进入审核与派单流程。</text>
+      <view class="field">
+        <text class="field-label">重修原因（必填）</text>
+        <textarea class="textarea" value="{{reworkReason}}" bindinput="reworkInput" placeholder="请说明尚未解决的问题" maxlength="500"/>
+      </view>
+      <view class="action-bar">
+        <button class="outline" bindtap="closeRework">取消</button>
+        <button class="primary" loading="{{actionBusy}}" disabled="{{actionBusy}}" bindtap="submitRework">提交重修</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 拒单 -->
+  <view wx:if="{{rejectModal}}" class="modal-mask">
+    <view class="modal-panel">
+      <view class="modal-head">
+        <text class="section-title">拒绝接单</text>
+        <text class="modal-close" bindtap="closeReject">关闭</text>
+      </view>
+      <view class="field">
+        <text class="field-label">拒单原因（必填）</text>
+        <textarea class="textarea" value="{{rejectReason}}" bindinput="rejectInput" placeholder="例如：不属本人工种范围 / 现场无法处理" maxlength="500"/>
+      </view>
+      <view class="action-bar">
+        <button class="outline" bindtap="closeReject">取消</button>
+        <button class="danger" loading="{{actionBusy}}" disabled="{{actionBusy}}" bindtap="submitReject">提交拒单</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 提交维修结果 -->
+  <view wx:if="{{resultModal}}" class="modal-mask">
+    <view class="modal-panel">
+      <view class="modal-head">
+        <text class="section-title">提交维修结果</text>
+        <text class="modal-close" bindtap="closeResult">关闭</text>
+      </view>
+      <view class="field">
+        <text class="field-label">维修处理过程（必填）</text>
+        <textarea class="textarea" value="{{resultText}}" bindinput="resultInput" placeholder="请填写处理过程和结果" maxlength="1000"/>
+      </view>
+      <view class="field">
+        <text class="field-label">完工现场照片（必传，至少 1 张）</text>
+        <button class="outline compact-button" bindtap="chooseResultPhotos">选择照片（{{resultFiles.length}}）</button>
+        <view class="photo-row" wx:for="{{resultFiles}}" wx:key="*this">
+          <text class="photo-name">{{item}}</text>
+          <text class="file-remove" data-index="{{index}}" bindtap="removeResultPhoto">移除</text>
+        </view>
+      </view>
+      <view class="action-bar">
+        <button class="outline" bindtap="closeResult">取消</button>
+        <button class="primary" loading="{{actionBusy}}" disabled="{{actionBusy}}" bindtap="submitResult">提交结果</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 申请延期 -->
+  <view wx:if="{{delayModal}}" class="modal-mask">
+    <view class="modal-panel">
+      <view class="modal-head">
+        <text class="section-title">申请维修延期</text>
+        <text class="modal-close" bindtap="closeDelay">关闭</text>
+      </view>
+      <view class="field">
+        <text class="field-label">延期原因（必填）</text>
+        <textarea class="textarea" value="{{delayForm.reason}}" data-key="reason" bindinput="delayInput" placeholder="请填写延期原因" maxlength="500"/>
+      </view>
+      <view class="field">
+        <text class="field-label">预计完成时间（必填）</text>
+        <view class="range-grid">
+          <picker mode="date" value="{{delayForm.date}}" data-key="date" bindchange="delayInput">
+            <view><text class="range-label">日期</text><text class="range-date">{{delayForm.date || '选择日期'}}</text></view>
+          </picker>
+          <picker mode="time" value="{{delayForm.time}}" data-key="time" bindchange="delayInput">
+            <view><text class="range-label">时间</text><text class="range-date">{{delayForm.time || '选择时间'}}</text></view>
+          </picker>
+        </view>
+        <text class="field-hint">预计完成时间必须晚于当前维修期限。</text>
+      </view>
+      <view class="field">
+        <text class="field-label">维修现场照片（必传，至少 1 张）</text>
+        <button class="outline compact-button" bindtap="chooseDelayPhotos">选择照片（{{delayFiles.length}}）</button>
+        <view class="photo-row" wx:for="{{delayFiles}}" wx:key="*this">
+          <text class="photo-name">{{item}}</text>
+          <text class="file-remove" data-index="{{index}}" bindtap="removeDelayPhoto">移除</text>
+        </view>
+      </view>
+      <view class="action-bar">
+        <button class="outline" bindtap="closeDelay">取消</button>
+        <button class="primary" loading="{{actionBusy}}" disabled="{{actionBusy}}" bindtap="submitDelay">提交延期</button>
+      </view>
+    </view>
+  </view>
 </view>

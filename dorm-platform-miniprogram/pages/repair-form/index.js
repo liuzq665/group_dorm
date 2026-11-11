@@ -1,10 +1,108 @@
 const { request, upload, showError } = require('../../utils/request');
+const { orDash } = require('../../utils/format');
+
 Page({
- data:{loading:true,editing:false,orderId:'',catalog:{categories:[],workTypes:[]},categoryIndex:0,form:{title:'',description:'',categoryId:''},files:[]},
- onLoad(query){if(!getApp().requireStudent())return;this.setData({orderId:query.id||'',editing:!!query.id});this.load();},
- async load(){this.setData({loading:true});try{const catalog=await request('/repair-catalog');let form={...this.data.form};if(this.data.editing){const detail=await request(`/repair-orders/${this.data.orderId}`);form={title:detail.title,description:detail.description,categoryId:String(detail.category_id)};}const index=Math.max(0,catalog.categories.findIndex(x=>String(x.id)===String(form.categoryId)));form.categoryId=String(catalog.categories[index]?.id||'');this.setData({catalog,categoryIndex:index,form});}catch(e){showError(e);}finally{this.setData({loading:false});}},
- input(e){this.setData({[`form.${e.currentTarget.dataset.key}`]:e.detail.value});}, category(e){const index=Number(e.detail.value);this.setData({categoryIndex:index,'form.categoryId':String(this.data.catalog.categories[index].id)});},
- choose(){wx.chooseMedia({count:6,mediaType:['image'],success:r=>this.setData({files:r.tempFiles.map(x=>x.tempFilePath)})});},
- async save(e){const submitNow=e.currentTarget.dataset.submit === 'true';const {form,files,editing,orderId}=this.data;if(!form.title.trim()||!form.description.trim()||!form.categoryId){wx.showToast({title:'请完整填写报修信息',icon:'none'});return;}wx.showLoading({title:'正在保存'});try{const fileIds=await Promise.all(files.map(filePath=>upload(filePath)));let id=orderId;if(editing)await request(`/repair-orders/${id}`,{method:'PUT',data:{...form,categoryId:Number(form.categoryId),fileIds}});else{id=(await request('/repair-orders',{method:'POST',data:{...form,categoryId:Number(form.categoryId),fileIds}})).orderId;}if(submitNow)await request(`/repair-orders/${id}/submit`,{method:'POST'});wx.showToast({title:submitNow?'已提交审核':'已保存草稿'});setTimeout(()=>wx.redirectTo({url:`/pages/repair-detail/index?id=${id}`}),600);}catch(e){showError(e);}finally{wx.hideLoading();}},
- remove(e){const files=this.data.files;files.splice(e.currentTarget.dataset.index,1);this.setData({files});}
+  data: {
+    loading: true,
+    editing: false,
+    orderId: '',
+    categories: [],
+    categoryIndex: 0,
+    categoryName: '',
+    categoryChosen: false,
+    form: { title: '', description: '' },
+    files: [],
+    existing: [],
+    actionBusy: false
+  },
+  onLoad(query) {
+    if (!getApp().requireStudent()) return;
+    this.setData({ orderId: query.id || '', editing: !!query.id });
+    this.load();
+  },
+  async load() {
+    this.setData({ loading: true });
+    try {
+      const catalog = await request('/repair-catalog');
+      const categories = catalog.categories || [];
+      let form = { ...this.data.form };
+      let existing = [];
+      let categoryId = '';
+      if (this.data.editing) {
+        const detail = await request(`/repair-orders/${this.data.orderId}`);
+        form = { title: detail.title || '', description: detail.description || '' };
+        categoryId = String(detail.category_id || '');
+        existing = (detail.files || []).filter(file => file.purpose === 'FAULT');
+      }
+      const categoryIndex = Math.max(0, categories.findIndex(item => String(item.id) === String(categoryId)));
+      this.setData({
+        categories,
+        categoryIndex,
+        categoryName: this.data.editing ? categories[categoryIndex]?.name || '' : '',
+        categoryChosen: this.data.editing,
+        form,
+        existing
+      });
+    } catch (error) {
+      showError(error);
+    } finally {
+      this.setData({ loading: false });
+    }
+  },
+  input(event) {
+    this.setData({ [`form.${event.currentTarget.dataset.key}`]: event.detail.value });
+  },
+  category(event) {
+    const index = Number(event.detail.value);
+    this.setData({ categoryIndex: index, categoryName: this.data.categories[index]?.name || '', categoryChosen: true });
+  },
+  choose() {
+    wx.chooseMedia({
+      count: Math.max(1, 6 - this.data.files.length),
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      success: result => {
+        this.setData({ files: [...this.data.files, ...result.tempFiles.map(file => file.tempFilePath)].slice(0, 6) });
+      }
+    });
+  },
+  removeFile(event) {
+    const files = this.data.files.filter((item, index) => index !== Number(event.currentTarget.dataset.index));
+    this.setData({ files });
+  },
+  async save(event) {
+    if (this.data.actionBusy) return;
+    const submitNow = event.currentTarget.dataset.submit === 'true';
+    const { form, files, editing, orderId, categoryIndex, categories, categoryChosen } = this.data;
+    const category = categories[categoryIndex];
+    if (!categoryChosen || !category) { wx.showToast({ title: '请选择故障分类', icon: 'none' }); return; }
+    if (!form.title.trim()) { wx.showToast({ title: '请填写报修标题', icon: 'none' }); return; }
+    if (!form.description.trim()) { wx.showToast({ title: '请填写故障位置与说明', icon: 'none' }); return; }
+    this.setData({ actionBusy: true });
+    wx.showLoading({ title: '正在保存' });
+    try {
+      const fileIds = await Promise.all(files.map(filePath => upload(filePath)));
+      const payload = {
+        title: form.title.trim(),
+        description: form.description.trim(),
+        categoryId: Number(category.id),
+        fileIds
+      };
+      let id = orderId;
+      if (editing) {
+        await request(`/repair-orders/${id}`, { method: 'PUT', data: payload });
+      } else {
+        const created = await request('/repair-orders', { method: 'POST', data: payload });
+        id = created.orderId;
+      }
+      if (submitNow) await request(`/repair-orders/${id}/submit`, { method: 'POST' });
+      wx.showToast({ title: submitNow ? '已提交审核' : '草稿已保存' });
+      setTimeout(() => wx.redirectTo({ url: `/pages/repair-detail/index?id=${id}` }), 600);
+    } catch (error) {
+      showError(error);
+    } finally {
+      this.setData({ actionBusy: false });
+      wx.hideLoading();
+    }
+  }
 });

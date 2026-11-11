@@ -1,0 +1,22 @@
+# 构建产物 / 运行产物（不纳入版本库）
+dorm-platform-backend/target/
+dorm-platform-backend/uploads/
+uploads/
+log/
+*.class
+*.jar.original
+
+# 依赖目录
+node_modules/
+
+# IDE 与本地环境
+.idea/
+.vscode/
+.DS_Store
+
+# 本地数据库导出与临时产物
+sql/_localhost-*.sql
+test-results/miniprogram-compile/
+test-results/devtools-desktop.png
+test-results/devtools-focus.png
+test-results/gui-step*.png

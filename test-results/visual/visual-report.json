@@ -1,0 +1,1256 @@
+{
+  "generatedAt": "2026-11-11T10:20:24.935Z",
+  "total": 32,
+  "failed": 0,
+  "results": [
+    {
+      "role": "STUDENT",
+      "page": "home",
+      "state": "default",
+      "file": "test-results/visual/STUDENT/home.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 753,
+        "beyond": [],
+        "bars": [
+          {
+            "count": 2,
+            "rows": 1,
+            "widths": [
+              166,
+              166
+            ]
+          }
+        ],
+        "clipped": [],
+        "heads": [
+          {
+            "overlap": false,
+            "titleRight": 82,
+            "tagLeft": 322
+          }
+        ],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 5,
+          "selectedCount": 1,
+          "selectedText": "⌂ 首页",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "学生端 张一 校园住宿服务 64 条未读消息 当前住宿 已分配 明德二号楼 · 102 · B 床 查看住宿与历史 查看报修进度 校园服务 住 我的住宿 床位、舍友与住宿历史 › 修 我的报修 报修进度、确认完成与评价 › 宿 假期留宿 提交申请与查看审核 › 信 消息中心 查看业务通知 ›"
+      }
+    },
+    {
+      "role": "STUDENT",
+      "page": "repairs-all",
+      "state": "default",
+      "file": "test-results/visual/STUDENT/repairs-all.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 1372,
+        "beyond": [],
+        "bars": [],
+        "clipped": [],
+        "heads": [
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 297,
+            "tagLeft": 303
+          },
+          {
+            "overlap": false,
+            "titleRight": 297,
+            "tagLeft": 303
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          }
+        ],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 5,
+          "selectedCount": 1,
+          "selectedText": "⚒ 报修",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "我的报修 查看处理进度、确认完成并评价 新建 全部 27 待审核 15 待人工处理 9 待接单 0 已接单 0 待确认 3 已完成 0 历史记录 12 按工单号查询 查询 共 27 条 · 第 1 / 3 页 B端验证-宿舍门锁异响 待审核 WX202611110026 · 水龙头漏水 更新于 2026-11-11 10:32 查看详情 › B端验证-撤销后重新提交 待审核 WX202611110027 · 水龙头漏水 更新于 2026-11-11 10:32 查看详情 › B端验证-卫生间水龙头漏水 待人工处理 "
+      }
+    },
+    {
+      "role": "STUDENT",
+      "page": "repairs-accept",
+      "state": "default",
+      "file": "test-results/visual/STUDENT/repairs-accept.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 753,
+        "beyond": [],
+        "bars": [],
+        "clipped": [],
+        "heads": [],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 5,
+          "selectedCount": 1,
+          "selectedText": "⚒ 报修",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "我的报修 查看处理进度、确认完成并评价 新建 全部 27 待审核 15 待人工处理 9 待接单 0 已接单 0 待确认 3 已完成 0 历史记录 12 按工单号查询 查询 当前分类暂无待接单工单 可切换其他分类查看"
+      }
+    },
+    {
+      "role": "STUDENT",
+      "page": "repairs-history",
+      "state": "default",
+      "file": "test-results/visual/STUDENT/repairs-history.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 1482,
+        "beyond": [],
+        "bars": [],
+        "clipped": [],
+        "heads": [
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          }
+        ],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 5,
+          "selectedCount": 1,
+          "selectedText": "⚒ 报修",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "我的报修 查看处理进度、确认完成并评价 新建 全部 27 待审核 15 待人工处理 9 待接单 0 已接单 0 待确认 3 已完成 0 历史记录 12 按工单号查询 查询 共 12 条 · 第 1 / 2 页 B端验证-卫生间水龙头漏水 已归档 WX202611110025 · 水龙头漏水 维修人员：王师傅1 ★ 4 分 更新于 2026-11-11 10:32 查看详情 › B端验证-卫生间水龙头漏水 已归档 WX202611110011 · 水龙头漏水 维修人员：王师傅1 ★ 4 分 更新于 2026-11-1"
+      }
+    },
+    {
+      "role": "STUDENT",
+      "page": "repair-detail",
+      "state": "default",
+      "file": "test-results/visual/STUDENT/repair-detail.png",
+      "issues": [],
+      "metrics": {
+        "vw": 375,
+        "docOverflow": 0,
+        "paintHeight": 1121,
+        "beyond": [],
+        "bars": [
+          {
+            "count": 1,
+            "rows": 1,
+            "widths": [
+              347
+            ]
+          }
+        ],
+        "clipped": [
+          {
+            "cls": "attachment-name",
+            "text": "verify-0250b8777765470bb",
+            "sw": 263,
+            "cw": 235
+          }
+        ],
+        "heads": [],
+        "buttonsMisaligned": [],
+        "tabBar": null,
+        "text": "WX202611110026 · 点击复制 B端验证-宿舍门锁异响 待审核 工单信息 门锁开合有明显异响 工单编号 WX202611110026 当前状态 待审核 故障分类 水龙头漏水 维修工种 水暖维修 报修位置 明德二号楼 102 维修人员 暂无派单 报修时间 2026-11-11 10:32 更新时间 2026-11-11 10:32 附件与现场照片 1 个 verify-0250b8777765470bbce37d143685c68a.png 完工照片 预览 派单记录 1 条 ▾ 王师傅1 · 自动派单 ·"
+      }
+    },
+    {
+      "role": "STUDENT",
+      "page": "repair-detail-scored",
+      "state": "default",
+      "file": "test-results/visual/STUDENT/repair-detail-scored.png",
+      "issues": [],
+      "metrics": {
+        "vw": 375,
+        "docOverflow": 0,
+        "paintHeight": 1113,
+        "beyond": [],
+        "bars": [],
+        "clipped": [
+          {
+            "cls": "attachment-name",
+            "text": "verify-72cb6acc89c4441f8",
+            "sw": 256,
+            "cw": 235
+          },
+          {
+            "cls": "attachment-name",
+            "text": "verify-8fa323262653464cb",
+            "sw": 258,
+            "cw": 235
+          }
+        ],
+        "heads": [],
+        "buttonsMisaligned": [],
+        "tabBar": null,
+        "text": "WX202611110025 · 点击复制 B端验证-卫生间水龙头漏水 已归档 工单信息 水龙头持续滴水，阀门无法关紧，影响正常使用 工单编号 WX202611110025 当前状态 已归档 故障分类 水龙头漏水 维修工种 水暖维修 报修位置 明德二号楼 102 维修人员 王师傅1 报修时间 2026-11-11 10:32 更新时间 2026-11-11 10:32 维修期限 2026-11-12 10:32 接单截止 2026-11-11 12:32 附件与现场照片 2 个 verify-72cb6acc89c"
+      }
+    },
+    {
+      "role": "STUDENT",
+      "page": "repair-form",
+      "state": "default",
+      "file": "test-results/visual/STUDENT/repair-form.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 753,
+        "beyond": [],
+        "bars": [
+          {
+            "count": 2,
+            "rows": 1,
+            "widths": [
+              166,
+              166
+            ]
+          }
+        ],
+        "clipped": [],
+        "heads": [],
+        "buttonsMisaligned": [],
+        "tabBar": null,
+        "text": "新建报修 填写故障信息，可先保存草稿 故障分类（必填） 请选择故障分类 ⌄ 报修标题（必填） 例如：卫生间水龙头漏水 故障位置与说明（必填） 请说明问题位置、现象和是否影响使用 a 现场照片（可选，最多 6 张） 选择照片（新增 0） 保存草稿 提交审核 提交后由负责楼栋宿管审核，审核通过自动派单；维修完成后请在“我的报修”中确认完成并填写评分与文字评价。"
+      }
+    },
+    {
+      "role": "STUDENT",
+      "page": "messages-all",
+      "state": "default",
+      "file": "test-results/visual/STUDENT/messages-all.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 1456,
+        "beyond": [],
+        "bars": [],
+        "clipped": [],
+        "heads": [],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 5,
+          "selectedCount": 1,
+          "selectedText": "✉ 消息 64",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "消息中心 64 条未读消息 全部已读 全部 系统通知 系统管理员发布 宿管发布 全部 未读 已读 B端验证-宿管通知 宿管发布 发布人：周老师 本楼栋本周五进行水电检修，请提前做好准备 2026-11-11 10:32 已读 报修进度 系统通知 发布人：系统 WX202611110026：维修完成，请确认或申请重修 2026-11-11 10:32 未读 报修进度 系统通知 发布人：系统 WX202611110026：维修人员已接单 2026-11-11 10:32 未读 报修进度 系统通知 发布人：系统 WX20"
+      }
+    },
+    {
+      "role": "STUDENT",
+      "page": "messages-source",
+      "state": "default",
+      "file": "test-results/visual/STUDENT/messages-source.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 1363,
+        "beyond": [],
+        "bars": [],
+        "clipped": [],
+        "heads": [],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 5,
+          "selectedCount": 1,
+          "selectedText": "✉ 消息 64",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "消息中心 64 条未读消息 全部已读 全部 系统通知 系统管理员发布 宿管发布 全部 未读 已读 B端验证-宿管通知 宿管发布 发布人：周老师 本楼栋本周五进行水电检修，请提前做好准备 2026-11-11 10:32 已读 B端验证-宿管通知 宿管发布 发布人：周老师 本楼栋本周五进行水电检修，请提前做好准备 2026-11-11 10:01 已读 B端验证-宿管通知 宿管发布 发布人：周老师 本楼栋本周五进行水电检修，请提前做好准备 2026-11-11 09:33 未读 B端验证-宿管通知 宿管发布 发布人："
+      }
+    },
+    {
+      "role": "STUDENT",
+      "page": "messages-detail",
+      "state": "default",
+      "file": "test-results/visual/STUDENT/messages-detail.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 1363,
+        "beyond": [],
+        "bars": [],
+        "clipped": [],
+        "heads": [],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 5,
+          "selectedCount": 1,
+          "selectedText": "✉ 消息 64",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "消息中心 64 条未读消息 全部已读 全部 系统通知 系统管理员发布 宿管发布 全部 未读 已读 B端验证-宿管通知 宿管发布 发布人：周老师 本楼栋本周五进行水电检修，请提前做好准备 2026-11-11 10:32 已读 B端验证-宿管通知 宿管发布 发布人：周老师 本楼栋本周五进行水电检修，请提前做好准备 2026-11-11 10:01 已读 B端验证-宿管通知 宿管发布 发布人：周老师 本楼栋本周五进行水电检修，请提前做好准备 2026-11-11 09:33 未读 B端验证-宿管通知 宿管发布 发布人："
+      }
+    },
+    {
+      "role": "STUDENT",
+      "page": "stays",
+      "state": "default",
+      "file": "test-results/visual/STUDENT/stays.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 1438,
+        "beyond": [],
+        "bars": [],
+        "clipped": [],
+        "heads": [
+          {
+            "overlap": false,
+            "titleRight": 289,
+            "tagLeft": 295
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          }
+        ],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 5,
+          "selectedCount": 1,
+          "selectedText": "▦ 留宿",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "留宿管理 开放批次、我的申请与审核结果 开放批次 1 个 2026 寒假留宿 寒假 · 开放中 开放区间：2027-01-10 至 2027-02-20 申请截止：2026-12-20 23:59 截止后自动锁定进入审核 材料：3.png 已提交申请：待审核 查看申请 › 我的申请 6 条 全部批次 ⌄ 全部 草稿 待审核 审核中 待修改 已通过 历史记录 张一 · 2026 寒假留宿 待审核 2024000001 · 软件工程 留宿日期：2027-01-11 至 2027-01-14 留宿原因：B端验证-假期留宿"
+      }
+    },
+    {
+      "role": "STUDENT",
+      "page": "stays-approved",
+      "state": "default",
+      "file": "test-results/visual/STUDENT/stays-approved.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 1131,
+        "beyond": [],
+        "bars": [],
+        "clipped": [],
+        "heads": [
+          {
+            "overlap": false,
+            "titleRight": 289,
+            "tagLeft": 295
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          }
+        ],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 5,
+          "selectedCount": 1,
+          "selectedText": "▦ 留宿",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "留宿管理 开放批次、我的申请与审核结果 开放批次 1 个 2026 寒假留宿 寒假 · 开放中 开放区间：2027-01-10 至 2027-02-20 申请截止：2026-12-20 23:59 截止后自动锁定进入审核 材料：3.png 已提交申请：待审核 查看申请 › 我的申请 4 条 全部批次 ⌄ 全部 草稿 待审核 审核中 待修改 已通过 历史记录 张一 · 2024 寒假留宿 已完成 2024000001 · 软件工程 留宿日期：2025-01-17 至 2025-01-19 留宿原因：2024年寒假留宿"
+      }
+    },
+    {
+      "role": "STUDENT",
+      "page": "stay-form",
+      "state": "default",
+      "file": "test-results/visual/STUDENT/stay-form.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 820,
+        "beyond": [],
+        "bars": [
+          {
+            "count": 2,
+            "rows": 1,
+            "widths": [
+              166,
+              166
+            ]
+          }
+        ],
+        "clipped": [],
+        "heads": [],
+        "buttonsMisaligned": [],
+        "tabBar": null,
+        "text": "留宿申请 2026 寒假留宿 2026 寒假留宿 开放区间：2027-01-10 至 2027-02-20 本人楼栋申请截止：2026-12-20（截止后自动锁定进入审核） 注意事项：请按连续开放区间填写留宿日期，提交后等待宿管审核。 留宿日期段（必填） 第 1 段 移除 开始 选择日期 结束 选择日期 多个日期段之间不允许重叠。 添加时间段 留宿原因（必填） 请如实填写留宿原因 a 申请材料（提交审核前至少 1 份，最多 8 份） 选择材料（新增 0） 保存草稿 提交审核"
+      }
+    },
+    {
+      "role": "STUDENT",
+      "page": "stay-detail",
+      "state": "default",
+      "file": "test-results/visual/STUDENT/stay-detail.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 753,
+        "beyond": [],
+        "bars": [
+          {
+            "count": 1,
+            "rows": 1,
+            "widths": [
+              362
+            ]
+          }
+        ],
+        "clipped": [],
+        "heads": [],
+        "buttonsMisaligned": [],
+        "tabBar": null,
+        "text": "2026 寒假留宿 待审核 2027-01-11 至 2027-01-14 申请信息 申请编号 128 留宿批次 2026 寒假留宿 申请状态 待审核 住宿楼栋 明德二号楼 留宿日期 2027-01-11 至 2027-01-14 留宿原因 B端验证-假期留宿申请 审核意见 - 重交截止 - 提交时间 2026-11-11 10:32 申请附件 1 个 verify-805ff09c8bc74b28bc876cfe71c9ad93.png 预览 撤回申请"
+      }
+    },
+    {
+      "role": "STUDENT",
+      "page": "accommodation",
+      "state": "default",
+      "file": "test-results/visual/STUDENT/accommodation.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 1033,
+        "beyond": [],
+        "bars": [
+          {
+            "count": 1,
+            "rows": 1,
+            "widths": [
+              338
+            ]
+          }
+        ],
+        "clipped": [],
+        "heads": [
+          {
+            "overlap": false,
+            "titleRight": 295,
+            "tagLeft": 301
+          },
+          {
+            "overlap": false,
+            "titleRight": 295,
+            "tagLeft": 301
+          },
+          {
+            "overlap": false,
+            "titleRight": 295,
+            "tagLeft": 301
+          },
+          {
+            "overlap": false,
+            "titleRight": 295,
+            "tagLeft": 301
+          },
+          {
+            "overlap": false,
+            "titleRight": 295,
+            "tagLeft": 301
+          }
+        ],
+        "buttonsMisaligned": [],
+        "tabBar": null,
+        "text": "住宿管理 我的住宿、舍友与住宿历史 我的床位 明德二号楼 102 宿舍 · B 床 · 入住于 2026-10-30 当前住宿 楼栋 明德二号楼 宿舍 102 床位 B 床 入住日期 2026-10-30 住宿状态 在住 报修本宿舍 舍友 0 人 当前没有可显示的舍友信息 住宿历史 5 条 知行一号楼 203 · A 床 分配调换 住宿期间：2026-10-29 至 2026-10-30 知行一号楼 203 · D 床 分配调换 住宿期间：2026-10-29 至 2026-10-29 知行一号楼 203 · A "
+      }
+    },
+    {
+      "role": "STUDENT",
+      "page": "mine",
+      "state": "default",
+      "file": "test-results/visual/STUDENT/mine.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 924,
+        "beyond": [],
+        "bars": [
+          {
+            "count": 1,
+            "rows": 1,
+            "widths": [
+              338
+            ]
+          }
+        ],
+        "clipped": [],
+        "heads": [],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 5,
+          "selectedCount": 1,
+          "selectedText": "● 我的",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "学生档案 张一 2024000001 · 软件工程2024级1班 个人资料 编辑 登录账号 student1 姓名 张一 学号 2024000001 联系电话 13800000001 性别 男 出生日期 2004-03-14 学院 工程学院 专业 软件工程 班级 软件工程2024级1班 学籍状态 ENROLLED 修改密码 原密码 请输入原密码 新密码 至少 6 位 修改密码 退出登录"
+      }
+    },
+    {
+      "role": "REPAIRER",
+      "page": "home",
+      "state": "default",
+      "file": "test-results/visual/REPAIRER/home.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 753,
+        "beyond": [],
+        "bars": [],
+        "clipped": [],
+        "heads": [],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 4,
+          "selectedCount": 1,
+          "selectedText": "⌂ 工作台",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "维修人员端 王师傅1 维修任务工作台 39 条未读消息 0 待接单 0 维修中 0 延期申请 1 待学生确认 维修工作 修 维修任务 接单、拒单、维修与延期 › 记 维修记录 工单记录、异常记录与评价 › 信 消息中心 接收派单与业务通知 › 工作台数字与“维修任务”“维修记录”使用同一统计口径，如与实际工单不符请刷新页面。"
+      }
+    },
+    {
+      "role": "REPAIRER",
+      "page": "repairs-all",
+      "state": "default",
+      "file": "test-results/visual/REPAIRER/repairs-all.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 753,
+        "beyond": [],
+        "bars": [],
+        "clipped": [],
+        "heads": [
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          }
+        ],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 4,
+          "selectedCount": 1,
+          "selectedText": "⚒ 维修任务",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "维修任务 只显示派给本人的工单 全部 16 待接单 0 维修中 0 延期 0 待确认 1 已确认 0 历史记录 18 按工单号查询 查询 共 1 条 · 第 1 / 1 页 视觉验收-待确认工单 待确认 WX202611110019 · 水龙头漏水 明德二号楼 102 · 张一 维修期限 2026-11-12 10:28 更新于 2026-11-11 10:28 查看详情 ›"
+      }
+    },
+    {
+      "role": "REPAIRER",
+      "page": "repairs-history",
+      "state": "default",
+      "file": "test-results/visual/REPAIRER/repairs-history.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 1687,
+        "beyond": [],
+        "bars": [],
+        "clipped": [],
+        "heads": [
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          }
+        ],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 4,
+          "selectedCount": 1,
+          "selectedText": "⚒ 维修任务",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "维修任务 只显示派给本人的工单 全部 1 待接单 0 维修中 0 延期 0 待确认 1 已确认 0 历史记录 18 按工单号查询 查询 共 18 条 · 第 1 / 2 页 B端验证-卫生间水龙头漏水 已归档 WX202611110025 · 水龙头漏水 明德二号楼 102 · 张一 维修期限 2026-11-12 10:32 ★ 4 分 更新于 2026-11-11 10:32 查看详情 › B端验证-卫生间水龙头漏水 已归档 WX202611110011 · 水龙头漏水 明德二号楼 102 · 张一 维修期限 "
+      }
+    },
+    {
+      "role": "REPAIRER",
+      "page": "repair-detail",
+      "state": "default",
+      "file": "test-results/visual/REPAIRER/repair-detail.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 1109,
+        "beyond": [],
+        "bars": [],
+        "clipped": [
+          {
+            "cls": "attachment-name",
+            "text": "verify-0250b8777765470bb",
+            "sw": 263,
+            "cw": 250
+          }
+        ],
+        "heads": [],
+        "buttonsMisaligned": [],
+        "tabBar": null,
+        "text": "WX202611110026 · 点击复制 B端验证-宿舍门锁异响 待审核 工单信息 门锁开合有明显异响 工单编号 WX202611110026 当前状态 待审核 故障分类 水龙头漏水 维修工种 水暖维修 申请学生 张一 报修位置 明德二号楼 102 维修人员 暂无派单 报修时间 2026-11-11 10:32 更新时间 2026-11-11 10:32 附件与现场照片 1 个 verify-0250b8777765470bbce37d143685c68a.png 完工照片 预览 派单记录 1 条 ▾ 王师傅1 "
+      }
+    },
+    {
+      "role": "REPAIRER",
+      "page": "records",
+      "state": "default",
+      "file": "test-results/visual/REPAIRER/records.png",
+      "issues": [],
+      "metrics": {
+        "vw": 375,
+        "docOverflow": 0,
+        "paintHeight": 2497,
+        "beyond": [],
+        "bars": [],
+        "clipped": [],
+        "heads": [
+          {
+            "overlap": false,
+            "titleRight": 294,
+            "tagLeft": 300
+          },
+          {
+            "overlap": false,
+            "titleRight": 294,
+            "tagLeft": 300
+          },
+          {
+            "overlap": false,
+            "titleRight": 294,
+            "tagLeft": 300
+          },
+          {
+            "overlap": false,
+            "titleRight": 294,
+            "tagLeft": 300
+          },
+          {
+            "overlap": false,
+            "titleRight": 294,
+            "tagLeft": 300
+          },
+          {
+            "overlap": false,
+            "titleRight": 294,
+            "tagLeft": 300
+          }
+        ],
+        "buttonsMisaligned": [],
+        "tabBar": null,
+        "text": "维修人员工作台 王师傅1 累计完工 26 单 · 收到评价 20 条 全部年份 ⌄ 全部月份 ⌄ 重置 记录 评价 0 待接单 0 维修中 1 待学生确认 3.3 综合评分 个人工单记录 18 条 ▾ 统计范围：全部时间 B端验证-卫生间水龙头漏水 已归档 WX202611110025 · 明德二号楼 102 ★ 4 分 2026-11-11 10:32 B端验证-卫生间水龙头漏水 已归档 WX202611110011 · 明德二号楼 102 ★ 4 分 2026-11-11 10:01 B端验证-卫生间水龙头漏水"
+      }
+    },
+    {
+      "role": "REPAIRER",
+      "page": "records-rating",
+      "state": "default",
+      "file": "test-results/visual/REPAIRER/records-rating.png",
+      "issues": [],
+      "metrics": {
+        "vw": 375,
+        "docOverflow": 0,
+        "paintHeight": 2535,
+        "beyond": [],
+        "bars": [],
+        "clipped": [],
+        "heads": [
+          {
+            "overlap": false,
+            "titleRight": 290,
+            "tagLeft": 296
+          },
+          {
+            "overlap": false,
+            "titleRight": 290,
+            "tagLeft": 296
+          },
+          {
+            "overlap": false,
+            "titleRight": 290,
+            "tagLeft": 296
+          },
+          {
+            "overlap": false,
+            "titleRight": 290,
+            "tagLeft": 296
+          },
+          {
+            "overlap": false,
+            "titleRight": 290,
+            "tagLeft": 296
+          },
+          {
+            "overlap": false,
+            "titleRight": 290,
+            "tagLeft": 296
+          }
+        ],
+        "buttonsMisaligned": [],
+        "tabBar": null,
+        "text": "维修人员工作台 王师傅1 累计完工 26 单 · 收到评价 20 条 全部年份 ⌄ 全部月份 ⌄ 重置 记录 评价 0 待接单 0 维修中 1 待学生确认 3.3 综合评分 全部时间综合评分 共 20 次评价 3.3 / 5 2024 2.00 4 次 2025 3.00 4 次 2026 3.83 12 次 评价明细 20 条 B端验证-卫生间水龙头漏水 ★ 4 分 维修及时，处理干净，问题已解决 WX202611110025 2026-11-11 10:32 B端验证-卫生间水龙头漏水 ★ 4 分 维修及时，处"
+      }
+    },
+    {
+      "role": "REPAIRER",
+      "page": "messages",
+      "state": "default",
+      "file": "test-results/visual/REPAIRER/messages.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 1456,
+        "beyond": [],
+        "bars": [],
+        "clipped": [],
+        "heads": [],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 4,
+          "selectedCount": 1,
+          "selectedText": "✉ 消息 39",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "消息中心 39 条未读消息 全部已读 全部 系统通知 系统管理员发布 宿管发布 全部 未读 已读 全部楼栋 ⌄ 接单超时 系统通知 发布人：系统 WX202611110024 2026-11-11 17:30 未读 新的维修派单 系统通知 发布人：系统 WX202611110024 2026-11-11 15:30 未读 接单超时 系统通知 发布人：系统 WX202611110018 2026-11-11 15:30 未读 接单超时 系统通知 发布人：系统 WX202611110015 2026-11-11 15:"
+      }
+    },
+    {
+      "role": "REPAIRER",
+      "page": "mine",
+      "state": "default",
+      "file": "test-results/visual/REPAIRER/mine.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 924,
+        "beyond": [],
+        "bars": [
+          {
+            "count": 1,
+            "rows": 1,
+            "widths": [
+              338
+            ]
+          }
+        ],
+        "clipped": [],
+        "heads": [],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 4,
+          "selectedCount": 1,
+          "selectedText": "● 我的",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "维修人员档案 王师傅1 RP000001 · 维修人员 个人资料 编辑 登录账号 repair1 姓名 王师傅1 工号 RP000001 联系电话 13800000001 性别 男 出生日期 1990-03-18 维修工种 水暖维修, 电气维修, 综合维修 负责楼栋 明德二号楼 在岗状态 在岗 在办工单 0 修改密码 原密码 请输入原密码 新密码 至少 6 位 修改密码 退出登录"
+      }
+    },
+    {
+      "role": "DORM_MANAGER",
+      "page": "home",
+      "state": "default",
+      "file": "test-results/visual/DORM_MANAGER/home.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 766,
+        "beyond": [],
+        "bars": [],
+        "clipped": [],
+        "heads": [],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 5,
+          "selectedCount": 1,
+          "selectedText": "⌂ 工作台",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "宿管端 周老师 楼栋事务工作台 49 条未读消息 22 待处理报修 1 待审核留宿 0 管辖楼栋通过留宿人数 业务状态 当前可见工单与申请 报修工单 待审核 15 待人工处理 7 待确认 3 已归档 11 留宿申请 COMPLETED 4 待审核 1 楼栋事务 修 报修审核 审核、派单与延期复核 › 宿 留宿审核 锁定申请与审核名单 › 住 楼栋住宿 查看负责范围的住宿 › 信 消息中心 通知学生与查看消息 ›"
+      }
+    },
+    {
+      "role": "DORM_MANAGER",
+      "page": "repairs",
+      "state": "default",
+      "file": "test-results/visual/DORM_MANAGER/repairs.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 1650,
+        "beyond": [],
+        "bars": [],
+        "clipped": [],
+        "heads": [
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 297,
+            "tagLeft": 303
+          },
+          {
+            "overlap": false,
+            "titleRight": 297,
+            "tagLeft": 303
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          }
+        ],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 5,
+          "selectedCount": 1,
+          "selectedText": "⚒ 报修审核",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "楼栋报修 仅显示负责楼栋范围 全部 25 待审核 15 待人工处理 7 待派单 0 待接单 0 维修中 0 待确认 3 历史记录 11 按工单号查询 查询 共 25 条 · 第 1 / 3 页 B端验证-宿舍门锁异响 待审核 WX202611110026 · 水龙头漏水 明德二号楼 102 · 张一 更新于 2026-11-11 10:32 查看详情 › B端验证-撤销后重新提交 待审核 WX202611110027 · 水龙头漏水 明德二号楼 102 · 张一 更新于 2026-11-11 10:32 查看详情 "
+      }
+    },
+    {
+      "role": "DORM_MANAGER",
+      "page": "stays",
+      "state": "default",
+      "file": "test-results/visual/DORM_MANAGER/stays.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 1321,
+        "beyond": [],
+        "bars": [
+          {
+            "count": 2,
+            "rows": 1,
+            "widths": [
+              167,
+              167
+            ]
+          }
+        ],
+        "clipped": [],
+        "heads": [
+          {
+            "overlap": false,
+            "titleRight": 289,
+            "tagLeft": 295
+          },
+          {
+            "overlap": false,
+            "titleRight": 289,
+            "tagLeft": 295
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          }
+        ],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 5,
+          "selectedCount": 1,
+          "selectedText": "▦ 留宿审核",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "留宿管理 负责楼栋批次、截止时间与申请审核 批次设置 2 个 2026 寒假留宿 寒假 · 开放中 开放区间：2027-01-10 至 2027-02-20 申请截止：2026-12-20 23:59 截止后自动锁定进入审核 材料：3.png 2027 暑假留宿 暑假 · 开放中 开放区间：2027-07-10 至 2027-08-20 申请截止：2026-12-20 23:59 申请名单 5 条 全部批次 ⌄ 全部 待审核 审核中 待修改 已通过 历史记录 张一 · 2026 寒假留宿 待审核 202400000"
+      }
+    },
+    {
+      "role": "ADMIN",
+      "page": "home",
+      "state": "default",
+      "file": "test-results/visual/ADMIN/home.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 883,
+        "beyond": [],
+        "bars": [],
+        "clipped": [],
+        "heads": [],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 5,
+          "selectedCount": 1,
+          "selectedText": "⌂ 工作台",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "系统管理员端 系统管理员 全校运行工作台 94 条未读消息 367 在读学生 315 已安排住宿 264 处理中报修 96 当前通过留宿 业务状态 当前可见工单与申请 报修工单 待审核 75 待人工处理 156 维修中 30 待确认 3 已归档 190 留宿申请 已通过 102 待审核 66 COMPLETED 60 草稿 58 审核中 57 已归档 50 系统管理 修 报修管理 待审核、异常与全校工单 › 宿 留宿管理 开放批次、申请与历史 › 人 人员与角色 学生、宿管、维修人员 › 住 宿舍资源 楼栋、宿舍、"
+      }
+    },
+    {
+      "role": "ADMIN",
+      "page": "repairs",
+      "state": "default",
+      "file": "test-results/visual/ADMIN/repairs.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 1650,
+        "beyond": [],
+        "bars": [],
+        "clipped": [],
+        "heads": [
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 297,
+            "tagLeft": 303
+          },
+          {
+            "overlap": false,
+            "titleRight": 297,
+            "tagLeft": 303
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          }
+        ],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 5,
+          "selectedCount": 1,
+          "selectedText": "⚒ 报修管理",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "全校报修 按工单状态处理业务 全部 264 待审核 75 待人工处理 156 待派单 0 待接单 0 维修中 30 待确认 3 历史记录 190 按工单号查询 查询 共 264 条 · 第 1 / 27 页 B端验证-宿舍门锁异响 待审核 WX202611110026 · 水龙头漏水 明德二号楼 102 · 张一 更新于 2026-11-11 10:32 查看详情 › B端验证-撤销后重新提交 待审核 WX202611110027 · 水龙头漏水 明德二号楼 102 · 张一 更新于 2026-11-11 10:3"
+      }
+    },
+    {
+      "role": "ADMIN",
+      "page": "stays",
+      "state": "default",
+      "file": "test-results/visual/ADMIN/stays.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 2387,
+        "beyond": [],
+        "bars": [
+          {
+            "count": 2,
+            "rows": 1,
+            "widths": [
+              167,
+              167
+            ]
+          },
+          {
+            "count": 2,
+            "rows": 1,
+            "widths": [
+              167,
+              167
+            ]
+          },
+          {
+            "count": 1,
+            "rows": 1,
+            "widths": [
+              340
+            ]
+          }
+        ],
+        "clipped": [],
+        "heads": [
+          {
+            "overlap": false,
+            "titleRight": 289,
+            "tagLeft": 295
+          },
+          {
+            "overlap": false,
+            "titleRight": 289,
+            "tagLeft": 295
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          },
+          {
+            "overlap": false,
+            "titleRight": 317,
+            "tagLeft": 323
+          }
+        ],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 5,
+          "selectedCount": 1,
+          "selectedText": "▦ 留宿管理",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "留宿管理 全校批次设置、申请名单与补录 新增批次 批次设置 2 个 2026 寒假留宿 寒假 · 开放中 开放区间：2027-01-10 至 2027-02-20 申请截止：2026-12-20 23:59 材料：3.png 上传材料示例 人工补录 2027 暑假留宿 暑假 · 开放中 开放区间：2027-07-10 至 2027-08-20 申请截止：2026-12-20 23:59 上传材料示例 人工补录 申请名单 335 条 全部批次 ⌄ 全部 待审核 审核中 待修改 已通过 历史记录 张一 · 2026 寒"
+      }
+    },
+    {
+      "role": "ADMIN",
+      "page": "messages",
+      "state": "default",
+      "file": "test-results/visual/ADMIN/messages.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 1558,
+        "beyond": [],
+        "bars": [],
+        "clipped": [],
+        "heads": [],
+        "buttonsMisaligned": [],
+        "tabBar": {
+          "items": 5,
+          "selectedCount": 1,
+          "selectedText": "✉ 消息 94",
+          "covered": false,
+          "coveredPx": 0
+        },
+        "text": "消息中心 94 条未读消息 全部已读 发布 全部 系统通知 宿管发布 我发布的 全部 未读 已读 暂无可派维修人员 系统通知 发布人：系统 WX202611110024暂无符合条件的维修人员，请系统管理员协调处理。 2026-11-11 17:30 未读 暂无可派维修人员 系统通知 发布人：系统 WX202611110021暂无符合条件的维修人员，请系统管理员协调处理。 2026-11-11 15:30 未读 暂无可派维修人员 系统通知 发布人：系统 WX202611110018暂无符合条件的维修人员，请系统管理员"
+      }
+    },
+    {
+      "role": "通用",
+      "page": "login",
+      "state": "default",
+      "file": "test-results/visual/通用/login.png",
+      "issues": [],
+      "metrics": {
+        "vw": 390,
+        "docOverflow": 0,
+        "paintHeight": 753,
+        "beyond": [],
+        "bars": [
+          {
+            "count": 1,
+            "rows": 1,
+            "widths": [
+              326
+            ]
+          }
+        ],
+        "clipped": [],
+        "heads": [],
+        "buttonsMisaligned": [],
+        "tabBar": null,
+        "text": "宿 宿舍事务 学生 · 宿管 · 维修人员 · 系统管理员 账号 请输入登录账号 密码 请输入密码 登录 登录状态失效后将自动返回此页；不同角色登录后进入各自的业务视图。"
+      }
+    }
+  ]
+}

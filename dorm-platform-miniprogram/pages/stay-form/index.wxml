@@ -1,1 +1,63 @@
-<view class="page"><view wx:if="{{loading}}" class="loading">正在准备留宿申请…</view><view wx:else class="form-card"><view class="card-hint"><text class="section-inline">{{batch.batch_name}}</text><text class="muted">可申请：{{batch.open_start_date}} 至 {{batch.open_end_date}}</text></view><view class="field"><text class="field-label">留宿日期段</text><view class="range" wx:for="{{ranges}}" wx:key="index"><view class="row"><text>第 {{index + 1}} 段</text><text class="file-remove" data-index="{{index}}" bindtap="removeRange">移除</text></view><view class="range-grid"><picker mode="date" value="{{item.startDate}}" data-index="{{index}}" data-key="startDate" bindchange="date"><view><text class="range-label">开始</text><text class="range-date">{{item.startDate || '选择日期'}}</text></view></picker><picker mode="date" value="{{item.endDate}}" data-index="{{index}}" data-key="endDate" bindchange="date"><view><text class="range-label">结束</text><text class="range-date">{{item.endDate || '选择日期'}}</text></view></picker></view></view><button class="outline" bindtap="addRange">添加时间段</button></view><view class="field"><text class="field-label">留宿原因</text><textarea class="textarea" value="{{reason}}" bindinput="reason" placeholder="请如实填写留宿原因" /></view><view class="field"><text class="field-label">申请材料（最多 8 个，可选）</text><button class="outline" bindtap="choose">选择材料（{{files.length}}）</button></view><view class="button-row"><button class="secondary" data-submit="false" bindtap="save">保存草稿</button><button class="primary" data-submit="true" bindtap="save">提交审核</button></view></view></view>
+<view class="page">
+  <view wx:if="{{loading}}" class="loading">正在准备留宿申请…</view>
+  <block wx:else>
+    <view class="page-heading">
+      <view class="grow">
+        <text class="heading-title">留宿申请</text>
+        <text class="heading-sub">{{batchInfo.name || '假期留宿'}}</text>
+      </view>
+    </view>
+
+    <view class="card">
+      <text class="section-inline">{{batchInfo.name}}</text>
+      <text class="record-meta">开放区间：{{batchInfo.openRange}}</text>
+      <text wx:if="{{deadlineLabel}}" class="record-note">{{deadlineLabel}}</text>
+      <text wx:if="{{batchInfo.instructions}}" class="record-meta">注意事项：{{batchInfo.instructions}}</text>
+    </view>
+
+    <view class="form-card">
+      <view class="field">
+        <text class="field-label">留宿日期段（必填）</text>
+        <view class="range" wx:for="{{ranges}}" wx:key="index">
+          <view class="row">
+            <text>第 {{index + 1}} 段</text>
+            <text class="file-remove" data-index="{{index}}" bindtap="removeRange">移除</text>
+          </view>
+          <view class="range-grid">
+            <picker mode="date" value="{{item.startDate}}" data-index="{{index}}" data-key="startDate" bindchange="date">
+              <view><text class="range-label">开始</text><text class="range-date">{{item.startDate || '选择日期'}}</text></view>
+            </picker>
+            <picker mode="date" value="{{item.endDate}}" data-index="{{index}}" data-key="endDate" bindchange="date">
+              <view><text class="range-label">结束</text><text class="range-date">{{item.endDate || '选择日期'}}</text></view>
+            </picker>
+          </view>
+        </view>
+        <text class="field-hint">多个日期段之间不允许重叠。</text>
+        <button class="outline compact-button" bindtap="addRange">添加时间段</button>
+      </view>
+
+      <view class="field">
+        <text class="field-label">留宿原因（必填）</text>
+        <textarea class="textarea" value="{{reason}}" bindinput="reasonInput" placeholder="请如实填写留宿原因" maxlength="500"/>
+      </view>
+
+      <view class="field">
+        <text class="field-label">申请材料（提交审核前至少 1 份，最多 8 份）</text>
+        <button class="outline compact-button" bindtap="choose">选择材料（新增 {{files.length}}）</button>
+        <view class="file-row" wx:for="{{existing}}" wx:key="file_id">
+          <text>{{item.original_name}}</text>
+          <text class="file-remove" data-index="{{index}}" bindtap="removeExisting">移除</text>
+        </view>
+        <view class="file-row" wx:for="{{files}}" wx:key="*this">
+          <text>{{item}}</text>
+          <text class="file-remove" data-index="{{index}}" bindtap="removeFile">移除</text>
+        </view>
+      </view>
+
+      <view class="action-bar">
+        <button class="secondary" data-submit="false" bindtap="save" loading="{{actionBusy}}" disabled="{{actionBusy}}">保存草稿</button>
+        <button class="primary" data-submit="true" bindtap="save" loading="{{actionBusy}}" disabled="{{actionBusy}}">提交审核</button>
+      </view>
+    </view>
+  </block>
+</view>

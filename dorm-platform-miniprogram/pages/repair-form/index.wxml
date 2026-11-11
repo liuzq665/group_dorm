@@ -1,1 +1,50 @@
-<view class="page"><view wx:if="{{loading}}" class="loading">正在准备表单…</view><view wx:else class="form-card"><view class="field"><text class="field-label">故障分类</text><picker mode="selector" range="{{catalog.categories}}" range-key="name" value="{{categoryIndex}}" bindchange="category"><view class="field-picker">{{catalog.categories[categoryIndex].name || '请选择分类'}}</view></picker></view><view class="field"><text class="field-label">报修标题</text><input class="input" value="{{form.title}}" data-key="title" bindinput="input" maxlength="100" placeholder="例如：卫生间水龙头漏水" /></view><view class="field"><text class="field-label">故障位置与说明</text><textarea class="textarea" value="{{form.description}}" data-key="description" bindinput="input" maxlength="1000" placeholder="请说明问题位置、现象和是否影响使用" /></view><view class="field"><text class="field-label">现场照片（可选）</text><view class="button-row"><button class="outline" bindtap="choose">选择照片</button><text class="muted">已选 {{files.length}} 张</text></view><view class="file-row" wx:for="{{files}}" wx:key="*this"><text>{{item}}</text><text class="file-remove" data-index="{{index}}" bindtap="remove">移除</text></view></view><view class="button-row"><button class="secondary" bindtap="save" data-submit="false">保存草稿</button><button class="primary" bindtap="save" data-submit="true">提交审核</button></view></view></view>
+<view class="page">
+  <view wx:if="{{loading}}" class="loading">正在准备表单…</view>
+  <block wx:else>
+    <view class="page-heading">
+      <view class="grow">
+        <text class="heading-title">{{editing ? '修改报修' : '新建报修'}}</text>
+        <text class="heading-sub">{{editing ? '修改后需重新提交审核' : '填写故障信息，可先保存草稿'}}</text>
+      </view>
+    </view>
+
+    <view class="form-card">
+      <view class="field">
+        <text class="field-label">故障分类（必填）</text>
+        <picker mode="selector" range="{{categories}}" range-key="name" value="{{categoryIndex}}" bindchange="category">
+          <view class="field-picker">{{categoryName || '请选择故障分类'}}<text class="picker-arrow">⌄</text></view>
+        </picker>
+      </view>
+
+      <view class="field">
+        <text class="field-label">报修标题（必填）</text>
+        <input class="input" value="{{form.title}}" data-key="title" bindinput="input" maxlength="100" placeholder="例如：卫生间水龙头漏水"/>
+      </view>
+
+      <view class="field">
+        <text class="field-label">故障位置与说明（必填）</text>
+        <textarea class="textarea" value="{{form.description}}" data-key="description" bindinput="input" maxlength="1000" placeholder="请说明问题位置、现象和是否影响使用"/>
+      </view>
+
+      <view class="field">
+        <text class="field-label">现场照片（可选，最多 6 张）</text>
+        <button class="outline compact-button" bindtap="choose">选择照片（新增 {{files.length}}）</button>
+        <view class="photo-row" wx:for="{{existing}}" wx:key="file_id">
+          <text class="photo-name">{{item.original_name}}</text>
+          <text class="photo-tag">已上传</text>
+        </view>
+        <view class="photo-row" wx:for="{{files}}" wx:key="*this">
+          <text class="photo-name">{{item}}</text>
+          <text class="file-remove" data-index="{{index}}" bindtap="removeFile">移除</text>
+        </view>
+      </view>
+
+      <view class="action-bar">
+        <button class="secondary" data-submit="false" bindtap="save" loading="{{actionBusy}}" disabled="{{actionBusy}}">保存草稿</button>
+        <button class="primary" data-submit="true" bindtap="save" loading="{{actionBusy}}" disabled="{{actionBusy}}">提交审核</button>
+      </view>
+    </view>
+
+    <view class="tip-bar">提交后由负责楼栋宿管审核，审核通过自动派单；维修完成后请在“我的报修”中确认完成并填写评分与文字评价。</view>
+  </block>
+</view>

@@ -1,9 +1,115 @@
+<import src="../../templates/ui.wxml"/>
 <view class="page">
-  <view class="row message-heading"><view><text class="section-title">消息中心</text><text class="muted">{{unread}} 条未读</text></view><view class="button-row"><button wx:if="{{unread}}" class="outline small-button" bindtap="readAll">全部标为已读</button><button wx:if="{{role==='ADMIN'||role==='DORM_MANAGER'}}" class="primary small-button" bindtap="openPublish">发布通知</button></view></view>
-  <view class="message-filters"><view class="message-source-tabs"><view wx:for="{{sourceOptions}}" wx:key="key" class="message-source-tab {{item.selected?'selected':''}}" data-key="{{item.key}}" bindtap="chooseSource">{{item.label}}</view></view><view class="message-read-tabs"><view wx:for="{{readOptions}}" wx:key="key" class="message-read-tab {{read===item.key?'selected':''}}" data-key="{{item.key}}" bindtap="chooseRead">{{item.label}}</view></view><picker wx:if="{{role==='REPAIRER'}}" range="{{buildings}}" range-key="building_name" bindchange="chooseBuilding"><view class="building-filter">{{buildingId?'已选择楼栋':'全部楼栋'}} <text>⌄</text></view></picker></view>
-  <view wx:if="{{loading}}" class="loading">正在加载消息…</view><view wx:elif="{{!items.length}}" class="empty">暂无消息</view>
-  <view wx:for="{{pageItems}}" wx:key="message_id" class="message-item {{!item.read_at&&item.is_recipient?'unread':''}}"><view class="row" data-item="{{item}}" bindtap="open"><view><text class="message-title">{{item.title}}</text><text class="message-source">{{item.source_label || item.publisher_name}} · {{item.read_label || (item.read_at?'已读':'未读')}}</text></view><text wx:if="{{!item.read_at&&item.is_recipient}}" class="notice-dot"></text></view><text class="message-content">{{item.content}}</text><text wx:if="{{item.building_names}}" class="message-buildings">楼栋：{{item.building_names}}</text><text class="muted">{{item.created_at}}</text><view wx:if="{{item.attachments.length}}" class="attachment-list"><button wx:for="{{item.attachments}}" wx:for-item="file" wx:key="file_id" class="attachment-button" data-file="{{file}}" catchtap="preview">{{file.original_name}} · 预览</button></view></view>
-  <view wx:if="{{items.length>pageSize}}" class="pager"><button class="outline pager-button" data-delta="-1" bindtap="changePage" disabled="{{page===1}}">上一页</button><text class="pager-text">{{page}} / {{pageCount}}</text><button class="outline pager-button" data-delta="1" bindtap="changePage" disabled="{{page===pageCount}}">下一页</button></view>
-  <view wx:if="{{detail}}" class="modal-mask"><view class="detail-panel"><view class="row detail-heading"><text class="section-title">消息详情</text><button class="outline small-button" bindtap="closeDetail">返回列表</button></view><text class="detail-title">{{detail.title}}</text><view class="detail-meta"><text>{{detail.source_label || detail.publisher_name}}</text><text>{{detail.created_at}}</text></view><view class="detail-field"><text class="field-label">发布人</text><text>{{detail.publisher_name || '系统'}}</text></view><view class="detail-field"><text class="field-label">接收对象</text><text>{{detail.recipient_roles || detail.target_role || '当前账号'}}</text></view><view class="detail-field"><text class="field-label">楼栋范围</text><text>{{detail.building_names || '未指定'}}</text></view><view class="detail-body">{{detail.content || '暂无正文'}}</view><view wx:if="{{detail.attachments.length}}" class="attachment-list"><text class="field-label">附件</text><button wx:for="{{detail.attachments}}" wx:for-item="file" wx:key="file_id" class="attachment-button" data-file="{{file}}" bindtap="preview">{{file.original_name}} · 预览</button></view></view></view>
-  <view wx:if="{{publishing}}" class="modal-mask"><view class="publish-panel"><view class="row"><text class="section-title">发布通知</text><text class="link" bindtap="closePublish">关闭</text></view><input class="input" placeholder="通知标题" data-key="title" value="{{form.title}}" bindinput="input"/><textarea class="textarea" placeholder="通知内容" data-key="content" value="{{form.content}}" bindinput="input"/><text class="field-label">接收对象</text><view class="button-row"><button class="{{form.targetRole==='STUDENT'?'primary':'outline'}}" data-value="STUDENT" bindtap="target">学生</button><button wx:if="{{role==='ADMIN'}}" class="{{form.targetRole==='DORM_MANAGER'?'primary':'outline'}}" data-value="DORM_MANAGER" bindtap="target">宿管</button><button wx:if="{{role==='ADMIN'}}" class="{{form.targetRole==='REPAIRER'?'primary':'outline'}}" data-value="REPAIRER" bindtap="target">维修人员</button><button wx:if="{{role==='ADMIN'}}" class="{{form.targetRole==='ADMIN'?'primary':'outline'}}" data-value="ADMIN" bindtap="target">管理员</button><button wx:if="{{role==='ADMIN'}}" class="{{form.targetRole==='ALL'?'primary':'outline'}}" data-value="ALL" bindtap="target">全部角色</button></view><text class="field-label">楼栋范围（默认全部）</text><checkbox-group class="building-options" bindchange="selectBuildings"><label wx:for="{{buildings}}" wx:key="building_id" class="building-option"><checkbox value="{{item.building_id}}" checked="{{item.selected}}"/>{{item.building_name}}</label></checkbox-group><button class="outline" bindtap="chooseFiles">添加附件（{{files.length}}）</button><text wx:for="{{files}}" wx:key="*this" class="muted">{{item}}</text><button class="primary publish-submit" bindtap="publish">发布</button></view></view>
+  <view class="page-heading">
+    <view class="grow">
+      <text class="heading-title">消息中心</text>
+      <text class="heading-sub">{{unread}} 条未读消息</text>
+    </view>
+    <view class="heading-actions">
+      <button wx:if="{{unread}}" class="outline compact-button" bindtap="readAll">全部已读</button>
+      <button wx:if="{{role==='ADMIN'||role==='DORM_MANAGER'}}" class="primary compact-button" bindtap="openPublish">发布</button>
+    </view>
+  </view>
+
+  <view class="sticky-filter">
+    <view class="tabs">
+      <view wx:for="{{sourceOptions}}" wx:key="key" class="tab {{source===item.key?'active':''}}" data-key="{{item.key}}" bindtap="chooseSource">{{item.label}}</view>
+    </view>
+    <view class="filter-row">
+      <view class="tabs read-tabs">
+        <view wx:for="{{readOptions}}" wx:key="key" class="tab {{read===item.key?'active':''}}" data-key="{{item.key}}" bindtap="chooseRead">{{item.label}}</view>
+      </view>
+      <picker wx:if="{{role==='REPAIRER'}}" class="building-picker" range="{{buildings}}" range-key="building_name" value="{{buildingIndex}}" bindchange="chooseBuilding">
+        <view class="filter-select">{{buildingLabel}}<text class="picker-arrow">⌄</text></view>
+      </picker>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading">正在加载消息…</view>
+  <block wx:elif="{{!items.length}}">
+    <template is="empty-state" data="{{...emptyView}}"/>
+  </block>
+  <block wx:else>
+    <view class="record-list">
+      <view wx:for="{{pageItems}}" wx:key="message_id" class="record-card message-card {{item.unread?'unread':''}}" data-item="{{item}}" bindtap="open">
+        <view class="record-head">
+          <text class="record-title">{{item.title}}</text>
+          <text wx:if="{{item.unread}}" class="notice-dot"></text>
+        </view>
+        <view class="message-meta">
+          <text class="tag tag-info">{{item.sourceLabel}}</text>
+          <text class="message-publisher">发布人：{{item.publisherLabel}}</text>
+        </view>
+        <text class="record-meta message-content">{{item.content}}</text>
+        <view class="record-foot">
+          <text class="record-time">{{item.timeLabel}}</text>
+          <text class="message-read">{{item.readLabel}}</text>
+        </view>
+      </view>
+    </view>
+    <template is="pager" data="{{...pager}}"/>
+  </block>
+
+  <!-- 消息详情 -->
+  <view wx:if="{{detail}}" class="modal-mask">
+    <view class="modal-panel">
+      <view class="modal-head">
+        <text class="section-title">消息详情</text>
+        <text class="modal-close" bindtap="closeDetail">返回列表</text>
+      </view>
+      <view class="detail-title">{{detailView.title}}</view>
+      <view wx:for="{{detailView.fields}}" wx:key="label">
+        <template is="detail-field" data="{{...item}}"/>
+      </view>
+      <text class="field-label">正文</text>
+      <text class="detail-copy">{{detailView.content}}</text>
+      <text class="field-label">附件</text>
+      <template is="attachment-list" data="{{...detailView}}"/>
+    </view>
+  </view>
+
+  <!-- 发布通知（管理员/宿管） -->
+  <view wx:if="{{publishing}}" class="modal-mask">
+    <view class="modal-panel">
+      <view class="modal-head">
+        <text class="section-title">发布通知</text>
+        <text class="modal-close" bindtap="closePublish">关闭</text>
+      </view>
+      <view class="field">
+        <text class="field-label">通知标题</text>
+        <input class="input" placeholder="请输入通知标题" data-key="title" value="{{form.title}}" bindinput="input"/>
+      </view>
+      <view class="field">
+        <text class="field-label">通知内容</text>
+        <textarea class="textarea" placeholder="请输入通知内容" data-key="content" value="{{form.content}}" bindinput="input"/>
+      </view>
+      <view class="field">
+        <text class="field-label">接收对象</text>
+        <view class="tabs">
+          <view class="tab {{form.targetRole==='STUDENT'?'active':''}}" data-value="STUDENT" bindtap="target">学生</view>
+          <view wx:if="{{role==='ADMIN'}}" class="tab {{form.targetRole==='DORM_MANAGER'?'active':''}}" data-value="DORM_MANAGER" bindtap="target">宿管</view>
+          <view wx:if="{{role==='ADMIN'}}" class="tab {{form.targetRole==='REPAIRER'?'active':''}}" data-value="REPAIRER" bindtap="target">维修人员</view>
+          <view wx:if="{{role==='ADMIN'}}" class="tab {{form.targetRole==='ADMIN'?'active':''}}" data-value="ADMIN" bindtap="target">管理员</view>
+          <view wx:if="{{role==='ADMIN'}}" class="tab {{form.targetRole==='ALL'?'active':''}}" data-value="ALL" bindtap="target">全部角色</view>
+        </view>
+      </view>
+      <view class="field">
+        <text class="field-label">楼栋范围（默认全部）</text>
+        <checkbox-group class="building-options" bindchange="selectBuildings">
+          <label wx:for="{{buildings}}" wx:key="building_id" class="building-option">
+            <checkbox value="{{item.building_id}}" checked="{{item.selected}}"/>{{item.building_name}}
+          </label>
+        </checkbox-group>
+      </view>
+      <view class="field">
+        <text class="field-label">附件（最多 8 个，可选）</text>
+        <button class="outline compact-button" bindtap="chooseFiles">添加附件（{{files.length}}）</button>
+        <text wx:for="{{files}}" wx:key="*this" class="file-row-text">{{item}}</text>
+      </view>
+      <view class="action-bar">
+        <button class="outline" bindtap="closePublish">取消</button>
+        <button class="primary" loading="{{actionBusy}}" disabled="{{actionBusy}}" bindtap="publish">发布</button>
+      </view>
+    </view>
+  </view>
 </view>

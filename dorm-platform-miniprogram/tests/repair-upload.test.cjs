@@ -22,7 +22,16 @@ test('saving a repair uploads every photo to /files and submits their IDs', asyn
   };
   try {
     require('../pages/repair-form/index');
-    page.data = { ...page.data, files: ['first.jpg', 'second.jpg'], form: { title: '漏水', description: '水龙头漏水', categoryId: '1' } };
+    page.data = {
+      ...page.data,
+      files: ['first.jpg', 'second.jpg'],
+      categories: [{ id: 1, name: '水暖维修' }],
+      categoryIndex: 0,
+      categoryName: '水暖维修',
+      categoryChosen: true,
+      form: { title: '漏水', description: '水龙头漏水' }
+    };
+    page.setData = function setData(values) { Object.assign(this.data, values); };
     await page.save({ currentTarget: { dataset: { submit: 'true' } } });
     assert.equal(uploads.length, 2);
     for (const upload of uploads) {

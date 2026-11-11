@@ -1,5 +1,7 @@
-.card .row { align-items: flex-start; padding: 10rpx 0; border-bottom: 1rpx solid #e8edeb; }
-.card .row:last-child { border-bottom: 0; }
-.card .row > text:last-child { max-width: 65%; color: #334743; text-align: right; overflow-wrap: anywhere; }
-.detail-copy { display: block; margin: 14rpx 0; color: #3c504c; line-height: 1.65; white-space: pre-wrap; }
-.button-row button { flex: 1 1 180rpx; }
+.hero-tags { display: flex; flex-wrap: wrap; gap: 8rpx; margin-top: 12rpx; }
+.hero-tags .tag { background: rgba(255, 255, 255, .16); color: #fff; }
+.log-item { padding: 14rpx 0; border-bottom: 1rpx solid var(--divider); }
+.log-item:last-child { border-bottom: 0; }
+.log-title { display: block; color: var(--text-1); font-size: 24rpx; line-height: 1.5; word-break: break-word; }
+.log-time { display: block; margin-top: 4rpx; color: var(--text-3); font-size: 22rpx; }
+

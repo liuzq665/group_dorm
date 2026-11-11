@@ -1,6 +1,4 @@
-.small-button { min-height: 56rpx; padding: 0 16rpx; font-size: 23rpx; }
-.card .row { align-items: flex-start; padding: 12rpx 0; border-bottom: 1rpx solid #e8edeb; }
-.card .row:last-child { border-bottom: 0; }
-.card .row > text:last-child { max-width: 66%; color: #334743; text-align: right; overflow-wrap: anywhere; }
-.full-button, .logout-button { width: 100%; min-height: 68rpx; margin-top: 18rpx; }
-.logout-button { color: #9f3e3a !important; background: #f8ecea !important; }
+.hero { margin-bottom: 16rpx; }
+.section-heading { align-items: center; }
+.logout-button { width: 100%; min-height: 68rpx; }
+

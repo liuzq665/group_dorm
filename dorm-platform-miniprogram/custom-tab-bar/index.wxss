@@ -1,6 +1,63 @@
-.tabbar { position: fixed; z-index: 10; left: 0; right: 0; bottom: 0; display: flex; height: calc(106rpx + env(safe-area-inset-bottom)); padding: 6rpx 8rpx env(safe-area-inset-bottom); box-sizing: border-box; background: #fff; border-top: 1rpx solid #dce5e2; }
-.tab-item { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3rpx; color: #65736f; }
-.tab-item.selected { color: #176fc1; }
-.tab-icon { min-width: 40rpx; text-align: center; font-size: 30rpx; line-height: 1.1; }
-.tab-label { font-size: 21rpx; }
-.tab-badge { position: absolute; top: 4rpx; left: calc(50% + 14rpx); min-width: 26rpx; padding: 0 5rpx; height: 26rpx; line-height: 26rpx; text-align: center; color: #fff; background: #b84d49; border-radius: 14rpx; font-size: 17rpx; }
+.tabbar {
+  position: fixed;
+  z-index: 10;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  height: calc(106rpx + env(safe-area-inset-bottom));
+  padding: 6rpx 8rpx env(safe-area-inset-bottom);
+  box-sizing: border-box;
+  background: #fff;
+  border-top: 1rpx solid #eef2f0;
+  box-shadow: 0 -2rpx 10rpx rgba(43, 58, 56, .05);
+}
+.tab-item {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3rpx;
+  color: #8a9793;
+}
+/* 当前页高亮：顶部短指示条 + 图标浅色底 + 文字加粗变色 */
+.tab-item.selected { color: #3e6b62; font-weight: 650; }
+.tab-item.selected::before {
+  content: '';
+  position: absolute;
+  top: -6rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 44rpx;
+  height: 5rpx;
+  background: #3e6b62;
+  border-radius: 3rpx;
+}
+.tab-icon {
+  min-width: 40rpx;
+  text-align: center;
+  font-size: 29rpx;
+  line-height: 1.1;
+  border-radius: 50%;
+  padding: 3rpx 8rpx;
+  box-sizing: content-box;
+}
+.tab-item.selected .tab-icon { color: #3e6b62; background: #eef3f1; }
+.tab-label { font-size: 20rpx; }
+.tab-item.selected .tab-label { color: #3e6b62; }
+.tab-badge {
+  position: absolute;
+  top: 2rpx;
+  left: calc(50% + 14rpx);
+  min-width: 26rpx;
+  padding: 0 5rpx;
+  height: 26rpx;
+  line-height: 26rpx;
+  text-align: center;
+  color: #fff;
+  background: #9a5a55;
+  border-radius: 14rpx;
+  font-size: 17rpx;
+}

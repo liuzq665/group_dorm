@@ -1,0 +1,88 @@
+{
+  "generatedAt": "2026-11-11T02:30:14.611Z",
+  "orders": {
+    "pendingAccept": 632,
+    "repaired": 633
+  },
+  "results": [
+    {
+      "file": "test-results/visual/extra/student-repaired-actions.png",
+      "scrollY": 0,
+      "height": 1023,
+      "vw": 390,
+      "overflow": 0
+    },
+    {
+      "file": "test-results/visual/extra/student-repaired-bottom.png",
+      "scrollY": 269.3333435058594,
+      "height": 1023,
+      "vw": 390,
+      "overflow": 0
+    },
+    {
+      "file": "test-results/visual/extra/student-pending-accept.png",
+      "scrollY": 269.3333435058594,
+      "height": 1023,
+      "vw": 390,
+      "overflow": 0
+    },
+    {
+      "file": "test-results/visual/extra/student-repairs-bottom.png",
+      "scrollY": 678,
+      "height": 1431,
+      "vw": 390,
+      "overflow": 0
+    },
+    {
+      "file": "test-results/visual/extra/repairer-pending-accept.png",
+      "scrollY": 0,
+      "height": 957,
+      "vw": 390,
+      "overflow": 0
+    },
+    {
+      "file": "test-results/visual/extra/repairer-pending-accept-bottom.png",
+      "scrollY": 204,
+      "height": 957,
+      "vw": 390,
+      "overflow": 0
+    },
+    {
+      "file": "test-results/visual/extra/repairer-repairs.png",
+      "scrollY": 0,
+      "height": 854,
+      "vw": 390,
+      "overflow": 0
+    },
+    {
+      "file": "test-results/visual/extra/manager-review-bottom.png",
+      "scrollY": 0,
+      "height": 753,
+      "vw": 390,
+      "overflow": 0
+    },
+    {
+      "file": "test-results/visual/extra/admin-review-bottom.png",
+      "scrollY": 0,
+      "height": 753,
+      "vw": 390,
+      "overflow": 0
+    },
+    {
+      "file": "test-results/visual/extra/narrow-320.png",
+      "narrowMetrics": {
+        "vw": 320,
+        "overflow": 0,
+        "beyond": [],
+        "clipped": []
+      },
+      "baseline": {
+        "file": "test-results/visual/extra/narrow-before.png",
+        "scrollY": 0,
+        "height": 1385,
+        "vw": 390,
+        "overflow": 0
+      }
+    }
+  ]
+}

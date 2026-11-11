@@ -1,1 +1,39 @@
-<view class="page"><view wx:if="{{loading}}" class="loading">正在加载申请…</view><view wx:elif="{{!detail}}" class="empty">未找到该留宿申请</view><block wx:else><view class="hero"><text class="hero-kicker">{{detail.batch_name}}</text><text class="hero-title">{{detail.statusLabel}}</text><text class="hero-copy">{{detail.dateRangeText}}</text></view><view class="card"><view class="row"><text class="label">申请学生</text><text>{{detail.student_name || '我'}}</text></view><view class="row"><text class="label">留宿原因</text><text>{{detail.reason}}</text></view><view class="row"><text class="label">审核意见</text><text>{{detail.review_reason || '-'}}</text></view><view class="row"><text class="label">重交截止</text><text>{{detail.resubmit_deadline || '-'}}</text></view><view class="row"><text class="label">最近撤回</text><text>{{detail.withdraw_count || 0}} 次</text></view></view><view class="card" wx:if="{{detail.attachments.length}}"><text class="section-inline">申请附件</text><view class="row" wx:for="{{detail.attachments}}" wx:key="file_id" data-file="{{item}}" bindtap="preview"><text>{{item.original_name}}</text><text class="link">预览</text></view></view><view class="card" wx:if="{{detail.reviews.length}}"><text class="section-inline">审核记录</text><view class="row" wx:for="{{detail.reviews}}" wx:key="review_id"><text>{{item.result}} · {{item.reason || '-'}}</text><text class="muted">{{item.reviewed_at}}</text></view></view><view class="button-row"><button wx:if="{{role==='STUDENT' && (detail.current_status==='DRAFT'||detail.current_status==='PENDING_EDIT')}}" class="secondary" bindtap="edit">修改申请</button><button wx:if="{{role==='STUDENT' && (detail.current_status==='DRAFT'||detail.current_status==='PENDING_EDIT')}}" class="primary" bindtap="submit">提交审核</button><button wx:if="{{role==='STUDENT' && detail.current_status==='PENDING_REVIEW'}}" class="danger" bindtap="withdraw">撤回申请</button></view></block></view>
+<import src="../../templates/ui.wxml"/>
+<view class="page">
+  <view wx:if="{{loading}}" class="loading">正在加载留宿申请…</view>
+  <view wx:elif="{{!detail}}" class="empty-state"><text class="empty-title">未找到该留宿申请</text><text class="empty-tip">请返回列表刷新后重试</text></view>
+  <block wx:else>
+    <view class="hero">
+      <text class="hero-kicker">{{detail.batch_name}}</text>
+      <text class="hero-title">{{detail.statusLabel}}</text>
+      <text class="hero-copy">{{detail.dateRangeText}}</text>
+    </view>
+
+    <view class="card">
+      <text class="section-inline">申请信息</text>
+      <view class="divider"></view>
+      <view wx:for="{{rows}}" wx:key="label">
+        <template is="detail-field" data="{{...item}}"/>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="section-heading"><text class="section-inline">申请附件</text><text class="muted">{{attachmentView.files.length}} 个</text></view>
+      <template is="attachment-list" data="{{...attachmentView}}"/>
+    </view>
+
+    <view wx:if="{{reviews.length}}" class="card">
+      <view class="section-heading"><text class="section-inline">审核记录</text><text class="muted">{{reviews.length}} 条</text></view>
+      <view class="log-item" wx:for="{{reviews}}" wx:key="review_id">
+        <text class="log-title">{{item.title}}</text>
+        <text class="log-time">{{item.timeLabel}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{detail.canEdit || detail.canWithdraw}}" class="action-bar">
+      <button wx:if="{{detail.canEdit}}" class="secondary" bindtap="edit">修改申请</button>
+      <button wx:if="{{detail.canSubmit}}" class="primary" loading="{{actionBusy}}" disabled="{{actionBusy}}" bindtap="submit">提交审核</button>
+      <button wx:if="{{detail.canWithdraw}}" class="danger" loading="{{actionBusy}}" disabled="{{actionBusy}}" bindtap="withdraw">撤回申请</button>
+    </view>
+  </block>
+</view>

@@ -1,0 +1,268 @@
+{
+  "startedAt": "2026-11-11T10:32:28",
+  "checks": [
+    {
+      "name": "维修端可读取本人负责楼栋（消息中心楼栋筛选数据源）",
+      "pass": true,
+      "detail": {
+        "count": 1,
+        "buildings": [
+          "明德二号楼"
+        ]
+      }
+    },
+    {
+      "name": "学生提交报修后状态为待审核",
+      "pass": true,
+      "detail": {
+        "status": "PENDING_REVIEW",
+        "orderNo": "WX202611110025"
+      }
+    },
+    {
+      "name": "宿管审核通过后自动派单给具备资质的维修人员",
+      "pass": true,
+      "detail": {
+        "status": "PENDING_ACCEPT",
+        "repairer": "王师傅1"
+      }
+    },
+    {
+      "name": "维修人员端“维修任务”能收到该派单",
+      "pass": true,
+      "detail": {
+        "count": 13
+      }
+    },
+    {
+      "name": "维修任务列表状态口径为“待接单”",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "name": "维修人员提交结果后学生端状态为待确认",
+      "pass": true,
+      "detail": {
+        "status": "REPAIRED"
+      }
+    },
+    {
+      "name": "学生端详情可见维修结果与完工照片",
+      "pass": true,
+      "detail": {
+        "files": 2
+      }
+    },
+    {
+      "name": "确认完成时文字评价缺失会被拒绝（必填口径）",
+      "pass": true,
+      "detail": {
+        "message": "comment不能为空"
+      }
+    },
+    {
+      "name": "学生确认完成后工单归档并保存评分",
+      "pass": true,
+      "detail": {
+        "comment": "维修及时，处理干净，问题已解决",
+        "score": 4,
+        "status": "ARCHIVED"
+      }
+    },
+    {
+      "name": "学生“报修历史”可查询已确认工单及评价",
+      "pass": true,
+      "detail": {
+        "found": true
+      }
+    },
+    {
+      "name": "维修“历史记录”可看到学生评分与文字评价",
+      "pass": true,
+      "detail": {
+        "comment": "维修及时，处理干净，问题已解决",
+        "score": 4
+      }
+    },
+    {
+      "name": "重修不新建业务工单（沿用原工单号）",
+      "pass": true,
+      "detail": {
+        "orderNo": "WX202611110026",
+        "orderId": 637
+      }
+    },
+    {
+      "name": "重修后原工单回到待审核",
+      "pass": true,
+      "detail": {
+        "status": "PENDING_REVIEW"
+      }
+    },
+    {
+      "name": "重修记录写入原工单且数量一致",
+      "pass": true,
+      "detail": {
+        "relatedOrders": 0,
+        "reworkRequests": 1
+      }
+    },
+    {
+      "name": "上一轮维修结果进入历次维修结果（round_no=1）",
+      "pass": true,
+      "detail": {
+        "rounds": [
+          1
+        ]
+      }
+    },
+    {
+      "name": "重修操作不产生新的待审核工单数量",
+      "pass": true,
+      "detail": {
+        "after": 26,
+        "before": 26
+      }
+    },
+    {
+      "name": "学生撤销报修后进入历史记录",
+      "pass": true,
+      "detail": {
+        "status": "CANCELLED"
+      }
+    },
+    {
+      "name": "学生撤销后可重新提交回待审核（原工单）",
+      "pass": true,
+      "detail": {
+        "status": "PENDING_REVIEW"
+      }
+    },
+    {
+      "name": "学生消息“全部”来源返回条数等于各来源之和",
+      "pass": true,
+      "detail": {
+        "all": 75,
+        "manager": 9,
+        "admin": 9,
+        "system": 57
+      }
+    },
+    {
+      "name": "宿管发布消息来源为“宿管发布”且发布人为宿管（不出现逻辑错配）",
+      "pass": true,
+      "detail": {
+        "role": "DORM_MANAGER",
+        "source": "宿管发布",
+        "publisher": "周老师"
+      }
+    },
+    {
+      "name": "系统通知发布人为“系统”",
+      "pass": true,
+      "detail": {
+        "publisher": "系统"
+      }
+    },
+    {
+      "name": "无附件消息附件字段显示“-”",
+      "pass": true,
+      "detail": {
+        "value": "-"
+      }
+    },
+    {
+      "name": "维修端消息来源含系统通知/管理员发布且能按来源过滤",
+      "pass": true,
+      "detail": {
+        "total": 30
+      }
+    },
+    {
+      "name": "维修工作台“待接单”与维修任务列表一致",
+      "pass": true,
+      "detail": {
+        "stats": 3,
+        "list": 3
+      }
+    },
+    {
+      "name": "维修记录“个人工单记录”来源可用（历史工单可查询）",
+      "pass": true,
+      "detail": {
+        "count": 18
+      }
+    },
+    {
+      "name": "维修记录按年份筛选可用",
+      "pass": true,
+      "detail": {
+        "year": 2026
+      }
+    },
+    {
+      "name": "学生端可读取开放留宿批次及本人楼栋截止时间",
+      "pass": true,
+      "detail": {
+        "batches": [
+          "2026 寒假留宿"
+        ],
+        "deadline": "2026-12-20T23:59:59"
+      }
+    },
+    {
+      "name": "学生提交留宿申请后状态为待审核",
+      "pass": true,
+      "detail": {
+        "dates": [
+          {
+            "startDate": "2027-01-11",
+            "endDate": "2027-01-14"
+          }
+        ],
+        "status": "PENDING_REVIEW"
+      }
+    },
+    {
+      "name": "留宿申请附件与日期段可追溯",
+      "pass": true,
+      "detail": {
+        "ranges": 1,
+        "attachments": 1
+      }
+    },
+    {
+      "name": "评分与文字评价真实写入数据库并可在四端同步",
+      "pass": true,
+      "detail": {
+        "db": "4|维修及时，处理干净，问题已解决"
+      }
+    },
+    {
+      "name": "工单最终状态与数据库一致（ARCHIVED）",
+      "pass": true,
+      "detail": {
+        "db": "ARCHIVED"
+      }
+    },
+    {
+      "name": "重修轮次真实写入维修结果历史表",
+      "pass": true,
+      "detail": {
+        "historyRows": "1"
+      }
+    }
+  ],
+  "finishedAt": "2026-11-11T10:32:29",
+  "passed": 32,
+  "failed": 0,
+  "writtenData": {
+    "repairOrders": [
+      636,
+      637,
+      638
+    ],
+    "verificationMessage": "B端验证-宿管通知",
+    "stayApplication": 128
+  }
+}

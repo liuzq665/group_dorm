@@ -1,0 +1,55 @@
+<!--
+  公共 WXML 模板（规范 C-04/C-07/C-08/C-09/C-10）
+  用法：页面顶部 <import src="../../templates/ui.wxml"/>，然后 <template is="..." data="{{...view}}"/>
+  约定：data 统一使用“展开对象”，模板字段由页面数据对象提供，避免在 WXML 里写对象字面量。
+-->
+
+<!-- 状态标签：需要 statusLabel / statusTone -->
+<template name="status-tag">
+  <text class="tag {{statusTone || 'tag-muted'}}">{{statusLabel || '-'}}</text>
+</template>
+
+<!-- 详情字段：需要 label / value -->
+<template name="detail-field">
+  <view class="detail-field">
+    <text class="detail-label">{{label}}</text>
+    <text class="detail-value">{{value}}</text>
+  </view>
+</template>
+
+<!-- 空态：需要 title / tip -->
+<template name="empty-state">
+  <view class="empty-state">
+    <text class="empty-title">{{title || '暂无数据'}}</text>
+    <text wx:if="{{tip}}" class="empty-tip">{{tip}}</text>
+  </view>
+</template>
+
+<!-- 分页：需要 page / pages / total / size -->
+<template name="pager">
+  <view wx:if="{{total > size}}" class="pager">
+    <button class="outline pager-button" data-delta="-1" bindtap="changePage" disabled="{{page <= 1}}">上一页</button>
+    <text class="pager-text">{{page}} / {{pages}}</text>
+    <button class="outline pager-button" data-delta="1" bindtap="changePage" disabled="{{page >= pages}}">下一页</button>
+  </view>
+</template>
+
+<!-- 加载更多：需要 page / pages / total / size / loading -->
+<template name="load-more">
+  <view wx:if="{{total > size}}" class="load-more">
+    <button wx:if="{{page < pages}}" class="outline load-more-button" loading="{{loading}}" disabled="{{loading}}" bindtap="loadMore">加载更多（{{page}} / {{pages}}）</button>
+    <text wx:else class="load-more-text">已全部加载 {{total}} 条</text>
+  </view>
+</template>
+
+<!-- 附件列表：需要 files -->
+<template name="attachment-list">
+  <view wx:if="{{files.length}}" class="attachment-list">
+    <view class="attachment-item" wx:for="{{files}}" wx:key="file_id" data-file="{{item}}" bindtap="previewFile">
+      <text class="attachment-name">{{item.original_name || item.name || '-'}}</text>
+      <text wx:if="{{item.purposeLabel}}" class="attachment-purpose">{{item.purposeLabel}}</text>
+      <text class="attachment-action">预览</text>
+    </view>
+  </view>
+  <text wx:else class="detail-value">-</text>
+</template>

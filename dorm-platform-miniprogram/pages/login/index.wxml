@@ -1,11 +1,24 @@
 <view class="page login-page">
-  <view class="login-mark">宿</view>
-  <text class="login-title">宿舍事务</text>
-  <text class="login-copy">学生 · 宿管 · 维修人员 · 系统管理员</text>
-  <view class="form-card login-form">
-    <view class="field"><text class="field-label">账号</text><input class="input" value="{{account}}" data-key="account" bindinput="input" placeholder="请输入账号" /></view>
-    <view class="field"><text class="field-label">密码</text><input class="input" password value="{{password}}" data-key="password" bindinput="input" placeholder="请输入密码" /></view>
-    <button class="primary login-button" loading="{{submitting}}" bindtap="login">登录</button>
+  <view class="login-brand">
+    <view class="login-mark">宿</view>
+    <text class="login-title">宿舍事务</text>
+    <text class="login-copy">学生 · 宿管 · 维修人员 · 系统管理员</text>
   </view>
-  <text class="login-tip">登录状态失效后将自动返回此页</text>
+
+  <view class="form-card login-form">
+    <view class="field">
+      <text class="field-label">账号</text>
+      <input class="input" value="{{account}}" data-key="account" bindinput="input" placeholder="请输入登录账号" confirm-type="next" />
+    </view>
+    <view class="field">
+      <text class="field-label">密码</text>
+      <input class="input" password value="{{password}}" data-key="password" bindinput="input" placeholder="请输入密码" confirm-type="done" bindconfirm="login" />
+    </view>
+    <text wx:if="{{error}}" class="login-error">{{error}}</text>
+    <view class="action-bar">
+      <button class="primary" loading="{{submitting}}" disabled="{{submitting}}" bindtap="login">{{submitting ? '正在登录' : '登录'}}</button>
+    </view>
+  </view>
+
+  <text class="login-tip">登录状态失效后将自动返回此页；不同角色登录后进入各自的业务视图。</text>
 </view>

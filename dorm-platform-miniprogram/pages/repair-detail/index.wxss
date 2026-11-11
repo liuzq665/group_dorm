@@ -1,9 +1,22 @@
-.hero { margin-top: 12rpx; }
-.card .row { align-items: flex-start; padding: 10rpx 0; border-bottom: 1rpx solid #e8edeb; }
-.card .row:last-child { border-bottom: 0; }
-.card .row > text:last-child { max-width: 65%; color: #334743; text-align: right; overflow-wrap: anywhere; }
-.detail-copy { display: block; margin: 14rpx 0; color: #3c504c; line-height: 1.65; white-space: pre-wrap; }
-.button-row button { flex: 1 1 180rpx; }
-.history-entry + .history-entry { margin-top: 14rpx; padding-top: 12rpx; border-top: 1rpx solid #e7ecea; }
-.history-entry .detail-copy { margin-bottom: 6rpx; }
-.rating-value { color: #176d62; font-weight: 700; }
+.hero { margin-top: 4rpx; }
+.hero-kicker { display: block; }
+.hero-tags { display: flex; flex-wrap: wrap; gap: 8rpx; margin-top: 12rpx; }
+.hero-tags .tag { background: rgba(255, 255, 255, .16); color: #fff; }
+
+.log-item { padding: 14rpx 0; border-bottom: 1rpx solid var(--divider); }
+.log-item:last-child { border-bottom: 0; }
+.log-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-2); }
+.log-head .record-title, .log-title { flex: 1; min-width: 0; color: var(--text-1); font-size: 24rpx; line-height: 1.5; word-break: break-word; }
+.log-time { display: block; margin-top: 4rpx; color: var(--text-3); font-size: 22rpx; }
+.log-note { display: block; margin-top: 6rpx; color: var(--text-2); font-size: 22rpx; line-height: 1.5; word-break: break-word; }
+
+.score-line { display: flex; align-items: center; gap: var(--sp-3); margin: 8rpx 0; }
+.stars { display: flex; align-items: center; gap: 4rpx; }
+.star { color: #e3e8e5; font-size: 34rpx; line-height: 1; }
+.star.on { color: #c2a76a; }
+.stars-input .star { padding: 6rpx; }
+.score-value { color: var(--brand-600); font-size: 26rpx; font-weight: 700; }
+
+.photo-row { display: flex; align-items: center; justify-content: space-between; gap: 12rpx; padding-top: 8rpx; }
+.photo-name { flex: 1; min-width: 0; color: var(--text-2); font-size: 22rpx; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+

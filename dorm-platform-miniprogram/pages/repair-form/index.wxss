@@ -1,5 +1,5 @@
-.file-row { display: flex; align-items: center; justify-content: space-between; gap: 14rpx; padding-top: 10rpx; color: #52635f; font-size: 23rpx; }
-.file-row text:first-child { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.file-remove { flex: none; color: #a43d3b; font-size: 23rpx; }
-.form-card > .button-row { padding-top: 12rpx; }
-.form-card > .button-row button { flex: 1; min-width: 0; }
+.picker-arrow { color: var(--text-3); font-size: 22rpx; }
+.photo-row { display: flex; align-items: center; justify-content: space-between; gap: 12rpx; padding-top: 8rpx; }
+.photo-name { flex: 1; min-width: 0; color: var(--text-2); font-size: 22rpx; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.photo-tag { flex: none; color: var(--text-3); font-size: 21rpx; }
+

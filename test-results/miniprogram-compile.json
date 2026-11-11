@@ -1,0 +1,11 @@
+{
+  "tool": "WeChat DevTools wcc/wcsc",
+  "compilerDir": "C:\\Program Files (x86)\\Tencent\\微信web开发者工具\\resources\\app.asar.unpacked\\node_modules\\wcc-exec",
+  "wxmlFiles": 16,
+  "wxssFiles": 16,
+  "compiledWxml": 16,
+  "compiledWxss": 16,
+  "passed": true,
+  "errors": [],
+  "checkedAt": "2026-11-11T10:21:17.724Z"
+}
