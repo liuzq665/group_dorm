@@ -41,13 +41,9 @@ function actions(r){
   if(r.current_status==='PENDING_ASSIGN'){add('强制派单','dispatch');add('退回修改','return');}
   if(r.current_status==='DELAYED')add('延期审核','delay-review');
  }
- if(role()==='ADMIN'){
-  if(r.current_status==='PENDING_REVIEW')add('审核','review');
-  if(['PENDING_ASSIGN','PENDING_MANUAL'].includes(r.current_status))add('强制派单','dispatch');
-  if(r.current_status==='DELAYED')add('延期审核','delay-review');
- }
- if(role()==='DORM_MANAGER'&&r.current_status==='PENDING_MANUAL'){if(r.dispatch_available)add('强制派单','dispatch');add('退回修改','return');}
- if(role()==='ADMIN'&&r.current_status==='PENDING_MANUAL'&&!r.urgent&&!r.abnormal&&!r.parent_order_id&&r.dispatch_available)add(r.auto_dispatch_retried?'重新尝试自动派单':'尝试自动派单','retry');
+ if(role()==='ADMIN'&&['PENDING_ASSIGN','PENDING_MANUAL'].includes(r.current_status))add('强制派单','dispatch');
+ if(role()==='DORM_MANAGER'&&r.current_status==='PENDING_MANUAL'){if(r.dispatch_available)add('强制派单','dispatch');if(!r.rework)add('退回修改','return');}
+ if(role()==='ADMIN'&&r.current_status==='PENDING_MANUAL'&&!r.urgent&&!r.abnormal&&!r.rework&&r.dispatch_available)add(r.auto_dispatch_retried?'重新尝试自动派单':'尝试自动派单','retry');
  if(role()==='REPAIRER'&&String(r.repairer_user_id)===String(state.user.id)){
   if(r.current_status==='PENDING_ACCEPT'){add('接单','accept');add('拒单','reject');}
   if(['ACCEPTED','DELAYED'].includes(r.current_status)){add('提交维修结果','result');add('申请延期','delay');}

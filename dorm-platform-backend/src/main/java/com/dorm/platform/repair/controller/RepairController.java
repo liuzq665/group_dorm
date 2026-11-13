@@ -11,6 +11,7 @@ public class RepairController {
  @GetMapping("/repair-catalog") public ApiResponse<?> catalog(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(service.catalog(currentUser));}
  @GetMapping("/repair-orders") public ApiResponse<?> list(@RequestAttribute CurrentUser currentUser,@RequestParam Map<String,String> filters){return ApiResponse.ok(service.list(currentUser,filters,false));}
  @GetMapping("/repair-history") public ApiResponse<?> history(@RequestAttribute CurrentUser currentUser,@RequestParam Map<String,String> filters){return ApiResponse.ok(service.list(currentUser,filters,true));}
+ @GetMapping("/repair-evaluations") public ApiResponse<?> evaluations(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(service.evaluations(currentUser));}
  @GetMapping("/repairer-stats") public ApiResponse<?> repairerStats(@RequestAttribute CurrentUser currentUser,@RequestParam(required=false) String eventYear,@RequestParam(required=false) String eventMonth,@RequestParam(required=false) String ratingYear,@RequestParam(required=false) String ratingMonth){return ApiResponse.ok(service.repairerStats(currentUser,eventYear,eventMonth,ratingYear,ratingMonth));}
  @GetMapping("/repair-orders/{id}") public ApiResponse<?> detail(@RequestAttribute CurrentUser currentUser,@PathVariable long id){return ApiResponse.ok(service.detail(currentUser,id));}
  @GetMapping("/repair-orders/{id}/candidates") public ApiResponse<?> candidates(@RequestAttribute CurrentUser currentUser,@PathVariable long id){return ApiResponse.ok(service.candidates(currentUser,id));}
@@ -18,6 +19,7 @@ public class RepairController {
  @PutMapping("/repair-orders/{id}") public ApiResponse<?> edit(@RequestAttribute CurrentUser currentUser,@PathVariable long id,@RequestBody Map<String,Object>b){service.edit(currentUser,id,b);return ApiResponse.ok();}
  @PostMapping("/repair-orders/{id}/submit") public ApiResponse<?> submit(@RequestAttribute CurrentUser currentUser,@PathVariable long id){service.submit(currentUser,id);return ApiResponse.ok();}
  @PostMapping("/repair-orders/{id}/cancel") public ApiResponse<?> cancel(@RequestAttribute CurrentUser currentUser,@PathVariable long id){service.cancel(currentUser,id);return ApiResponse.ok();}
+ @PostMapping("/repair-orders/{id}/resubmit") public ApiResponse<?> resubmit(@RequestAttribute CurrentUser currentUser,@PathVariable long id){service.resubmit(currentUser,id);return ApiResponse.ok();}
  @PostMapping("/repair-orders/{id}/review") public ApiResponse<?> review(@RequestAttribute CurrentUser currentUser,@PathVariable long id,@RequestBody Map<String,Object>b){service.review(currentUser,id,b);return ApiResponse.ok();}
  @PostMapping("/repair-orders/{id}/dispatch") public ApiResponse<?> dispatch(@RequestAttribute CurrentUser currentUser,@PathVariable long id,@RequestBody Map<String,Object>b){service.dispatch(currentUser,id,b);return ApiResponse.ok();}
  @PostMapping("/repair-orders/{id}/retry") public ApiResponse<?> retry(@RequestAttribute CurrentUser currentUser,@PathVariable long id){service.retry(currentUser,id);return ApiResponse.ok();}
