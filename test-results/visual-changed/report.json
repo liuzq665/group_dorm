@@ -1,0 +1,43 @@
+[
+  {
+    "page": "stay-form",
+    "role": "STUDENT",
+    "error": "超时(20000ms)：shot stay-form"
+  },
+  {
+    "page": "stay-detail",
+    "role": "STUDENT",
+    "error": "超时(20000ms)：shot stay-detail"
+  },
+  {
+    "page": "stays",
+    "role": "DORM_MANAGER",
+    "error": "超时(20000ms)：shot stays"
+  },
+  {
+    "page": "stay-detail",
+    "role": "DORM_MANAGER",
+    "metrics": {
+      "vw": 390,
+      "overflow": 0,
+      "beyond": [],
+      "wrapBars": [],
+      "misaligned": [],
+      "tab": null
+    },
+    "issues": []
+  },
+  {
+    "page": "repair-detail",
+    "role": "STUDENT",
+    "metrics": {
+      "vw": 390,
+      "overflow": 0,
+      "beyond": [],
+      "wrapBars": [],
+      "misaligned": [],
+      "tab": null
+    },
+    "issues": []
+  }
+]

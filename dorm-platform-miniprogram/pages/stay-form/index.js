@@ -7,7 +7,7 @@ function emptyRange() {
   return { startDate: '', endDate: '' };
 }
 
-function validRanges(ranges) {
+function validRanges(ranges, batch) {
   if (!ranges.length) return '请至少填写一段留宿日期';
   if (ranges.some(item => !item.startDate || !item.endDate || item.endDate < item.startDate)) {
     return '请填写有效的开始和结束日期（结束日期不能早于开始日期）';
@@ -15,6 +15,15 @@ function validRanges(ranges) {
   const sorted = [...ranges].sort((left, right) => left.startDate.localeCompare(right.startDate));
   for (let index = 1; index < sorted.length; index += 1) {
     if (sorted[index].startDate <= sorted[index - 1].endDate) return '留宿日期段不能重叠，共享边界日也不允许';
+  }
+  if (batch && batch.open_start_date && batch.open_end_date) {
+    const openStart = String(batch.open_start_date).slice(0, 10);
+    const openEnd = String(batch.open_end_date).slice(0, 10);
+    for (const item of sorted) {
+      if (item.startDate < openStart || item.endDate > openEnd) {
+        return `留宿日期须落在开放区间 ${openStart} 至 ${openEnd} 内`;
+      }
+    }
   }
   return '';
 }
@@ -119,7 +128,7 @@ Page({
   },
   async save(event) {
     const submit = event.currentTarget.dataset.submit === 'true';
-    const message = validRanges(this.data.ranges);
+    const message = validRanges(this.data.ranges, this.data.batch);
     if (message) { wx.showToast({ title: message, icon: 'none' }); return; }
     if (!this.data.reason.trim()) { wx.showToast({ title: '请填写留宿原因', icon: 'none' }); return; }
     if (submit && !this.data.existing.length && !this.data.files.length) {

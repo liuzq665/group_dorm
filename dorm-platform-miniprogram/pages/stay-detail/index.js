@@ -35,14 +35,15 @@ Page({
       const status = detail.current_status;
       const role = this.data.role;
       const attachments = (detail.attachments || []).map(file => ({ ...file }));
+      const deadlinePassed = !!detail.resubmit_deadline && new Date(detail.resubmit_deadline).getTime() <= Date.now();
       this.setData({
         detail: {
           ...detail,
           statusLabel: statusText(status),
           statusTone: statusTone(status),
           dateRangeText: ranges(detail.dateRanges || []),
-          canEdit: role === 'STUDENT' && ['DRAFT', 'PENDING_EDIT'].includes(status),
-          canSubmit: role === 'STUDENT' && ['DRAFT', 'PENDING_EDIT'].includes(status),
+          canEdit: role === 'STUDENT' && ['DRAFT', 'PENDING_EDIT'].includes(status) && !deadlinePassed,
+          canSubmit: role === 'STUDENT' && ['DRAFT', 'PENDING_EDIT'].includes(status) && !deadlinePassed,
           canWithdraw: role === 'STUDENT' && status === 'PENDING_REVIEW'
         },
         rows: [

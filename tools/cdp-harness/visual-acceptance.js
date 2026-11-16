@@ -13,6 +13,7 @@ const {
 const ROOT = path.join(__dirname, '..', '..');
 const OUT = path.join(ROOT, 'test-results', 'visual');
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const SKIP_SHOT = process.env.SKIP_SHOT === '1'; // 截图偶发卡住时，仅做布局度量回归
 
 async function api(session, apiPath) {
   const response = await fetch(`http://127.0.0.1:8080/api/v1${apiPath}`, {
@@ -116,8 +117,8 @@ async function capture(app, spec, suffix) {
     throw new Error(`无法连接页面渲染目标：${spec.url}`);
   })();
   const file = path.join(OUT, spec.role, `${spec.name}${suffix ? `-${suffix}` : ''}.png`);
-  await pageClient.screenshot(file);
-  if (spec.fullPage) {
+  if (!SKIP_SHOT) await pageClient.screenshot(file);
+  if (!SKIP_SHOT && spec.fullPage) {
     await pageClient.screenshotFull(path.join(OUT, spec.role, `${spec.name}${suffix ? `-${suffix}` : ''}-full.png`));
   }
   const metrics = await pageClient.evaluate(METRICS);

@@ -77,7 +77,7 @@ Page({
           isConfirmed: status === 'CONFIRMED',
           canEdit: role === 'STUDENT' && ['DRAFT', 'PENDING_EDIT'].includes(status),
           canSubmit: role === 'STUDENT' && ['DRAFT', 'PENDING_EDIT'].includes(status),
-          canCancel: role === 'STUDENT' && ['DRAFT', 'PENDING_EDIT', 'PENDING_REVIEW'].includes(status),
+          canCancel: role === 'STUDENT' && ['DRAFT', 'PENDING_EDIT', 'PENDING_REVIEW', 'PENDING_ASSIGN', 'PENDING_MANUAL'].includes(status),
           canResubmit: role === 'STUDENT' && status === 'CANCELLED',
           canConfirm: role === 'STUDENT' && status === 'REPAIRED',
           canRework: role === 'STUDENT' && status === 'REPAIRED',
@@ -87,7 +87,7 @@ Page({
           canDelay: role === 'REPAIRER' && status === 'ACCEPTED',
           canReview: ['DORM_MANAGER', 'ADMIN'].includes(role) && status === 'PENDING_REVIEW',
           canDispatch: ['DORM_MANAGER', 'ADMIN'].includes(role) && ['PENDING_ASSIGN', 'PENDING_MANUAL'].includes(status),
-          canRetry: ['DORM_MANAGER', 'ADMIN'].includes(role) && status === 'PENDING_MANUAL' && !detail.urgent && !detail.abnormal && !detail.parent_order_id,
+          canRetry: ['DORM_MANAGER', 'ADMIN'].includes(role) && status === 'PENDING_MANUAL' && !detail.urgent && !detail.abnormal && !detail.parent_order_id && !(detail.reworkRequests || []).some(row => ['PENDING', 'APPROVED'].includes(row.request_status)),
           canDelayReview: role === 'DORM_MANAGER' && status === 'DELAYED'
         },
         rows,

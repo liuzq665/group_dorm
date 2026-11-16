@@ -1,0 +1,132 @@
+[
+  {
+    "name": "登录",
+    "ok": true,
+    "detail": "student1 / repair1 / manager3 登录成功"
+  },
+  {
+    "name": "报修分类目录",
+    "ok": true,
+    "detail": "categories=8"
+  },
+  {
+    "name": "故障照片上传",
+    "ok": true,
+    "detail": "fileId=99"
+  },
+  {
+    "name": "创建报修草稿",
+    "ok": true,
+    "detail": "orderId=652"
+  },
+  {
+    "name": "草稿状态 DRAFT",
+    "ok": true,
+    "detail": "status=DRAFT"
+  },
+  {
+    "name": "提交后待审核",
+    "ok": true,
+    "detail": "status=PENDING_REVIEW"
+  },
+  {
+    "name": "审核通过并派单",
+    "ok": true,
+    "detail": "status=PENDING_ACCEPT"
+  },
+  {
+    "name": "维修人员接单",
+    "ok": true,
+    "detail": "status=ACCEPTED"
+  },
+  {
+    "name": "提交维修结果",
+    "ok": true,
+    "detail": "status=REPAIRED"
+  },
+  {
+    "name": "学生确认并评价",
+    "ok": true,
+    "detail": "status=ARCHIVED score=5"
+  },
+  {
+    "name": "历史记录可查询",
+    "ok": true,
+    "detail": "historyCount=16"
+  },
+  {
+    "name": "评价记录可查询",
+    "ok": true,
+    "detail": "evaluations=17"
+  },
+  {
+    "name": "提交重修申请",
+    "ok": true,
+    "detail": "status=PENDING_REVIEW reworkCount=1"
+  },
+  {
+    "name": "重修审核通过进入手动派单",
+    "ok": true,
+    "detail": "status=PENDING_MANUAL"
+  },
+  {
+    "name": "候选维修人员查询",
+    "ok": true,
+    "detail": "candidates=1"
+  },
+  {
+    "name": "强制派单自动接单",
+    "ok": true,
+    "detail": "status=ACCEPTED"
+  },
+  {
+    "name": "留宿测试数据重置",
+    "ok": true,
+    "detail": "已清理 student1 在 batch 41 的历史申请（测试夹具）"
+  },
+  {
+    "name": "查询开放留宿批次",
+    "ok": true,
+    "detail": "batches=1 openBatch=41"
+  },
+  {
+    "name": "留宿材料上传",
+    "ok": true,
+    "detail": "fileId=101"
+  },
+  {
+    "name": "留宿草稿保存",
+    "ok": true,
+    "detail": "applicationId=543"
+  },
+  {
+    "name": "提交后待审核",
+    "ok": true,
+    "detail": "status=PENDING_REVIEW"
+  },
+  {
+    "name": "撤回后回到草稿",
+    "ok": true,
+    "detail": "status=DRAFT"
+  },
+  {
+    "name": "撤回后重新提交",
+    "ok": true,
+    "detail": "status=PENDING_REVIEW"
+  },
+  {
+    "name": "宿管锁定进入审核中",
+    "ok": true,
+    "detail": "status=UNDER_REVIEW"
+  },
+  {
+    "name": "审核驳回转待修改",
+    "ok": true,
+    "detail": "status=PENDING_EDIT reason=E2E 退回：请补充说明留宿事由"
+  },
+  {
+    "name": "待修改后重新提交",
+    "ok": true,
+    "detail": "status=UNDER_REVIEW"
+  }
+]

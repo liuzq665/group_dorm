@@ -1,0 +1,107 @@
+[
+  {
+    "name": "宿管审核通过",
+    "ok": true,
+    "detail": "appId=543 复用上次审核结果：APPROVED"
+  },
+  {
+    "name": "学生收到留宿结果通知",
+    "ok": true,
+    "detail": "messages=123"
+  },
+  {
+    "name": "未读消息计数可查询",
+    "ok": true,
+    "detail": "unread=112"
+  },
+  {
+    "name": "待审核工单可撤销",
+    "ok": true,
+    "detail": "status=CANCELLED"
+  },
+  {
+    "name": "撤销工单进入历史记录",
+    "ok": true,
+    "detail": "historyCount=18"
+  },
+  {
+    "name": "撤销后重新提交",
+    "ok": true,
+    "detail": "status=PENDING_REVIEW"
+  },
+  {
+    "name": "审核驳回转待修改",
+    "ok": true,
+    "detail": "status=PENDING_EDIT reason=E2E 请补充故障位置说明"
+  },
+  {
+    "name": "待修改可编辑并重新提交",
+    "ok": true,
+    "detail": "status=PENDING_REVIEW title=E2E-B端闭环-驳回重提（已修改）"
+  },
+  {
+    "name": "维修人员提交延期申请",
+    "ok": true,
+    "detail": "status=DELAYED"
+  },
+  {
+    "name": "延期申请复核通过",
+    "ok": true,
+    "detail": "status=DELAYED delayApproved=True"
+  },
+  {
+    "name": "延期工单提交结果",
+    "ok": true,
+    "detail": "status=REPAIRED"
+  },
+  {
+    "name": "延期工单确认评价归档",
+    "ok": true,
+    "detail": "status=ARCHIVED score=4"
+  },
+  {
+    "name": "住宿当前信息接口",
+    "ok": true,
+    "detail": "rooms=1"
+  },
+  {
+    "name": "舍友接口",
+    "ok": true,
+    "detail": "count=0"
+  },
+  {
+    "name": "住宿历史接口",
+    "ok": true,
+    "detail": "count=6"
+  },
+  {
+    "name": "个人资料接口",
+    "ok": true,
+    "detail": "account=student1"
+  },
+  {
+    "name": "维修记录统计接口（小程序卡片字段）",
+    "ok": true,
+    "detail": "completed=30 avg=3.62 evals=26"
+  },
+  {
+    "name": "维修人员历史工单接口",
+    "ok": true,
+    "detail": "count=24"
+  },
+  {
+    "name": "宿管工单列表接口",
+    "ok": true,
+    "detail": "count=40"
+  },
+  {
+    "name": "楼栋接口（消息筛选）",
+    "ok": true,
+    "detail": "count=1"
+  },
+  {
+    "name": "工作台概览接口",
+    "ok": true,
+    "detail": "keys=repairTotal,repairPending,repairProcessing,repairClosed,unread,stayOpen,averageScore,repairStatus,stayStatus,accommodationStats,repairMonthly,stayMonthly,stayApproved,stayCompleted"
+  }
+]

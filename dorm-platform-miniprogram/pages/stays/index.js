@@ -99,6 +99,7 @@ Page({
   },
   decorate(item, role) {
     const status = item.current_status;
+    const deadlinePassed = !!item.resubmit_deadline && new Date(item.resubmit_deadline).getTime() <= Date.now();
     const dateRanges = item.dateRanges || [];
     return {
       ...item,
@@ -114,11 +115,11 @@ Page({
       updatedLabel: formatDateTime(item.updated_at),
       resubmitText: item.resubmit_deadline ? formatDate(item.resubmit_deadline) : '-',
       attachments: item.attachments || [],
-      canEdit: role === 'STUDENT' && ['DRAFT', 'PENDING_EDIT'].includes(status) && !item.resubmit_deadline,
+      canEdit: role === 'STUDENT' && ['DRAFT', 'PENDING_EDIT'].includes(status) && !deadlinePassed,
       canWithdraw: role === 'STUDENT' && status === 'PENDING_REVIEW',
       canDetail: true,
       canLock: role === 'DORM_MANAGER' && status === 'PENDING_REVIEW',
-      canReview: ['DORM_MANAGER', 'ADMIN'].includes(role) && ['PENDING_REVIEW', 'UNDER_REVIEW'].includes(status),
+      canReview: ['DORM_MANAGER', 'ADMIN'].includes(role) && status === 'UNDER_REVIEW',
       deadlines: item.student_deadline ? formatDate(item.student_deadline) : ''
     };
   },
