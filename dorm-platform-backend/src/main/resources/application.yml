@@ -22,3 +22,11 @@ spring:
 backup:
   executable: E:/develop/mysql/files/MySQL Server 8.0/bin/mysqldump.exe
 
+assistant:
+  api-key: ${ASSISTANT_API_KEY:}
+  base-url: ${ASSISTANT_BASE_URL:https://api.hanhegufei.online/v1}
+  protocol: ${ASSISTANT_PROTOCOL:OPENAI_CHAT}
+  model: ${ASSISTANT_MODEL:claude-opus-4-8}
+  max-tokens: ${ASSISTANT_MAX_TOKENS:1200}
+  actor-authorization: ${ASSISTANT_ACTOR_AUTHORIZATION:local-image-extension}
+

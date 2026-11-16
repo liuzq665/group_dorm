@@ -1,4 +1,6 @@
 E:\workspace\group_dorm\dorm-platform\dorm-platform-backend\src\main\java\com\dorm\platform\api\AuthController.java
+E:\workspace\group_dorm\dorm-platform\dorm-platform-backend\src\main\java\com\dorm\platform\assistant\AssistantController.java
+E:\workspace\group_dorm\dorm-platform\dorm-platform-backend\src\main\java\com\dorm\platform\assistant\AssistantService.java
 E:\workspace\group_dorm\dorm-platform\dorm-platform-backend\src\main\java\com\dorm\platform\common\ApiResponse.java
 E:\workspace\group_dorm\dorm-platform\dorm-platform-backend\src\main\java\com\dorm\platform\common\BizException.java
 E:\workspace\group_dorm\dorm-platform\dorm-platform-backend\src\main\java\com\dorm\platform\common\GlobalExceptionHandler.java

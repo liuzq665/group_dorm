@@ -632,6 +632,32 @@ body:has(.repair-status-tabs) .bulk-table.repair-orders-student .table td:last-c
 }
 body .shell .table th:last-child { text-align:left !important; }
 body .shell .table td:last-child > .actions { max-width:none; justify-content:flex-start !important; margin-left:auto !important; }
+.assistant-panel { display:flex; flex-direction:column; min-height:min(720px,calc(100vh - 150px)); }
+.assistant-panel .toolbar h2 { margin:0 0 5px; font-size:18px; }
+.assistant-panel .toolbar p { margin:0; }
+.assistant-transcript { flex:1; min-height:280px; max-height:calc(100vh - 360px); overflow:auto; display:flex; flex-direction:column; gap:12px; padding:16px 2px; }
+.assistant-empty { margin:auto; color:#71808c; text-align:center; }
+.assistant-message { max-width:min(760px,88%); padding:11px 14px; border:1px solid #e1e7eb; border-radius:8px; overflow-wrap:anywhere; }
+.assistant-message > div { margin-bottom:5px; color:#657580; font-size:12px; }
+.assistant-message-content { font-size:14px; line-height:1.75; }
+.assistant-message-content p { margin:0 0 9px; white-space:pre-wrap; }
+.assistant-message-content p:last-child { margin-bottom:0; }
+.assistant-message-content h1,.assistant-message-content h2,.assistant-message-content h3 { margin:14px 0 7px; color:#20313b; line-height:1.4; }
+.assistant-message-content h1 { font-size:18px; }
+.assistant-message-content h2 { font-size:16px; }
+.assistant-message-content h3 { font-size:15px; }
+.assistant-message-content ul,.assistant-message-content ol { margin:5px 0 10px; padding-left:24px; }
+.assistant-message-content li { padding-left:2px; margin:3px 0; }
+.assistant-message-content code { padding:1px 4px; background:#f1f4f5; border-radius:3px; font-size:.92em; }
+.assistant-message-content pre { margin:8px 0; padding:10px 12px; overflow:auto; background:#f1f4f5; border-radius:5px; white-space:pre-wrap; }
+.assistant-message-content pre code { padding:0; background:transparent; }
+.assistant-user { align-self:flex-end; background:#edf6f3; border-color:#d4e8e1; }
+.assistant-bot { align-self:flex-start; background:#fff; }
+.assistant-composer { border-top:1px solid #e7ebee; padding-top:14px; }
+.assistant-composer textarea { min-height:84px; max-height:220px; }
+.assistant-compose-actions { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:8px; }
+.assistant-composer .error { min-height:0; }
+@media(max-width:600px) { .assistant-panel { min-height:calc(100vh - 135px); } .assistant-transcript { max-height:none; min-height:220px; } .assistant-message { max-width:96%; } }
 @media(max-width:1150px) {
  body .shell:has(.repair-status-tabs) .table td:last-child::before,body .shell .message-table .table td:last-child::before { text-align:center !important; }
  body .shell:has(.repair-status-tabs) .table td:last-child > .actions,body .shell .message-table .table td:last-child > .actions { display:flex !important; flex-flow:row nowrap !important; justify-content:flex-start !important; gap:5px; }

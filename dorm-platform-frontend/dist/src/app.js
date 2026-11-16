@@ -9,6 +9,24 @@ export const statuses = { DRAFT:'草稿', PENDING_REVIEW:'待审核', PENDING_ED
 export const state = { token:sessionStorage.getItem('dorm_token'), user:JSON.parse(sessionStorage.getItem('dorm_user') || 'null'), page:'dashboard', data:{} };
 export const role = () => state.user?.role;
 export const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+export const assistantMarkup = value => {
+ const lines=String(value??'').replace(/\r\n?/g,'\n').split('\n'),html=[];let list='',code=false,codeLines=[];
+ const closeList=()=>{if(list){html.push(`</${list}>`);list='';}};
+ const inline=text=>esc(text).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+ for(const line of lines){
+  if(/^\s*```/.test(line)){closeList();if(code){html.push(`<pre><code>${esc(codeLines.join('\n'))}</code></pre>`);codeLines=[];}code=!code;continue;}
+  if(code){codeLines.push(line);continue;}
+  const heading=line.match(/^\s{0,3}(#{1,3})\s+(.+)$/);if(heading){closeList();const level=heading[1].length;html.push(`<h${level}>${inline(heading[2])}</h${level}>`);continue;}
+  const item=line.match(/^\s*(?:[-*•]\s+|\d+[.、)]\s+)(.+)$/);if(item){const ordered=/^\s*\d/.test(line),tag=ordered?'ol':'ul';if(list!==tag){closeList();html.push(`<${tag}>`);list=tag;}html.push(`<li>${inline(item[1])}</li>`);continue;}
+  closeList();if(!line.trim())continue;html.push(`<p>${inline(line)}</p>`);
+ }
+ closeList();if(code)html.push(`<pre><code>${esc(codeLines.join('\n'))}</code></pre>`);return html.join('');
+};
+export const assistantText = value => {
+ const text=String(value??'');
+ try{const normalized=text.trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');const parsed=JSON.parse(normalized);if(Array.isArray(parsed?.tasks))return '这条历史回复包含内部处理内容，已隐藏。请重新提问，我会按查询结果回答。';}catch{}
+ return text;
+};
 export const status = value => `<span class="status ${esc(value)}">${esc(statuses[value] || value || '-')}</span>`;
 export const button = (label, action, id='', extra='') => `<button type="button" class="secondary" data-action="${action}" data-id="${esc(id)}" ${extra}>${label}</button>`;
 export const post = (path, data={}) => api(path, {method:'POST',body:JSON.stringify(data)});
@@ -25,7 +43,7 @@ export async function api(path, options={}) {
   if(!response.ok || body.code!==0) throw new Error(body.message || `请求失败 (${response.status})`);
   return body.data;
 }
-function clearSession(){navExpansion.clear();state.token=null;state.user=null;sessionStorage.removeItem('dorm_token');sessionStorage.removeItem('dorm_user');}
+function clearSession(){navExpansion.clear();state.token=null;state.user=null;sessionStorage.removeItem('dorm_token');sessionStorage.removeItem('dorm_user');for(const key of Object.keys(sessionStorage))if(key.startsWith('assistant_'))sessionStorage.removeItem(key);sessionStorage.removeItem('student_assistant_conversation');sessionStorage.removeItem('student_assistant_messages');state.data.assistantConversationId='';state.data.assistantMessages=[];}
 export function notify(message,error=false){let node=document.querySelector('#toast');if(!node)return;node.textContent=message;node.className=error?'toast error-toast':'toast';node.hidden=false;setTimeout(()=>node.hidden=true,4000);}
 export function field(name,label,type='text',value='',required=true,extra=''){return `<label class="field"><span>${label}</span>${type==='textarea'?`<textarea name="${name}" ${required?'required':''}>${esc(value)}</textarea>`:`<input name="${name}" type="${type}" value="${esc(value)}" ${required?'required':''} ${extra}>`}</label>`;}
 export function select(name,label,items,value='',multiple=false,required=true){return `<label class="field"><span>${label}</span><select name="${name}" aria-label="${esc(label)}" ${multiple?'multiple':required?'required':''}>${items.map(([id,text])=>`<option value="${esc(id)}" ${(multiple?Array.from(value||[]).map(String).includes(String(id)):String(id)===String(value))?'selected':''}>${esc(text)}</option>`).join('')}</select></label>`;}
@@ -112,6 +130,10 @@ const navExpansion=new Map();
 const originalMenus=menus;
 menus=()=>originalMenus().map(item=>Array.isArray(item)||item.key!=='repair-records'?item:{...item,children:item.children.filter(([key])=>key!=='repairerStats')});
 function menus(){const common=[['messages','消息中心'],['profile','个人信息']];switch(role()){case 'STUDENT':return [...common,{key:'dorm',label:'住宿管理',children:[['accommodation','我的住宿'],['studentAccommodationHistory','住宿历史']]},{key:'repair',label:'报修管理',children:[['repairs','我的报修'],['repairHistory','报修历史']]},['stay','假期留宿']];case 'DORM_MANAGER':return [['dashboard','工作台'],...common,{key:'repair',label:'报修管理',children:[['repairs','全楼报修'],['repairHistory','报修历史']]},{key:'stay',label:'留宿管理',children:[['stayManager','全楼留宿'],['stayHistory','留宿历史']]},{key:'dorm',label:'住宿管理',children:[['rooms','宿舍管理'],['beds','床位管理'],['accommodationHistory','住宿历史']]},['students','学生管理']];case 'REPAIRER':return [['dashboard','工作台'],...common,['repairs','维修任务'],{key:'repair-records',label:'维修记录',children:[['repairerStats','统计概览'],['repairerRejects','拒单记录'],['repairerAcceptTimeouts','接单超时记录'],['repairerRepairTimeouts','超时未修好记录'],['repairerDelays','延期记录'],['repairerReworks','重修工单记录']]},['repairHistory','报修历史']];default:return [['dashboard','工作台'],...common,{key:'repair',label:'报修管理',children:[['repairs','全校报修'],['repairHistory','报修历史'],['rules','报修规则']]},{key:'stay',label:'留宿管理',children:[['staySchool','全校留宿'],['stayHistory','留宿历史']]},{key:'dorm',label:'住宿管理',children:[['buildings','楼栋管理'],['rooms','宿舍管理'],['beds','床位管理'],['accommodationHistory','住宿历史']]},{key:'roles',label:'角色管理',children:[['students','学生管理'],['managers','宿管管理'],['repairers','维修人员管理']]},['logs','操作日志'],['data','数据备份']];}}
+const originalMenusForAssistant=menus;
+menus=()=>[...originalMenusForAssistant(),['assistant','对话助手']];
+titles.assistant='对话助手';
+const assistantStorageKey=suffix=>`assistant_${role().toLowerCase()}_${suffix}`;
 function layout(content){document.querySelectorAll('.nav-group').forEach(group=>navExpansion.set(group.dataset.navGroup,group.open));const menu=menus().map(item=>Array.isArray(item)?`<button data-page="${item[0]}" class="${state.page===item[0]?'active':''}">${item[0]==='messages'&&Number(state.data.unreadCount)>0?`${item[1]}<span class="unread-badge">${state.data.unreadCount}</span>`:item[1]}</button>`:`<details class="nav-group" data-nav-group="${item.key}" ${navExpansion.get(item.key)?'open':''}><summary class="${item.children.some(([key])=>state.page===key)?'active':''}">${item.label}</summary><div class="nav-children">${item.children.map(([key,label])=>`<button data-page="${key}" class="${state.page===key?'active':''}">${label}</button>`).join('')}</div></details>`).join('');document.querySelector('#app').innerHTML=`<div class="shell ${role()==='ADMIN'?'admin-shell':''}"><aside class="sidebar"><h2>宿舍事务平台</h2><div class="role-tag">${roles[role()]}</div><nav class="nav">${menu}</nav><button class="logout" id="logout">退出登录</button></aside><main class="content"><div class="topbar"><div><div class="muted">${roles[role()]}</div><h1>${state.page==='repairs'?({STUDENT:'我的报修',DORM_MANAGER:'全楼报修',REPAIRER:'我的维修任务',ADMIN:'全校报修'}[role()]||titles[state.page]):titles[state.page]}</h1></div><span>${esc(state.user.name)}</span></div>${content}</main></div><div id="toast" class="toast" role="status" hidden></div>`;
  document.querySelectorAll('button[data-page]').forEach(b=>b.onclick=()=>{state.page=b.dataset.page;render();});document.querySelector('#logout').onclick=()=>modal('退出登录','确定退出当前账号吗？',async()=>{try{await post('/auth/logout');}finally{clearSession();}return '已退出登录';},'确认退出');
 }
@@ -179,6 +201,13 @@ const pages={...adminPages,repairs:repairPage,repairHistory:repairHistoryPage,re
   return `<section class="panel"><div class="toolbar"><h3>站内消息</h3><div class="actions">${button('批量标为已读','message-mark-selected')}${button('批量删除','message-delete-selected')}${['ADMIN','DORM_MANAGER'].includes(role())?button('发布消息','publish-message'):''}</div></div>${sourceTabs}<form id="message-filter-form" class="filter-grid">${showRead?select('read','阅读状态',[['unread','未读'],['read','已读'],['','全部']],f.read,false,false):''}${admin&&f.sender==='DORM_MANAGER'?field('publisher','宿管姓名','search',f.publisher||'',false):''}${role()==='REPAIRER'?select('building','楼栋',[['','全部楼栋'],...buildings.map(b=>[b.building_id,b.building_name])],f.building||'',false,false):''}${field('from','开始日期','date',f.from||'',false)}${field('to','结束日期','date',f.to||'',false)}${admin?select('building','楼栋',[['','全部楼栋'],...buildings.map(b=>[b.building_id,b.building_name])],f.building||'',false,false):''}<div class="filter-actions"><button class="primary">查询</button><button type="reset" class="secondary" data-filter-clear="message-filter-form">清空</button></div></form>${messageTable}</section>`;
  }
 };
+pages.assistant=async()=>{
+ const messagesKey=assistantStorageKey('messages'),conversationKey=assistantStorageKey('conversation');
+ if(!state.data.assistantMessages){try{state.data.assistantMessages=JSON.parse(sessionStorage.getItem(messagesKey)||'[]').map(item=>item.role==='assistant'?{...item,content:assistantText(item.content)}:item);state.data.assistantConversationId=sessionStorage.getItem(conversationKey)||'';}catch{state.data.assistantMessages=[];}}
+ const transcript=state.data.assistantMessages.map(item=>`<article class="assistant-message ${item.role==='user'?'assistant-user':'assistant-bot'}"><div>${item.role==='user'?'我':'助手'}</div><div class="assistant-message-content">${item.role==='assistant'?assistantMarkup(assistantText(item.content)):`<p>${esc(item.content)}</p>`}</div></article>`).join('');
+ return `<section class="panel assistant-panel"><div class="toolbar"><div><h2>宿舍事务对话助手</h2><p class="muted">可以咨询当前角色的业务和个人记录</p></div><button type="button" class="secondary" id="assistant-clear">清空对话</button></div><div class="assistant-transcript" id="assistant-transcript" aria-live="polite">${transcript||'<div class="assistant-empty">你好，我可以协助解答宿舍事务相关问题。</div>'}</div><form id="assistant-form" class="assistant-composer"><label class="field"><span>输入问题</span><textarea name="content" maxlength="4000" rows="3" required placeholder="请输入你的问题"></textarea></label><div class="assistant-compose-actions"><span class="muted">每条消息最多 4000 字</span><button class="primary" type="submit">发送</button></div><p class="error" id="assistant-error" role="alert"></p></form></section>`;
+};
+
 function alignTableOperations(root=document){
  if(window.innerWidth<=850){
   root.querySelectorAll('.table-component').forEach(component=>{
@@ -250,6 +279,9 @@ export async function render(){
   state.data.unreadCount=(await api('/messages/unread-count')).count;
   if(current!==renderId||!state.token)return;
   layout(html);
+  const assistantTranscript=document.querySelector('#assistant-transcript');if(assistantTranscript)assistantTranscript.scrollTop=assistantTranscript.scrollHeight;
+  const assistantForm=document.querySelector('#assistant-form');if(assistantForm)assistantForm.onsubmit=async event=>{event.preventDefault();const textarea=assistantForm.elements.content,sendButton=assistantForm.querySelector('[type="submit"]'),errorNode=document.querySelector('#assistant-error'),content=textarea.value.trim();if(!content)return;sendButton.disabled=true;errorNode.textContent='';try{const history=(state.data.assistantMessages||[]).slice(-38).map(item=>item.role==='assistant'?{...item,content:assistantText(item.content)}:item);const result=await post('/assistant/messages',{conversationId:state.data.assistantConversationId||'',content,history});state.data.assistantConversationId=result.conversationId;state.data.assistantMessages??=[];state.data.assistantMessages.push({role:'user',content},{role:'assistant',content:assistantText(result.reply)});if(state.data.assistantMessages.length>40)state.data.assistantMessages.splice(0,state.data.assistantMessages.length-40);sessionStorage.setItem(assistantStorageKey('conversation'),state.data.assistantConversationId);sessionStorage.setItem(assistantStorageKey('messages'),JSON.stringify(state.data.assistantMessages));assistantForm.reset();const transcript=document.querySelector('#assistant-transcript');transcript.innerHTML=state.data.assistantMessages.map(item=>`<article class="assistant-message ${item.role==='user'?'assistant-user':'assistant-bot'}"><div>${item.role==='user'?'我':'助手'}</div><div class="assistant-message-content">${item.role==='assistant'?assistantMarkup(assistantText(item.content)):`<p>${esc(item.content)}</p>`}</div></article>`).join('');transcript.scrollTop=transcript.scrollHeight;}catch(error){errorNode.textContent=error.message;}finally{sendButton.disabled=false;textarea.focus();}};
+  document.querySelector('#assistant-clear')?.addEventListener('click',async event=>{const button=event.currentTarget;button.disabled=true;try{if(state.data.assistantConversationId)await api(`/assistant/conversations/${encodeURIComponent(state.data.assistantConversationId)}`,{method:'DELETE'});delete state.data.assistantConversationId;state.data.assistantMessages=[];sessionStorage.removeItem(assistantStorageKey('conversation'));sessionStorage.removeItem(assistantStorageKey('messages'));await render();notify('对话已清空');}catch(error){notify(error.message,true);}finally{button.disabled=false;}});
   document.querySelectorAll('.bulk-table tbody tr,.message-table tbody tr').forEach(row=>{const checkbox=row.querySelector(':scope > td.select-col');if(checkbox)row.prepend(checkbox);});
   alignTableOperations();
   window.onresize=()=>alignTableOperations();
