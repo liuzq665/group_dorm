@@ -44,8 +44,12 @@ Page({
       this.setData({ role, sourceOptions: buildSourceOptions(role) });
       this.load();
     }
+    // 选择附件会触发 onHide→onShow，回来时恢复发布弹层与 tabBar 隐藏状态
+    if (this.data.publishing || this.data.detail) overlay(this, true);
   },
   onHide() {
+    // 选择文件时页面会短暂隐藏，此时不能关闭弹层，否则已填写的标题/正文会丢
+    if (this._pickingMedia) return;
     // 离开消息中心时关闭详情/发布弹层，避免下次进入残留
     this.setData({ detail: null, detailView: {}, publishing: false });
     overlay(this, false);
@@ -234,13 +238,15 @@ Page({
   },
   async chooseFiles() {
     try {
+      this._pickingMedia = true;
       const paths = await new Promise((resolve, reject) => wx.chooseMessageFile({
         count: 8 - this.data.files.length,
         type: 'file',
-        success: result => resolve(result.tempFiles.map(item => item.path)),
-        fail: reject
+        success: result => { this._pickingMedia = false; resolve(result.tempFiles.map(item => item.path)); },
+        fail: error => { this._pickingMedia = false; reject(error); }
       }));
-      this.setData({ files: [...this.data.files, ...paths].slice(0, 8) });
+      this.setData({ publishing: true, files: [...this.data.files, ...paths].slice(0, 8) });
+      overlay(this, true);
     } catch (error) {
       if (!error.errMsg?.includes('cancel')) showError(error);
     }

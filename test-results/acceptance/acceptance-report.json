@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-18T10:47:49.592Z",
+  "generatedAt": "2026-11-18T11:43:36.370Z",
   "total": 38,
   "failed": 0,
   "results": [
@@ -7,6 +7,7 @@
       "role": "STUDENT",
       "id": "student-home",
       "url": "/pages/home/index",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -38,7 +39,7 @@
           "top": 664,
           "coveredPx": 0
         },
-        "text": "学生端 张一 校园住宿服务 134 条未读消息 当前住宿 已分配 明德二号楼 · 102 · B 床 查看住宿与历史 查看报修进度 校园服务 住 我的住宿 床位、舍友与住宿历史 › 修 我的报修 报修进度、确认完成与评价 › 宿 假期留宿 提交申请与查看审核 › 信 消息中心 查看业务通知 ›"
+        "text": "学生端 张一 校园住宿服务 135 条未读消息 当前住宿 已分配 明德二号楼 · 102 · B 床 查看住宿与历史 查看报修进度 校园服务 住 我的住宿 床位、舍友与住宿历史 › 修 我的报修 报修进度、确认完成与评价 › 宿 假期留宿 提交申请与查看审核 › 信 消息中心 查看业务通知 ›"
       }
     },
     {
@@ -46,14 +47,15 @@
       "id": "student-repairs",
       "url": "/pages/repairs/index",
       "matchPath": "pages/repairs",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
         "vh": 753,
         "docOverflow": 0,
-        "scrollHeight": 1407,
-        "scrollable": 654,
-        "scrolledTop": 653,
+        "scrollHeight": 1433,
+        "scrollable": 680,
+        "scrolledTop": 680,
         "empty": false,
         "beyond": [],
         "fixed": [],
@@ -87,7 +89,7 @@
           "top": 664,
           "coveredPx": 0
         },
-        "text": "我的报修 查看处理进度、确认完成并评价 新建 全部 53 待审核 26 待人工处理 15 待接单 4 已接单 3 待确认 3 已完成 0 历史记录 21 按工单号查询 查询 共 53 条 · 第 1 / 6 页 验收-待接单 待接单 WX202611180015 · 水龙头漏水 维修人员：王师傅1 更新于 2026-11-18 18:43 查看详情 › 验收-待审核 待审核 WX202611180014 · 水龙头漏水 更新于 2026"
+        "text": "我的报修 查看处理进度、确认完成并评价 新建 全部 55 待审核 27 待人工处理 15 待接单 4 已接单 3 待确认 4 已完成 0 历史记录 22 按工单号查询 查询 共 55 条 · 第 1 / 6 页 验收-待接单 待接单 WX202611180022 · 水龙头漏水 维修人员：王师傅1 更新于 2026-11-18 19:32 查看详情 › 验收-待审核 待审核 WX202611180021 · 水龙头漏水 更新于 2026"
       }
     },
     {
@@ -96,14 +98,17 @@
       "url": "/pages/repairs/index",
       "matchPath": "pages/repairs",
       "openMethod": "page.chooseTab({ currentTarget: { dataset: { tab: 'history' } } })",
+      "beforeIds": [
+        "CF985FA889D6A6185CC04395C23D7420"
+      ],
       "issues": [],
       "metrics": {
         "vw": 390,
         "vh": 753,
         "docOverflow": 0,
-        "scrollHeight": 1482,
-        "scrollable": 729,
-        "scrolledTop": 729,
+        "scrollHeight": 1461,
+        "scrollable": 708,
+        "scrolledTop": 708,
         "empty": false,
         "beyond": [],
         "fixed": [],
@@ -137,14 +142,15 @@
           "top": 664,
           "coveredPx": 0
         },
-        "text": "我的报修 查看处理进度、确认完成并评价 新建 全部 53 待审核 26 待人工处理 15 待接单 4 已接单 3 待确认 3 已完成 0 历史记录 21 按工单号查询 查询 共 21 条 · 第 1 / 3 页 E2E-B端闭环-延期 已归档 WX202611160021 · 水龙头漏水 维修人员：王师傅1 ★ 4 分 更新于 2026-11-16 20:24 查看详情 › E2E-B端闭环-延期 已归档 WX202611160018 "
+        "text": "我的报修 查看处理进度、确认完成并评价 新建 全部 55 待审核 27 待人工处理 15 待接单 4 已接单 3 待确认 4 已完成 0 历史记录 22 按工单号查询 查询 共 22 条 · 第 1 / 3 页 回归检查 已撤销 WX202611180017 · 水龙头漏水 更新于 2026-11-18 19:20 查看详情 › E2E-B端闭环-延期 已归档 WX202611160021 · 水龙头漏水 维修人员：王师傅1 ★ 4 分"
       }
     },
     {
       "role": "STUDENT",
       "id": "student-detail-pending-review",
-      "url": "/pages/repair-detail/index?id=673",
+      "url": "/pages/repair-detail/index?id=680",
       "matchPath": "pages/repair-detail",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -166,7 +172,7 @@
         "heads": [],
         "misaligned": [],
         "tabBar": null,
-        "text": "WX202611180014 · 点击复制 验收-待审核 待审核 工单信息 小程序端验收夹具：状态流转与页面交互验证。 工单编号 WX202611180014 当前状态 待审核 故障分类 水龙头漏水 维修工种 水暖维修 报修位置 明德二号楼 102 维修人员 暂无派单 报修时间 2026-11-18 18:43 更新时间 2026-11-18 18:43 附件与现场照片 0 个 - 撤销"
+        "text": "WX202611180021 · 点击复制 验收-待审核 待审核 工单信息 小程序端验收夹具：状态流转与页面交互验证。 工单编号 WX202611180021 当前状态 待审核 故障分类 水龙头漏水 维修工种 水暖维修 报修位置 明德二号楼 102 维修人员 暂无派单 报修时间 2026-11-18 19:32 更新时间 2026-11-18 19:32 附件与现场照片 0 个 - 撤销"
       }
     },
     {
@@ -178,6 +184,9 @@
       "openTap": "确认完成",
       "closeTap": "取消",
       "shot": true,
+      "beforeIds": [
+        "6E4153ACA9083A93AF77654E114D1B6C"
+      ],
       "issues": [],
       "metrics": {
         "present": true,
@@ -239,6 +248,9 @@
       "openTap": "申请重修",
       "closeTap": "取消",
       "shot": true,
+      "beforeIds": [
+        "79F3A210394E8237F258A65C91A7B663"
+      ],
       "issues": [],
       "metrics": {
         "present": true,
@@ -296,6 +308,7 @@
       "id": "student-repair-form",
       "url": "/pages/repair-form/index",
       "matchPath": "pages/repair-form",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -325,6 +338,7 @@
       "id": "student-stays",
       "url": "/pages/stays/index",
       "matchPath": "pages/stays",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -374,6 +388,7 @@
       "id": "student-messages",
       "url": "/pages/messages/index",
       "matchPath": "pages/messages",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -396,7 +411,7 @@
           "top": 664,
           "coveredPx": 0
         },
-        "text": "消息中心 134 条未读消息 全部已读 全部 系统通知 系统管理员发布 宿管发布 全部 未读 已读 报修进度 系统通知 发布人：系统 WX202611180015：审核通过 2026-11-18 18:43 已读 报修进度 系统通知 发布人：系统 WX202611180012：维修完成，请确认或申请重修 2026-11-18 18:43 未读 报修进度 系统通知 发布人：系统 WX202611180012：维修人员已接单 2026-11"
+        "text": "消息中心 135 条未读消息 全部已读 全部 系统通知 系统管理员发布 宿管发布 全部 未读 已读 报修进度 系统通知 发布人：系统 WX202611180022：审核通过 2026-11-18 19:32 已读 报修进度 系统通知 发布人：系统 WX202611180015：维修完成，请确认或申请重修 2026-11-18 19:29 已读 报修进度 系统通知 发布人：系统 WX202611180015：维修人员已接单 2026-11"
       }
     },
     {
@@ -407,6 +422,9 @@
       "modal": true,
       "openMethod": "const item = page.data.items[0]; page.open({ currentTarget: { dataset: { item } } })",
       "closeTap": "返回列表",
+      "beforeIds": [
+        "8969C16FECFB99782C20C2FCAE23F4AA"
+      ],
       "issues": [],
       "metrics": {
         "present": true,
@@ -437,7 +455,7 @@
             "actionBottom": null,
             "actionReachable": true,
             "horizontalOverflow": 0,
-            "text": "消息详情 返回列表 报修进度 通知来源 系统通知 发布人 系统 接收对象 学生 楼栋范围 明德二号楼 发送时间 2026-11-18 18:43 阅读状态 已读 正文 WX202611180015：审核通过 附件 -"
+            "text": "消息详情 返回列表 报修进度 通知来源 系统通知 发布人 系统 接收对象 学生 楼栋范围 明德二号楼 发送时间 2026-11-18 19:32 阅读状态 已读 正文 WX202611180022：审核通过 附件 -"
           }
         ],
         "detail": {
@@ -455,7 +473,7 @@
           "actionBottom": null,
           "actionReachable": true,
           "horizontalOverflow": 0,
-          "text": "消息详情 返回列表 报修进度 通知来源 系统通知 发布人 系统 接收对象 学生 楼栋范围 明德二号楼 发送时间 2026-11-18 18:43 阅读状态 已读 正文 WX202611180015：审核通过 附件 -"
+          "text": "消息详情 返回列表 报修进度 通知来源 系统通知 发布人 系统 接收对象 学生 楼栋范围 明德二号楼 发送时间 2026-11-18 19:32 阅读状态 已读 正文 WX202611180022：审核通过 附件 -"
         }
       }
     },
@@ -464,6 +482,7 @@
       "id": "student-accommodation",
       "url": "/pages/accommodation/index",
       "matchPath": "pages/accommodation",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -509,6 +528,7 @@
       "id": "student-mine",
       "url": "/pages/mine/index",
       "matchPath": "pages/mine",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -543,6 +563,7 @@
       "role": "REPAIRER",
       "id": "repairer-home",
       "url": "/pages/home/index",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -565,7 +586,7 @@
           "top": 664,
           "coveredPx": 0
         },
-        "text": "维修人员端 王师傅1 维修任务工作台 70 条未读消息 4 待接单 1 维修中 2 延期申请 3 待学生确认 维修工作 修 维修任务 接单、拒单、维修与延期 › 记 维修记录 工单记录、异常记录与评价 › 信 消息中心 接收派单与业务通知 › 工作台数字与“维修任务”“维修记录”使用同一统计口径，如与实际工单不符请刷新页面。"
+        "text": "维修人员端 王师傅1 维修任务工作台 70 条未读消息 4 待接单 1 维修中 2 延期申请 4 待学生确认 维修工作 修 维修任务 接单、拒单、维修与延期 › 记 维修记录 工单记录、异常记录与评价 › 信 消息中心 接收派单与业务通知 › 工作台数字与“维修任务”“维修记录”使用同一统计口径，如与实际工单不符请刷新页面。"
       }
     },
     {
@@ -573,14 +594,15 @@
       "id": "repairer-repairs",
       "url": "/pages/repairs/index",
       "matchPath": "pages/repairs",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
         "vh": 753,
         "docOverflow": 0,
-        "scrollHeight": 1805,
-        "scrollable": 1052,
-        "scrolledTop": 1052,
+        "scrollHeight": 1849,
+        "scrollable": 1096,
+        "scrolledTop": 1096,
         "empty": false,
         "beyond": [],
         "fixed": [],
@@ -614,18 +636,19 @@
           "top": 664,
           "coveredPx": 0
         },
-        "text": "维修任务 只显示派给本人的工单 全部 31 待接单 4 维修中 1 延期 2 待确认 3 已确认 0 历史记录 25 按工单号查询 查询 共 10 条 · 第 1 / 1 页 验收-待接单 待接单 WX202611180015 · 水龙头漏水 明德二号楼 102 · 张一 接单截止 2026-11-18 20:43 请在接单截止前接单或拒单（拒单需填写原因） 更新于 2026-11-18 18:43 查看详情 › 验收-待确认 待确认 "
+        "text": "维修任务 只显示派给本人的工单 全部 32 待接单 4 维修中 1 延期 2 待确认 4 已确认 0 历史记录 25 按工单号查询 查询 共 11 条 · 第 1 / 2 页 验收-待接单 待接单 WX202611180022 · 水龙头漏水 明德二号楼 102 · 张一 接单截止 2026-11-18 21:32 请在接单截止前接单或拒单（拒单需填写原因） 更新于 2026-11-18 19:32 查看详情 › 验收-待接单 待确认 "
       }
     },
     {
       "role": "REPAIRER",
       "id": "repairer-reject-modal",
-      "url": "/pages/repair-detail/index?id=674",
+      "url": "/pages/repair-detail/index?id=681",
       "matchPath": "pages/repair-detail",
       "modal": true,
       "openTap": "拒单",
       "closeTap": "取消",
       "shot": true,
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "present": true,
@@ -687,6 +710,9 @@
       "openTap": "提交维修结果",
       "closeTap": "取消",
       "shot": true,
+      "beforeIds": [
+        "7F9BD5D0A6A402BA2808558D8FC03E74"
+      ],
       "issues": [],
       "metrics": {
         "present": true,
@@ -744,6 +770,7 @@
       "id": "repairer-records",
       "url": "/pages/repairer-stats/index",
       "matchPath": "pages/repairer-stats",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -779,7 +806,7 @@
         ],
         "misaligned": [],
         "tabBar": null,
-        "text": "维修人员工作台 王师傅1 累计完工 32 单 · 收到评价 27 条 全部年份 ⌄ 全部月份 ⌄ 重置 记录 评价 4 待接单 1 维修中 3 待学生确认 3.67 综合评分 个人工单记录 25 条 ▾ 统计范围：全部时间 E2E-B端闭环-延期 已归档 WX202611160021 · 明德二号楼 102 ★ 4 分 2026-11-16 20:24 E2E-B端闭环-延期 已归档 WX202611160018 · 明德二号楼 102"
+        "text": "维修人员工作台 王师傅1 累计完工 33 单 · 收到评价 27 条 全部年份 ⌄ 全部月份 ⌄ 重置 记录 评价 4 待接单 1 维修中 4 待学生确认 3.67 综合评分 个人工单记录 25 条 ▾ 统计范围：全部时间 E2E-B端闭环-延期 已归档 WX202611160021 · 明德二号楼 102 ★ 4 分 2026-11-16 20:24 E2E-B端闭环-延期 已归档 WX202611160018 · 明德二号楼 102"
       }
     },
     {
@@ -788,6 +815,9 @@
       "url": "/pages/repairer-stats/index",
       "matchPath": "pages/repairer-stats",
       "openMethod": "page.selectTab({ currentTarget: { dataset: { tab: 'rating' } } })",
+      "beforeIds": [
+        "BA5AA06C8B5D65FCFA01779AFC4A3292"
+      ],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -823,7 +853,7 @@
         ],
         "misaligned": [],
         "tabBar": null,
-        "text": "维修人员工作台 王师傅1 累计完工 32 单 · 收到评价 27 条 全部年份 ⌄ 全部月份 ⌄ 重置 记录 评价 4 待接单 1 维修中 3 待学生确认 3.67 综合评分 全部时间综合评分 共 27 次评价 3.67 / 5 2024 2.00 4 次 2025 3.00 4 次 2026 4.16 19 次 评价明细 27 条 视觉验收-待确认工单 ★ 5 分 学生未在规定时间内评价，系统按规则记为5分 WX20261111001"
+        "text": "维修人员工作台 王师傅1 累计完工 33 单 · 收到评价 27 条 全部年份 ⌄ 全部月份 ⌄ 重置 记录 评价 4 待接单 1 维修中 4 待学生确认 3.67 综合评分 全部时间综合评分 共 27 次评价 3.67 / 5 2024 2.00 4 次 2025 3.00 4 次 2026 4.16 19 次 评价明细 27 条 视觉验收-待确认工单 ★ 5 分 学生未在规定时间内评价，系统按规则记为5分 WX20261111001"
       }
     },
     {
@@ -831,6 +861,7 @@
       "id": "repairer-messages",
       "url": "/pages/messages/index",
       "matchPath": "pages/messages",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -861,6 +892,7 @@
       "id": "repairer-mine",
       "url": "/pages/mine/index",
       "matchPath": "pages/mine",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -895,6 +927,7 @@
       "role": "DORM_MANAGER",
       "id": "manager-home",
       "url": "/pages/home/index",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -917,7 +950,7 @@
           "top": 664,
           "coveredPx": 0
         },
-        "text": "宿管端 周老师 楼栋事务工作台 110 条未读消息 39 待处理报修 0 待审核留宿 1 管辖楼栋通过留宿人数 业务状态 当前可见工单与申请 报修工单 待审核 26 待人工处理 13 待接单 4 维修中 3 待确认 3 已归档 20 留宿申请 COMPLETED 4 已通过 1 楼栋事务 修 报修审核 审核、派单与延期复核 › 宿 留宿审核 锁定申请与审核名单 › 住 楼栋住宿 查看负责范围的住宿 › 信 消息中心 通知学生与查看消息 "
+        "text": "宿管端 周老师 楼栋事务工作台 112 条未读消息 40 待处理报修 0 待审核留宿 1 管辖楼栋通过留宿人数 业务状态 当前可见工单与申请 报修工单 待审核 27 待人工处理 13 待接单 4 维修中 3 待确认 4 已归档 21 留宿申请 COMPLETED 4 已通过 1 楼栋事务 修 报修审核 审核、派单与延期复核 › 宿 留宿审核 锁定申请与审核名单 › 住 楼栋住宿 查看负责范围的住宿 › 信 消息中心 通知学生与查看消息 "
       }
     },
     {
@@ -925,6 +958,7 @@
       "id": "manager-repairs",
       "url": "/pages/repairs/index",
       "matchPath": "pages/repairs",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -966,14 +1000,15 @@
           "top": 664,
           "coveredPx": 0
         },
-        "text": "楼栋报修 仅显示负责楼栋范围 全部 49 待审核 26 待人工处理 13 待派单 0 待接单 4 维修中 3 待确认 3 历史记录 20 按工单号查询 查询 共 49 条 · 第 1 / 5 页 验收-待审核 待审核 WX202611180014 · 水龙头漏水 明德二号楼 102 · 张一 更新于 2026-11-18 18:43 查看详情 › 验收-待接单 待接单 WX202611180015 · 水龙头漏水 明德二号楼 102 ·"
+        "text": "楼栋报修 仅显示负责楼栋范围 全部 51 待审核 27 待人工处理 13 待派单 0 待接单 4 维修中 3 待确认 4 历史记录 21 按工单号查询 查询 共 51 条 · 第 1 / 6 页 验收-待审核 待审核 WX202611180021 · 水龙头漏水 明德二号楼 102 · 张一 更新于 2026-11-18 19:32 查看详情 › 验收-待接单 待接单 WX202611180022 · 水龙头漏水 明德二号楼 102 ·"
       }
     },
     {
       "role": "DORM_MANAGER",
       "id": "manager-repair-detail",
-      "url": "/pages/repair-detail/index?id=673",
+      "url": "/pages/repair-detail/index?id=680",
       "matchPath": "pages/repair-detail",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -995,7 +1030,7 @@
         "heads": [],
         "misaligned": [],
         "tabBar": null,
-        "text": "WX202611180014 · 点击复制 验收-待审核 待审核 工单信息 小程序端验收夹具：状态流转与页面交互验证。 工单编号 WX202611180014 当前状态 待审核 故障分类 水龙头漏水 维修工种 水暖维修 申请学生 张一 报修位置 明德二号楼 102 维修人员 暂无派单 报修时间 2026-11-18 18:43 更新时间 2026-11-18 18:43 附件与现场照片 0 个 - 审核"
+        "text": "WX202611180021 · 点击复制 验收-待审核 待审核 工单信息 小程序端验收夹具：状态流转与页面交互验证。 工单编号 WX202611180021 当前状态 待审核 故障分类 水龙头漏水 维修工种 水暖维修 申请学生 张一 报修位置 明德二号楼 102 维修人员 暂无派单 报修时间 2026-11-18 19:32 更新时间 2026-11-18 19:32 附件与现场照片 0 个 - 审核"
       }
     },
     {
@@ -1003,6 +1038,7 @@
       "id": "manager-stays",
       "url": "/pages/stays/index",
       "matchPath": "pages/stays",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -1066,6 +1102,9 @@
       "closeTap": "取消",
       "closeMethod": "closeSupplement",
       "shot": true,
+      "beforeIds": [
+        "66B2D0B2E2FA634762D493800191241A"
+      ],
       "issues": [],
       "metrics": {
         "present": true,
@@ -1123,6 +1162,7 @@
       "id": "manager-messages",
       "url": "/pages/messages/index",
       "matchPath": "pages/messages",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -1145,7 +1185,7 @@
           "top": 664,
           "coveredPx": 0
         },
-        "text": "消息中心 110 条未读消息 全部已读 发布 全部 系统通知 系统管理员发布 宿管发布 我发布的 全部 未读 已读 报修待审核 系统通知 发布人：系统 WX202611180015 2026-11-18 18:43 未读 报修待审核 系统通知 发布人：系统 WX202611180014 2026-11-18 18:43 未读 报修待审核 系统通知 发布人：系统 WX202611180013 2026-11-18 18:43 未读 报修待"
+        "text": "消息中心 112 条未读消息 全部已读 发布 全部 系统通知 系统管理员发布 宿管发布 我发布的 全部 未读 已读 报修待审核 系统通知 发布人：系统 WX202611180022 2026-11-18 19:32 未读 报修待审核 系统通知 发布人：系统 WX202611180021 2026-11-18 19:32 未读 报修待审核 系统通知 发布人：系统 WX202611180015 2026-11-18 18:43 未读 报修待"
       }
     },
     {
@@ -1158,6 +1198,9 @@
       "closeTap": "关闭",
       "closeMethod": "closePublish",
       "shot": true,
+      "beforeIds": [
+        "2A20FECF76B6FE92AFC6CC622FC667DB"
+      ],
       "issues": [],
       "metrics": {
         "present": true,
@@ -1215,6 +1258,7 @@
       "id": "manager-dorm",
       "url": "/pages/dorm/index",
       "matchPath": "pages/dorm",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -1231,7 +1275,7 @@
         "heads": [],
         "misaligned": [],
         "tabBar": null,
-        "text": "负责楼栋 楼栋、宿舍与床位 楼栋 宿舍 床位 明德二号楼 男生 西区宿舍组团 2 号 12 间宿舍 · 59 / 60 空闲床位 暂无楼栋 暂无宿舍 暂无床位"
+        "text": "负责楼栋 楼栋、宿舍与床位 楼栋 宿舍 床位 明德二号楼 男生 西区宿舍组团 2 号 12 间宿舍 · 58 / 60 空闲床位 暂无楼栋 暂无宿舍 暂无床位"
       }
     },
     {
@@ -1239,6 +1283,7 @@
       "id": "manager-mine",
       "url": "/pages/mine/index",
       "matchPath": "pages/mine",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -1273,6 +1318,7 @@
       "role": "ADMIN",
       "id": "admin-home",
       "url": "/pages/home/index",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -1295,7 +1341,7 @@
           "top": 664,
           "coveredPx": 0
         },
-        "text": "系统管理员端 系统管理员 全校运行工作台 99 条未读消息 367 在读学生 315 已安排住宿 289 处理中报修 98 当前通过留宿 业务状态 当前可见工单与申请 报修工单 待审核 86 待人工处理 163 待接单 4 维修中 33 待确认 3 已归档 199 留宿申请 已通过 104 待审核 65 COMPLETED 60 草稿 58 审核中 56 已归档 50 系统管理 修 报修管理 待审核、异常与全校工单 › 宿 留宿管理 开"
+        "text": "系统管理员端 系统管理员 全校运行工作台 99 条未读消息 377 在读学生 325 已安排住宿 293 处理中报修 98 当前通过留宿 业务状态 当前可见工单与申请 报修工单 待审核 87 待人工处理 163 待接单 4 维修中 35 待确认 4 已归档 201 留宿申请 已通过 104 待审核 65 COMPLETED 60 草稿 58 审核中 56 已归档 50 系统管理 修 报修管理 待审核、异常与全校工单 › 宿 留宿管理 开"
       }
     },
     {
@@ -1303,6 +1349,7 @@
       "id": "admin-repairs",
       "url": "/pages/repairs/index",
       "matchPath": "pages/repairs",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -1344,14 +1391,15 @@
           "top": 664,
           "coveredPx": 0
         },
-        "text": "全校报修 按工单状态处理业务 全部 289 待审核 86 待人工处理 163 待派单 0 待接单 4 维修中 33 待确认 3 历史记录 199 按工单号查询 查询 共 289 条 · 第 1 / 29 页 验收-待审核 待审核 WX202611180014 · 水龙头漏水 明德二号楼 102 · 张一 更新于 2026-11-18 18:43 查看详情 › 验收-待接单 待接单 WX202611180015 · 水龙头漏水 明德二号楼"
+        "text": "全校报修 按工单状态处理业务 全部 293 待审核 87 待人工处理 163 待派单 0 待接单 4 维修中 35 待确认 4 历史记录 201 按工单号查询 查询 共 293 条 · 第 1 / 30 页 验收-待审核 待审核 WX202611180021 · 水龙头漏水 明德二号楼 102 · 张一 更新于 2026-11-18 19:32 查看详情 › 验收-待接单 待接单 WX202611180022 · 水龙头漏水 明德二号楼"
       }
     },
     {
       "role": "ADMIN",
       "id": "admin-repair-detail",
-      "url": "/pages/repair-detail/index?id=673",
+      "url": "/pages/repair-detail/index?id=680",
       "matchPath": "pages/repair-detail",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -1368,7 +1416,7 @@
         "heads": [],
         "misaligned": [],
         "tabBar": null,
-        "text": "WX202611180014 · 点击复制 验收-待审核 待审核 工单信息 小程序端验收夹具：状态流转与页面交互验证。 工单编号 WX202611180014 当前状态 待审核 故障分类 水龙头漏水 维修工种 水暖维修 申请学生 张一 报修位置 明德二号楼 102 维修人员 暂无派单 报修时间 2026-11-18 18:43 更新时间 2026-11-18 18:43 附件与现场照片 0 个 -"
+        "text": "WX202611180021 · 点击复制 验收-待审核 待审核 工单信息 小程序端验收夹具：状态流转与页面交互验证。 工单编号 WX202611180021 当前状态 待审核 故障分类 水龙头漏水 维修工种 水暖维修 申请学生 张一 报修位置 明德二号楼 102 维修人员 暂无派单 报修时间 2026-11-18 19:32 更新时间 2026-11-18 19:32 附件与现场照片 0 个 -"
       }
     },
     {
@@ -1376,6 +1424,7 @@
       "id": "admin-stays",
       "url": "/pages/stays/index",
       "matchPath": "pages/stays",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -1442,6 +1491,9 @@
       "openTap": "新增批次",
       "closeTap": "取消",
       "closeMethod": "closeBatchForm",
+      "beforeIds": [
+        "2B57DCF8D7123AA3428A3F43FB17412D"
+      ],
       "issues": [],
       "metrics": {
         "present": true,
@@ -1472,7 +1524,7 @@
             "actionBottom": 694,
             "actionReachable": true,
             "horizontalOverflow": 0,
-            "text": "配置留宿批次 关闭 批次编号 批次名称 学年 假期类型 暑假 寒假 开放开始 选择日期 开放结束 选择日期 申请截止 选择日期 留宿注意事项 a 取消 保存批次"
+            "text": "配置留宿批次 关闭 批次编号 批次名称 学年 假期类型 暑假 寒假 开放开始 选择日期 开放结束 选择日期 申请截止 选择日期 留宿注意事项 取消 保存批次"
           }
         ],
         "detail": {
@@ -1490,7 +1542,7 @@
           "actionBottom": 694,
           "actionReachable": true,
           "horizontalOverflow": 0,
-          "text": "配置留宿批次 关闭 批次编号 批次名称 学年 假期类型 暑假 寒假 开放开始 选择日期 开放结束 选择日期 申请截止 选择日期 留宿注意事项 a 取消 保存批次"
+          "text": "配置留宿批次 关闭 批次编号 批次名称 学年 假期类型 暑假 寒假 开放开始 选择日期 开放结束 选择日期 申请截止 选择日期 留宿注意事项 取消 保存批次"
         }
       }
     },
@@ -1503,6 +1555,7 @@
       "openTap": "发布",
       "closeTap": "关闭",
       "closeMethod": "closePublish",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "present": true,
@@ -1560,18 +1613,59 @@
       "id": "admin-panel",
       "url": "/pages/admin/index",
       "matchPath": "pages/admin",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
         "vh": 753,
         "docOverflow": 0,
-        "scrollHeight": 45481,
-        "scrollable": 44728,
-        "scrolledTop": 44728,
+        "scrollHeight": 46703,
+        "scrollable": 45950,
+        "scrolledTop": 45950,
         "empty": false,
         "beyond": [],
         "fixed": [],
         "bars": [
+          {
+            "count": 3,
+            "rows": 1
+          },
+          {
+            "count": 3,
+            "rows": 1
+          },
+          {
+            "count": 3,
+            "rows": 1
+          },
+          {
+            "count": 3,
+            "rows": 1
+          },
+          {
+            "count": 3,
+            "rows": 1
+          },
+          {
+            "count": 3,
+            "rows": 1
+          },
+          {
+            "count": 3,
+            "rows": 1
+          },
+          {
+            "count": 3,
+            "rows": 1
+          },
+          {
+            "count": 3,
+            "rows": 1
+          },
+          {
+            "count": 3,
+            "rows": 1
+          },
           {
             "count": 3,
             "rows": 1
@@ -3065,6 +3159,7 @@
       "id": "admin-dorm",
       "url": "/pages/dorm/index",
       "matchPath": "pages/dorm",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,
@@ -3081,7 +3176,7 @@
         "heads": [],
         "misaligned": [],
         "tabBar": null,
-        "text": "宿舍资源管理 楼栋、宿舍与床位 新增 楼栋 宿舍 床位 知行一号楼 男生 东区宿舍组团 1 号 12 间宿舍 · 52 / 54 空闲床位 知行二号楼 女生 东区宿舍组团 2 号 12 间宿舍 · 50 / 50 空闲床位 知行三号楼 男生 东区宿舍组团 3 号 12 间宿舍 · 8 / 48 空闲床位 知行四号楼 女生 东区宿舍组团 4 号 12 间宿舍 · 8 / 48 空闲床位 明德一号楼 混合 西区宿舍组团 1 号 12 间宿舍"
+        "text": "宿舍资源管理 楼栋、宿舍与床位 新增 楼栋 宿舍 床位 知行一号楼 男生 东区宿舍组团 1 号 12 间宿舍 · 50 / 54 空闲床位 知行二号楼 女生 东区宿舍组团 2 号 12 间宿舍 · 50 / 50 空闲床位 知行三号楼 男生 东区宿舍组团 3 号 12 间宿舍 · 8 / 48 空闲床位 知行四号楼 女生 东区宿舍组团 4 号 12 间宿舍 · 8 / 48 空闲床位 明德一号楼 混合 西区宿舍组团 1 号 12 间宿舍"
       }
     },
     {
@@ -3089,6 +3184,7 @@
       "id": "admin-mine",
       "url": "/pages/mine/index",
       "matchPath": "pages/mine",
+      "beforeIds": [],
       "issues": [],
       "metrics": {
         "vw": 390,

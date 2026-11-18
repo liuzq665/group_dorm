@@ -48,8 +48,12 @@ Page({
       this.setData({ role, roleLabel: roleLabels[role] || role });
       this.load();
     }
+    // 从相册/相机选择图片会触发 onHide→onShow，回来时按当前弹层状态恢复 tabBar 隐藏，避免弹层被 tabBar 压住
+    this.syncOverlay();
   },
   onHide() {
+    // 选择相册图片时页面会短暂隐藏，此时不能清空弹层与已填内容，否则回到页面就像“被刷新”
+    if (this._pickingMedia) return;
     // 离开页面时关闭所有弹层，避免返回首页后再进入时残留上一轮的弹层状态
     this.setData({
       scoreModal: '',
@@ -59,6 +63,11 @@ Page({
       delayModal: false
     });
     overlay(this, false);
+  },
+  syncOverlay() {
+    const d = this.data;
+    const open = !!(d.scoreModal || d.rejectModal || d.reworkModal || d.resultModal || d.delayModal);
+    overlay(this, open);
   },
   async load() {
     this.setData({ loading: true });
@@ -280,7 +289,10 @@ Page({
   async chooseResultPhotos() {
     try {
       const paths = await this.choosePhotos();
-      this.setData({ resultFiles: [...this.data.resultFiles, ...paths].slice(0, 6) });
+      // 兜底：若选图期间弹层被生命周期清掉，重新打开并恢复 tabBar 隐藏
+      const base = this.data.resultModal ? this.data.resultFiles : [];
+      this.setData({ resultModal: true, resultFiles: [...base, ...paths].slice(0, 6) });
+      overlay(this, true);
     } catch (error) {
       if (!error.errMsg?.includes('cancel')) showError(error);
     }
@@ -325,7 +337,9 @@ Page({
   async chooseDelayPhotos() {
     try {
       const paths = await this.choosePhotos();
-      this.setData({ delayFiles: [...this.data.delayFiles, ...paths].slice(0, 6) });
+      const base = this.data.delayModal ? this.data.delayFiles : [];
+      this.setData({ delayModal: true, delayFiles: [...base, ...paths].slice(0, 6) });
+      overlay(this, true);
     } catch (error) {
       if (!error.errMsg?.includes('cancel')) showError(error);
     }
@@ -465,12 +479,14 @@ Page({
     }));
   },
   choosePhotos() {
+    // 选图期间页面会 onHide/onShow，用标记避免 onHide 清空正在填写的弹层内容
+    this._pickingMedia = true;
     return new Promise((resolve, reject) => wx.chooseMedia({
       count: 6,
       mediaType: ['image'],
       sourceType: ['album', 'camera'],
-      success: result => resolve(result.tempFiles.map(file => file.tempFilePath)),
-      fail: reject
+      success: result => { this._pickingMedia = false; resolve(result.tempFiles.map(file => file.tempFilePath)); },
+      fail: error => { this._pickingMedia = false; reject(error); }
     }));
   },
   previewFile(event) {

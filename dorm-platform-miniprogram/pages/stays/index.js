@@ -62,8 +62,11 @@ Page({
       this.load();
     }
     this.refreshTabBar();
+    if (this.data.batchForm || this.data.supplementForm) overlay(this, true);
   },
   onHide() {
+    // 选择材料文件时页面会短暂隐藏，不要清空正在填写的弹层
+    if (this._pickingMedia) return;
     // 离开留宿页时关闭批次/补录弹层，并恢复底部导航
     this.setData({ batchForm: null, supplementForm: null });
     overlay(this, false);
@@ -330,11 +333,13 @@ Page({
   async uploadMaterial(event) {
     const batchId = event.currentTarget.dataset.id;
     try {
+      // 选择文件会触发 onHide/onShow，标记一下以免把正在填写的弹层收掉
+      this._pickingMedia = true;
       const chosen = await new Promise((resolve, reject) => wx.chooseMessageFile({
         count: 1,
         type: 'file',
-        success: result => resolve(result.tempFiles[0].path),
-        fail: reject
+        success: result => { this._pickingMedia = false; resolve(result.tempFiles[0].path); },
+        fail: error => { this._pickingMedia = false; reject(error); }
       }));
       const response = await new Promise((resolve, reject) => wx.uploadFile({
         url: `${require('../../utils/config').baseUrl}/stay/batches/${batchId}/materials`,

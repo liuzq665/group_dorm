@@ -26,10 +26,18 @@ async function appserviceTarget() {
   return target;
 }
 
-async function pageTarget(pagePath) {
+async function pageTargets(pagePath) {
   const list = await targets();
-  const matches = list.filter(item => String(item.title || '').startsWith('Webview: ') && (!pagePath || String(item.title).includes(pagePath) || String(item.url || '').includes(pagePath)));
-  const target = matches[matches.length - 1];
+  return list.filter(item => String(item.title || '').startsWith('Webview: ') && (!pagePath || String(item.title).includes(pagePath) || String(item.url || '').includes(pagePath)));
+}
+
+async function pageTarget(pagePath, { excludeIds = [] } = {}) {
+  const matches = await pageTargets(pagePath);
+  const excluded = new Set(excludeIds);
+  // reLaunch 后旧的渲染目标仍可能留在列表里，按标题取“最后一个”会连到已销毁的旧页面，
+  // 因此优先选 navigate 之后新出现的目标，其次才回退到最后一个。
+  const fresh = matches.filter(item => !excluded.has(item.id));
+  const target = fresh[fresh.length - 1] || matches[matches.length - 1];
   if (!target) throw new Error(`未找到页面渲染目标：${pagePath || '(任意页面)'}`);
   return target;
 }
@@ -111,8 +119,8 @@ async function connectApp() {
   return client;
 }
 
-async function connectPage(pagePath) {
-  const target = await pageTarget(pagePath);
+async function connectPage(pagePath, options = {}) {
+  const target = await pageTarget(pagePath, options);
   const client = new Client(target.webSocketDebuggerUrl);
   await client.connect();
   await client.send('Runtime.enable').catch(() => {});
@@ -158,6 +166,7 @@ module.exports = {
   targets,
   appserviceTarget,
   pageTarget,
+  pageTargets,
   connectApp,
   connectPage,
   apiLogin,

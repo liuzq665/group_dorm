@@ -6,7 +6,7 @@
  */
 const fs = require('node:fs');
 const path = require('node:path');
-const { connectApp, connectPage, apiLogin, goto } = require('./lib');
+const { connectApp, connectPage, apiLogin, goto, pageTargets } = require('./lib');
 
 const ROOT = path.join(__dirname, '..', '..');
 const OUT = path.join(ROOT, 'test-results', 'acceptance');
@@ -209,7 +209,7 @@ async function navigate(app, session, url, wait = 1400) {
     let lastError = null;
     for (let attempt = 0; attempt < 3; attempt += 1) {
       try {
-        let page = await connectPage(spec.matchPath || spec.url.split('?')[0].replace(/^\//, ''));
+        let page = await connectPage(spec.matchPath || spec.url.split('?')[0].replace(/^\//, ''), { excludeIds: spec.beforeIds || [] });
         const ready = await page.evaluate(`document.body.innerText.trim().length`);
         if (!ready) {
           page.close();
@@ -232,6 +232,14 @@ async function navigate(app, session, url, wait = 1400) {
         } else if (spec.openMethod) {
           await app.evaluate(`(() => { const pages = getCurrentPages(); const page = pages[pages.length - 1]; ${spec.openMethod}; return true; })()`);
           await sleep(600);
+        }
+        if (spec.modal) {
+          // 弹层包含较多字段/选择器，渲染耗时不定（实测批次弹层可超过 600ms），轮询等待遮罩出现再测量
+          for (let i = 0; i < 10; i += 1) {
+            const hasMask = await page.evaluate(`!!document.querySelector('.modal-mask')`);
+            if (hasMask) break;
+            await sleep(300);
+          }
         }
         if (spec.shot && SHOT) {
           const file = path.join(OUT, `${spec.id}.png`);
@@ -281,13 +289,16 @@ async function navigate(app, session, url, wait = 1400) {
     if (ONLY.length && !ONLY.includes(spec.id)) return;
     // 每个用例都用 reLaunch 重建页面栈：navigateTo 会在同一路由上叠加多个实例，
     // pageTarget() 只能按标题匹配，容易连到旧实例，导致弹层入口找错页面。
+    const path = spec.matchPath || spec.url.split('?')[0].replace(/^\//, '');
+    // 记录导航前的渲染目标，导航后优先连“新出现”的那个，避免连到 reLaunch 已销毁的旧 Webview
+    const beforeIds = (await pageTargets(path).catch(() => [])).map(item => item.id);
     const payload = JSON.stringify(sessions[role]);
     await app.evaluate(`wx.setStorageSync('dorm_student_session', ${payload}); true`);
     const result = await app.evaluate(`new Promise((resolve) => wx.reLaunch({ url: ${JSON.stringify(spec.url)}, success: () => setTimeout(() => resolve('ok'), 500), fail: (e) => resolve('fail:' + e.errMsg) }))`);
     if (String(result).startsWith('fail')) throw new Error(`导航失败 ${spec.url}：${result}`);
     currentRole = role;
     await sleep(spec.wait || 1800);
-    await capture({ role, ...spec });
+    await capture({ role, ...spec, beforeIds });
   };
 
   // ----------------------------- 学生端 -----------------------------

@@ -1,0 +1,229 @@
+{
+  "generatedAt": "2026-11-18T19:18:44",
+  "password": "123456",
+  "accounts": [
+    {
+      "role": "学生",
+      "account": "walk_stu01",
+      "name": "陈浩",
+      "id": 396,
+      "detail": "知行一号楼 203",
+      "reused": true
+    },
+    {
+      "role": "学生",
+      "account": "walk_stu02",
+      "name": "周洋",
+      "id": 397,
+      "detail": "知行一号楼 204",
+      "reused": true
+    },
+    {
+      "role": "学生",
+      "account": "walk_stu03",
+      "name": "赵磊",
+      "id": 398,
+      "detail": "明德一号楼 101",
+      "reused": true
+    },
+    {
+      "role": "学生",
+      "account": "walk_stu04",
+      "name": "孙宇",
+      "id": 399,
+      "detail": "明德一号楼 301",
+      "reused": true
+    },
+    {
+      "role": "学生",
+      "account": "walk_stu05",
+      "name": "李明",
+      "id": 400,
+      "detail": "明德二号楼 101",
+      "reused": true
+    },
+    {
+      "role": "学生",
+      "account": "walk_stu06",
+      "name": "王芳",
+      "id": 401,
+      "detail": "博雅三号楼 301",
+      "reused": true
+    },
+    {
+      "role": "学生",
+      "account": "walk_stu07",
+      "name": "林晓",
+      "id": 402,
+      "detail": "博雅三号楼 302",
+      "reused": true
+    },
+    {
+      "role": "学生",
+      "account": "walk_stu08",
+      "name": "郑爽",
+      "id": 404,
+      "detail": "博雅三号楼 101",
+      "reused": true
+    },
+    {
+      "role": "学生",
+      "account": "walk_stu09",
+      "name": "何雨",
+      "id": 405,
+      "detail": "博雅一号楼 201",
+      "reused": true
+    },
+    {
+      "role": "学生",
+      "account": "walk_stu10",
+      "name": "张伟",
+      "id": 406,
+      "detail": "博雅一号楼 101",
+      "reused": true
+    },
+    {
+      "role": "宿管",
+      "account": "walk_mgr01",
+      "name": "赵敏",
+      "id": 407,
+      "detail": "负责 明德一号楼",
+      "reused": true
+    },
+    {
+      "role": "宿管",
+      "account": "walk_mgr02",
+      "name": "钱进",
+      "id": 408,
+      "detail": "负责 博雅一号楼",
+      "reused": true
+    },
+    {
+      "role": "维修",
+      "account": "walk_rep01",
+      "name": "李建国",
+      "id": 409,
+      "detail": "负责 知行一号楼、明德一号楼（水暖/电气/综合）",
+      "reused": true
+    },
+    {
+      "role": "维修",
+      "account": "walk_rep02",
+      "name": "张海",
+      "id": 410,
+      "detail": "负责 知行一号楼、明德二号楼、博雅一号楼（水暖/电气/综合）",
+      "reused": true
+    },
+    {
+      "role": "维修",
+      "account": "walk_rep03",
+      "name": "刘敏",
+      "id": 411,
+      "detail": "负责 明德二号楼、博雅三号楼（水暖/电气/综合）",
+      "reused": true
+    },
+    {
+      "role": "维修",
+      "account": "walk_rep04",
+      "name": "陈晨",
+      "id": 412,
+      "detail": "负责 博雅一号楼、至善一号楼（水暖/电气/综合）",
+      "reused": true
+    },
+    {
+      "role": "管理员",
+      "account": "walk_admin",
+      "name": "孙倩",
+      "id": 413,
+      "detail": "系统管理员",
+      "reused": true
+    }
+  ],
+  "checks": [
+    {
+      "account": "walk_stu01",
+      "ok": true,
+      "note": "登录OK；住宿=知行一号楼203-1"
+    },
+    {
+      "account": "walk_stu02",
+      "ok": true,
+      "note": "登录OK；住宿=知行一号楼204-1"
+    },
+    {
+      "account": "walk_stu03",
+      "ok": true,
+      "note": "登录OK；住宿=明德一号楼101-1"
+    },
+    {
+      "account": "walk_stu04",
+      "ok": true,
+      "note": "登录OK；住宿=明德一号楼301-1"
+    },
+    {
+      "account": "walk_stu05",
+      "ok": true,
+      "note": "登录OK；住宿=明德二号楼101-1"
+    },
+    {
+      "account": "walk_stu06",
+      "ok": true,
+      "note": "登录OK；住宿=博雅三号楼301-1"
+    },
+    {
+      "account": "walk_stu07",
+      "ok": true,
+      "note": "登录OK；住宿=博雅三号楼302-1"
+    },
+    {
+      "account": "walk_stu08",
+      "ok": true,
+      "note": "登录OK；住宿=博雅三号楼101-1"
+    },
+    {
+      "account": "walk_stu09",
+      "ok": true,
+      "note": "登录OK；住宿=博雅一号楼201-1"
+    },
+    {
+      "account": "walk_stu10",
+      "ok": true,
+      "note": "登录OK；住宿=博雅一号楼101-1"
+    },
+    {
+      "account": "walk_mgr01",
+      "ok": true,
+      "note": "登录OK；负责楼栋=明德一号楼；待审核申请=1"
+    },
+    {
+      "account": "walk_mgr02",
+      "ok": true,
+      "note": "登录OK；负责楼栋=博雅一号楼；待审核申请=0"
+    },
+    {
+      "account": "walk_rep01",
+      "ok": true,
+      "note": "登录OK；待接单=0；维修中=0"
+    },
+    {
+      "account": "walk_rep02",
+      "ok": true,
+      "note": "登录OK；待接单=0；维修中=0"
+    },
+    {
+      "account": "walk_rep03",
+      "ok": true,
+      "note": "登录OK；待接单=0；维修中=0"
+    },
+    {
+      "account": "walk_rep04",
+      "ok": true,
+      "note": "登录OK；待接单=0；维修中=0"
+    },
+    {
+      "account": "walk_admin",
+      "ok": true,
+      "note": "登录OK；管理员权限"
+    }
+  ]
+}
