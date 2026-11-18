@@ -107,8 +107,8 @@ Page({
         evaluation: detail.score ? { score: detail.score, comment: orDash(detail.comment) } : null,
         dispatches: (detail.dispatches || []).map(row => ({
           ...row,
-          title: `${orDash(row.repairer_name)} · ${row.dispatch_mode === 'AUTO' ? '自动派单' : '人工派单'} · ${dispatchText(row.dispatch_status)}`,
-          timeLabel: formatDateTime(row.created_at)
+          title: `${orDash(row.repairer_name)} · ${row.dispatch_mode === 'AUTO' ? '自动派单' : '人工派单'} · ${dispatchText(row.dispatch_status)}` + (row.dispatch_status === 'REJECTED' && row.decision_reason ? ` · 拒单理由：${row.decision_reason}` : '') + (row.dispatch_status === 'TIMEOUT' ? ' · 超过接单时限未处理' : ''),
+          timeLabel: formatDateTime(row.decided_at || row.created_at)
         })),
         audits: (detail.audits || []).map(row => ({
           ...row,
@@ -161,6 +161,15 @@ Page({
     if (detail.completed_at) rows.push({ label: '完工时间', value: formatDateTime(detail.completed_at) });
     if (detail.reject_reason) rows.push({ label: '审核意见', value: orDash(detail.reject_reason) });
     if (detail.manual_reason) rows.push({ label: '人工处理原因', value: orDash(detail.manual_reason) });
+    const refused = (detail.dispatches || []).filter(row => row.dispatch_status === 'REJECTED');
+    if (refused.length && ['PENDING_ACCEPT', 'PENDING_ASSIGN', 'PENDING_MANUAL'].includes(detail.current_status)) {
+      const last = refused[refused.length - 1];
+      rows.push({ label: '派单情况', value: `${orDash(last.repairer_name)} 已拒单${last.decision_reason ? `（${last.decision_reason}）` : ''}，系统已重新派单或转人工指派` });
+    }
+    const timedOut = (detail.dispatches || []).filter(row => row.dispatch_status === 'TIMEOUT');
+    if (timedOut.length && ['PENDING_ACCEPT', 'PENDING_ASSIGN', 'PENDING_MANUAL'].includes(detail.current_status)) {
+      rows.push({ label: '派单情况', value: '维修工超过接单时限未处理，系统已重新派单或转人工指派' });
+    }
     return rows;
   },
   /* ------------------------------ 学生操作 ------------------------------ */
@@ -384,10 +393,21 @@ Page({
     if (pass === null) return;
     const reason = await this.prompt(pass ? '审核通过' : '退回修改', pass ? '审核意见（可留空）' : '请填写退回原因');
     if (reason === null || (!pass && !reason.trim())) return;
+    let urgent = !!(this.data.detail && this.data.detail.urgent);
+    if (pass && !urgent) {
+      urgent = await new Promise(resolve => wx.showModal({
+        title: '是否需要人工指派',
+        content: '紧急工单（漏水、断电、门锁损坏等）不参与自动派单，审核后转人工指派。',
+        confirmText: '标记紧急',
+        cancelText: '普通工单',
+        success: result => resolve(!!result.confirm),
+        fail: () => resolve(false)
+      }));
+    }
     try {
       await request(`/repair-orders/${this.data.id}/review`, {
         method: 'POST',
-        data: { pass, reason: reason.trim(), urgent: !!this.data.detail.urgent }
+        data: { pass, reason: reason.trim(), urgent }
       });
       wx.showToast({ title: pass ? '审核通过' : '已退回修改' });
       this.load();

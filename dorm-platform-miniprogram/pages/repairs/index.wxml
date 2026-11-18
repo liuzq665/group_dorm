@@ -31,6 +31,7 @@
         <view class="record-head">
           <text class="record-title">{{item.title}}</text>
           <text class="tag {{item.statusTone}}">{{item.statusLabel}}</text>
+          <text wx:if="{{item.urgentLabel}}" class="tag tag-danger">{{item.urgentLabel}}</text>
         </view>
         <text class="record-meta">{{item.orderNoLabel}} · {{item.categoryLabel}}</text>
         <text wx:if="{{role!=='STUDENT'}}" class="record-meta">{{item.positionLabel}} · {{item.studentLabel}}</text>

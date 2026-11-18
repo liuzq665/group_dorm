@@ -27,6 +27,15 @@
       </view>
 
       <view class="field">
+        <text class="field-label">紧急程度</text>
+        <view class="switch-field">
+          <switch checked="{{form.urgent}}" bindchange="urgentChange" color="#3E6B62"/>
+          <text class="muted">标记为紧急（漏水、断电、门锁损坏等影响安全的情况）</text>
+        </view>
+        <text class="field-hint">紧急工单提交后由宿管审核并人工指派维修人员，不参与自动派单。</text>
+      </view>
+
+      <view class="field">
         <text class="field-label">现场照片（可选，最多 6 张）</text>
         <button class="outline compact-button" bindtap="choose">选择照片（新增 {{files.length}}）</button>
         <view class="photo-row" wx:for="{{existing}}" wx:key="file_id">
@@ -45,6 +54,6 @@
       </view>
     </view>
 
-    <view class="tip-bar">提交后由负责楼栋宿管审核，审核通过自动派单；维修完成后请在“我的报修”中确认完成并填写评分与文字评价。</view>
+    <view class="tip-bar">提交后由负责楼栋宿管审核，审核通过后自动派单（紧急工单转人工指派）；维修完成后请在“我的报修”中确认完成并填写评分与文字评价。</view>
   </block>
 </view>

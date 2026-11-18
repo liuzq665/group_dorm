@@ -10,7 +10,7 @@ Page({
     categoryIndex: 0,
     categoryName: '',
     categoryChosen: false,
-    form: { title: '', description: '' },
+    form: { title: '', description: '', urgent: false },
     files: [],
     existing: [],
     actionBusy: false
@@ -49,7 +49,7 @@ Page({
       let categoryId = '';
       if (this.data.editing) {
         const detail = await request(`/repair-orders/${this.data.orderId}`);
-        form = { title: detail.title || '', description: detail.description || '' };
+        form = { title: detail.title || '', description: detail.description || '', urgent: !!detail.urgent };
         categoryId = String(detail.category_id || '');
         existing = (detail.files || []).filter(file => file.purpose === 'FAULT');
       }
@@ -71,6 +71,7 @@ Page({
   input(event) {
     this.setData({ [`form.${event.currentTarget.dataset.key}`]: event.detail.value });
   },
+  urgentChange(event) { this.setData({ 'form.urgent': !!event.detail.value }); },
   category(event) {
     const index = Number(event.detail.value);
     this.setData({ categoryIndex: index, categoryName: this.data.categories[index]?.name || '', categoryChosen: true });
@@ -105,6 +106,7 @@ Page({
         title: form.title.trim(),
         description: form.description.trim(),
         categoryId: Number(category.id),
+        urgent: !!form.urgent,
         fileIds
       };
       let id = orderId;

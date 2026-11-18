@@ -134,6 +134,7 @@ Page({
       statusTone: tone,
       statusStyle: tone.replace('tag-', ''),
       scoreLabel: row.score ? `${row.score} 分` : '',
+      urgentLabel: row.urgent ? '紧急' : '',
       commentLabel: row.comment ? orDash(row.comment) : '',
       orderNoLabel: orDash(row.order_no),
       categoryLabel: orDash(row.category_name),
