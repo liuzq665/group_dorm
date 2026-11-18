@@ -51,6 +51,7 @@ Page({
     emptyView: { title: '暂无留宿申请', tip: '' },
     batchEmptyView: { title: '当前没有可申请或管理的留宿批次', tip: '批次开放后可在本页提交申请' },
     batchForm: null,
+    ruleForm: null,
     supplementForm: null,
     students: [],
     actionBusy: false
@@ -62,13 +63,13 @@ Page({
       this.load();
     }
     this.refreshTabBar();
-    if (this.data.batchForm || this.data.supplementForm) overlay(this, true);
+    if (this.data.batchForm || this.data.ruleForm || this.data.supplementForm) overlay(this, true);
   },
   onHide() {
     // 选择材料文件时页面会短暂隐藏，不要清空正在填写的弹层
     if (this._pickingMedia) return;
     // 离开留宿页时关闭批次/补录弹层，并恢复底部导航
-    this.setData({ batchForm: null, supplementForm: null });
+    this.setData({ batchForm: null, ruleForm: null, supplementForm: null });
     overlay(this, false);
   },
   /** 刷新自定义 tabBar 选中态，确保当前页高亮与角色一致 */
@@ -279,8 +280,83 @@ Page({
         method: 'POST',
         data: { applicationDeadline: `${batch.application_deadline}T23:00:00`.slice(0, 19), autoLock: true }
       });
-      wx.showToast({ title: '批次已开放' });
+      wx.showToast({ title: '批次已开放，宿管可设置本楼截止' });
       this.load();
+    } catch (error) {
+      showError(error);
+    }
+  },
+  /** 宿管：设置本楼申请截止时间（学生是否能看到该批次取决于本楼规则） */
+  openRuleForm(event) {
+    const id = event.currentTarget.dataset.id;
+    const batch = this.data.batches.find(item => String(item.batch_id) === String(id));
+    if (!batch) return;
+    const existing = batch.application_deadline ? String(batch.application_deadline) : '';
+    this.setData({
+      ruleForm: {
+        batchId: id,
+        batchName: batch.batch_name,
+        openStartDate: batch.open_start_date,
+        openEndDate: batch.open_end_date,
+        buildingId: batch.building_id,
+        deadlineDate: existing ? existing.slice(0, 10) : '',
+        deadlineTime: existing ? existing.slice(11, 16) : '23:59',
+        autoLock: batch.auto_lock !== 0 && batch.auto_lock !== false
+      }
+    });
+    overlay(this, true);
+  },
+  closeRuleForm() {
+    this.setData({ ruleForm: null });
+    overlay(this, false);
+  },
+  ruleDate(event) {
+    this.setData({ [`ruleForm.${event.currentTarget.dataset.key}`]: event.detail.value });
+  },
+  ruleSwitch(event) {
+    this.setData({ 'ruleForm.autoLock': event.detail.value });
+  },
+  async saveRule() {
+    const form = this.data.ruleForm;
+    if (!form || !form.deadlineDate || !form.deadlineTime) {
+      wx.showToast({ title: '请选择申请截止日期与时间', icon: 'none' });
+      return;
+    }
+    const deadline = `${form.deadlineDate} ${form.deadlineTime}:00`;
+    if (new Date(deadline.replace(/-/g, '/')).getTime() <= Date.now()) {
+      wx.showToast({ title: '截止时间必须晚于当前时间', icon: 'none' });
+      return;
+    }
+    if (form.openEndDate && form.deadlineDate > String(form.openEndDate).slice(0, 10)) {
+      wx.showToast({ title: '截止时间不能晚于开放结束日期', icon: 'none' });
+      return;
+    }
+    try {
+      await request(`/stay/batches/${form.batchId}/building-rule`, {
+        method: 'PUT',
+        data: { buildingId: Number(form.buildingId), applicationDeadline: deadline, autoLock: !!form.autoLock }
+      });
+      wx.showToast({ title: '本楼截止时间已保存' });
+      this.setData({ ruleForm: null });
+      overlay(this, false);
+      this.load();
+    } catch (error) {
+      showError(error);
+    }
+  },
+  /** 宿管：发布本楼申请通知（需要先设置有效的截止时间） */
+  async publishBuilding(event) {
+    const id = event.currentTarget.dataset.id;
+    const batch = this.data.batches.find(item => String(item.batch_id) === String(id));
+    if (batch && !batch.application_deadline) {
+      wx.showToast({ title: '请先设置本楼申请截止时间', icon: 'none' });
+      this.openRuleForm(event);
+      return;
+    }
+    try {
+      await request(`/stay/batches/${id}/publish`, { method: 'POST', data: { buildingId: Number(batch.building_id) } });
+      wx.showToast({ title: '已通知本楼学生' });
+      this.setData({ batches: this.data.batches.map(item => (String(item.batch_id) === String(id) ? { ...item, building_published: true } : item)) });
     } catch (error) {
       showError(error);
     }

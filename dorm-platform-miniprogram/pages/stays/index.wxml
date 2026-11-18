@@ -20,6 +20,9 @@
       <text class="record-meta">开放区间：{{item.open_start_date}} 至 {{item.open_end_date}}</text>
       <text class="record-meta">申请截止：{{item.deadlineText}}</text>
       <text wx:if="{{item.auto_lock}}" class="record-meta">截止后自动锁定进入审核</text>
+      <text wx:if="{{role==='ADMIN'&&item.current_status==='DRAFT'}}" class="record-note">草稿状态：点「发布开放」后宿管才能看到该批次并设置本楼截止时间</text>
+      <text wx:if="{{role==='DORM_MANAGER'&&item.current_status==='OPEN'&&!item.application_deadline}}" class="record-note">本楼尚未设置申请截止时间，学生暂时看不到该批次</text>
+      <text wx:if="{{role==='DORM_MANAGER'&&item.current_status==='OPEN'&&item.application_deadline&&!item.building_published}}" class="record-note">已设置截止时间，点「发布本楼通知」通知本楼学生</text>
       <view wx:if="{{item.materials.length}}" class="attachment-list">
         <view class="attachment-item" wx:for="{{item.materials}}" wx:for-item="material" wx:key="file_id">
           <text class="attachment-name">材料：{{material.original_name}}</text>
@@ -41,6 +44,8 @@
         <view class="action-bar">
           <button wx:if="{{role==='ADMIN'&&item.current_status==='DRAFT'}}" class="primary" data-id="{{item.batch_id}}" bindtap="publishBatch">发布开放</button>
           <button wx:if="{{role==='ADMIN'}}" class="outline" data-id="{{item.batch_id}}" bindtap="uploadMaterial">上传材料示例</button>
+          <button wx:if="{{role==='DORM_MANAGER'&&item.current_status==='OPEN'}}" class="outline" data-id="{{item.batch_id}}" bindtap="openRuleForm">设置本楼截止</button>
+          <button wx:if="{{role==='DORM_MANAGER'&&item.current_status==='OPEN'}}" class="secondary" data-id="{{item.batch_id}}" bindtap="publishBuilding">发布本楼通知</button>
           <button wx:if="{{item.current_status==='OPEN'}}" class="secondary" data-id="{{item.batch_id}}" bindtap="openSupplement">人工补录</button>
         </view>
       </block>
@@ -119,6 +124,38 @@
       <view class="action-bar">
         <button class="outline" bindtap="closeBatchForm">取消</button>
         <button class="primary" bindtap="saveBatch">保存批次</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 本楼申请截止时间 -->
+  <view wx:if="{{ruleForm}}" class="modal-mask">
+    <view class="modal-panel">
+      <view class="modal-head"><text class="section-title">设置本楼申请截止</text><text class="modal-close" bindtap="closeRuleForm">关闭</text></view>
+      <view class="field"><text class="field-label">留宿批次</text><text class="field-static">{{ruleForm.batchName}}</text></view>
+      <view class="field"><text class="field-label">开放区间</text><text class="field-static">{{ruleForm.openStartDate}} 至 {{ruleForm.openEndDate}}</text></view>
+      <view class="field">
+        <text class="field-label">申请截止日期</text>
+        <picker mode="date" data-key="deadlineDate" value="{{ruleForm.deadlineDate}}" bindchange="ruleDate">
+          <view class="field-picker">{{ruleForm.deadlineDate || '选择日期'}}</view>
+        </picker>
+      </view>
+      <view class="field">
+        <text class="field-label">申请截止时间</text>
+        <picker mode="time" data-key="deadlineTime" value="{{ruleForm.deadlineTime}}" bindchange="ruleDate">
+          <view class="field-picker">{{ruleForm.deadlineTime || '选择时间'}}</view>
+        </picker>
+      </view>
+      <view class="field switch-field">
+        <view class="grow">
+          <text class="field-label">截止后自动锁定进入审核</text>
+          <text class="field-hint">开启后，到点系统自动把待审核申请转为审核中</text>
+        </view>
+        <switch checked="{{ruleForm.autoLock}}" bindchange="ruleSwitch" color="#3E6B62"/>
+      </view>
+      <view class="action-bar">
+        <button class="outline" bindtap="closeRuleForm">取消</button>
+        <button class="primary" bindtap="saveRule">保存截止时间</button>
       </view>
     </view>
   </view>

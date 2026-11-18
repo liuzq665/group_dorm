@@ -386,6 +386,8 @@ button[disabled] { opacity: .55; }
 .textarea { min-height: 156rpx; }
 .field-picker { display: flex; align-items: center; justify-content: space-between; gap: 8rpx; }
 .field-hint { display: block; margin-top: 8rpx; color: var(--text-3); font-size: 21rpx; line-height: 1.5; }
+.field-static { display: block; color: var(--text-1); font-size: 26rpx; line-height: 1.5; }
+.switch-field { display: flex; align-items: center; gap: 16rpx; }
 .range { margin: 8rpx 0 12rpx; padding: 16rpx; background: #f7faf9; border: 0; border-radius: var(--radius-m); }
 .range-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12rpx; margin-top: 12rpx; }
 .range-grid picker { min-width: 0; padding: 10rpx 12rpx; background: #fff; border: 1rpx solid var(--border); border-radius: var(--radius-s); }
