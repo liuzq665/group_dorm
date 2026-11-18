@@ -37,10 +37,10 @@
           <text class="record-more" data-id="{{item.applied_application_id}}" bindtap="openApplication">查看申请 ›</text>
         </view>
       </block>
-      <block wx:if="{{role==='ADMIN'}}">
+      <block wx:if="{{role==='ADMIN'||role==='DORM_MANAGER'}}">
         <view class="action-bar">
-          <button wx:if="{{item.current_status==='DRAFT'}}" class="primary" data-id="{{item.batch_id}}" bindtap="publishBatch">发布开放</button>
-          <button class="outline" data-id="{{item.batch_id}}" bindtap="uploadMaterial">上传材料示例</button>
+          <button wx:if="{{role==='ADMIN'&&item.current_status==='DRAFT'}}" class="primary" data-id="{{item.batch_id}}" bindtap="publishBatch">发布开放</button>
+          <button wx:if="{{role==='ADMIN'}}" class="outline" data-id="{{item.batch_id}}" bindtap="uploadMaterial">上传材料示例</button>
           <button wx:if="{{item.current_status==='OPEN'}}" class="secondary" data-id="{{item.batch_id}}" bindtap="openSupplement">人工补录</button>
         </view>
       </block>

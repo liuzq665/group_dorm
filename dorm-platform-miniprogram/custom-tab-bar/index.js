@@ -31,7 +31,7 @@ const roleTabs = {
 };
 
 Component({
-  data: { tabs: [], selected: 0, unread: 0, resolved: false },
+  data: { tabs: [], selected: 0, unread: 0, resolved: false, overlayHidden: false },
   lifetimes: {
     attached() {
       this.refresh();

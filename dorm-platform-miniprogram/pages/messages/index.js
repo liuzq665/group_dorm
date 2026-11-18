@@ -2,6 +2,7 @@ const { request, uploadMessage, showError, getSession } = require('../../utils/r
 const { sourceOptions: buildSourceOptions, formatDateTime, orDash } = require('../../utils/format');
 const { paginate, stepPage } = require('../../utils/pager');
 const { baseUrl } = require('../../utils/config');
+const { overlay } = require('../../utils/overlay');
 
 const READ_OPTIONS = [
   { key: 'all', label: '全部' },
@@ -47,6 +48,7 @@ Page({
   onHide() {
     // 离开消息中心时关闭详情/发布弹层，避免下次进入残留
     this.setData({ detail: null, detailView: {}, publishing: false });
+    overlay(this, false);
   },
   /** 未读数变化后同步底部导航角标（自定义 tabBar） */
   refreshTabBar() {
@@ -142,6 +144,7 @@ Page({
   async open(event) {
     const item = event.currentTarget.dataset.item;
     this.setData({ detail: item, detailView: this.detailOf(item) });
+    overlay(this, true);
     if (item.is_recipient && !item.read_at) {
       try {
         await request(`/messages/${item.message_id}/read`, { method: 'POST' });
@@ -176,6 +179,7 @@ Page({
   },
   closeDetail() {
     this.setData({ detail: null, detailView: {} });
+    overlay(this, false);
   },
   refreshUnread() {
     return request('/messages/unread-count').then(result => {
@@ -209,9 +213,11 @@ Page({
       form: { title: '', content: '', targetRole: 'STUDENT' },
       files: []
     });
+    overlay(this, true);
   },
   closePublish() {
     this.setData({ publishing: false });
+    overlay(this, false);
   },
   input(event) {
     this.setData({ [`form.${event.currentTarget.dataset.key}`]: event.detail.value });
@@ -262,6 +268,7 @@ Page({
       });
       wx.showToast({ title: '通知已发布' });
       this.setData({ publishing: false });
+      overlay(this, false);
       this.load();
     } catch (error) {
       showError(error);

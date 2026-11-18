@@ -1,6 +1,7 @@
 const { request, showError, getSession } = require('../../utils/request');
 const { statusText, statusTone, orDash, formatDate, formatDateTime } = require('../../utils/format');
 const { paginate, stepPage } = require('../../utils/pager');
+const { overlay } = require('../../utils/overlay');
 
 const TABS = {
   STUDENT: [
@@ -62,6 +63,11 @@ Page({
     }
     this.refreshTabBar();
   },
+  onHide() {
+    // 离开留宿页时关闭批次/补录弹层，并恢复底部导航
+    this.setData({ batchForm: null, supplementForm: null });
+    overlay(this, false);
+  },
   /** 刷新自定义 tabBar 选中态，确保当前页高亮与角色一致 */
   refreshTabBar() {
     const tabBar = typeof this.getTabBar === 'function' ? this.getTabBar() : null;
@@ -90,7 +96,7 @@ Page({
       });
       this.setData({ batches: batchViews, applications: items, batchOptions, batchIndex: 0, batchId: '' });
       this.applyFilter(1);
-      if (role === 'ADMIN') this.setData({ students: await request('/admin/users?roleCode=STUDENT&accommodation=ASSIGNED&enabled=true') });
+      if (role === 'ADMIN' || role === 'DORM_MANAGER') this.setData({ students: await request('/admin/users?roleCode=STUDENT&accommodation=ASSIGNED&enabled=true') });
     } catch (error) {
       showError(error);
     } finally {
@@ -228,9 +234,11 @@ Page({
         instructions: ''
       }
     });
+    overlay(this, true);
   },
   closeBatchForm() {
     this.setData({ batchForm: null });
+    overlay(this, false);
   },
   batchInput(event) {
     this.setData({ [`batchForm.${event.currentTarget.dataset.key}`]: event.detail.value });
@@ -254,6 +262,7 @@ Page({
       });
       wx.showToast({ title: '留宿批次已保存' });
       this.setData({ batchForm: null });
+      overlay(this, false);
       this.load();
     } catch (error) {
       showError(error);
@@ -277,6 +286,7 @@ Page({
     this.setData({
       supplementForm: { batchId: String(event.currentTarget.dataset.id), studentId: '', studentIndex: 0, reason: '', startDate: '', endDate: '' }
     });
+    overlay(this, true);
   },
   chooseSupplementStudent(event) {
     const student = this.data.students[Number(event.detail.value)];
@@ -284,6 +294,7 @@ Page({
   },
   closeSupplement() {
     this.setData({ supplementForm: null });
+    overlay(this, false);
   },
   supplementInput(event) {
     this.setData({ [`supplementForm.${event.currentTarget.dataset.key}`]: event.detail.value });
@@ -310,6 +321,7 @@ Page({
       });
       wx.showToast({ title: '已补录' });
       this.setData({ supplementForm: null });
+      overlay(this, false);
       this.load();
     } catch (error) {
       showError(error);

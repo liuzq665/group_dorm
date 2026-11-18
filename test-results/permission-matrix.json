@@ -1,0 +1,569 @@
+{
+  "generatedAt": "2026-11-18T18:33:09",
+  "base": "http://127.0.0.1:8080/api/v1",
+  "total": 56,
+  "passed": 56,
+  "failed": 0,
+  "results": [
+    {
+      "case": "查看工单列表",
+      "role": "STUDENT",
+      "method": "GET",
+      "path": "/repair-orders?page=1&pageSize=5",
+      "status": 200,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "查看工单列表",
+      "role": "REPAIRER",
+      "method": "GET",
+      "path": "/repair-orders?page=1&pageSize=5",
+      "status": 200,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "查看工单列表",
+      "role": "DORM_MANAGER",
+      "method": "GET",
+      "path": "/repair-orders?page=1&pageSize=5",
+      "status": 200,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "查看工单列表",
+      "role": "ADMIN",
+      "method": "GET",
+      "path": "/repair-orders?page=1&pageSize=5",
+      "status": 200,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "新建报修单",
+      "role": "STUDENT",
+      "method": "POST",
+      "path": "/repair-orders",
+      "status": 400,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "新建报修单",
+      "role": "REPAIRER",
+      "method": "POST",
+      "path": "/repair-orders",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "新建报修单",
+      "role": "DORM_MANAGER",
+      "method": "POST",
+      "path": "/repair-orders",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "新建报修单",
+      "role": "ADMIN",
+      "method": "POST",
+      "path": "/repair-orders",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "修改报修单",
+      "role": "STUDENT",
+      "method": "PUT",
+      "path": "/repair-orders/660",
+      "status": 400,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "修改报修单",
+      "role": "REPAIRER",
+      "method": "PUT",
+      "path": "/repair-orders/660",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "修改报修单",
+      "role": "DORM_MANAGER",
+      "method": "PUT",
+      "path": "/repair-orders/660",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "修改报修单",
+      "role": "ADMIN",
+      "method": "PUT",
+      "path": "/repair-orders/660",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "审核工单",
+      "role": "STUDENT",
+      "method": "POST",
+      "path": "/repair-orders/660/review",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "审核工单",
+      "role": "REPAIRER",
+      "method": "POST",
+      "path": "/repair-orders/660/review",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "审核工单",
+      "role": "DORM_MANAGER",
+      "method": "POST",
+      "path": "/repair-orders/660/review",
+      "status": 200,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "审核工单",
+      "role": "ADMIN",
+      "method": "POST",
+      "path": "/repair-orders/660/review",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "提交维修结果",
+      "role": "STUDENT",
+      "method": "POST",
+      "path": "/repair-orders/660/result",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "提交维修结果",
+      "role": "REPAIRER",
+      "method": "POST",
+      "path": "/repair-orders/660/result",
+      "status": 400,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "提交维修结果",
+      "role": "DORM_MANAGER",
+      "method": "POST",
+      "path": "/repair-orders/660/result",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "提交维修结果",
+      "role": "ADMIN",
+      "method": "POST",
+      "path": "/repair-orders/660/result",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "维修统计",
+      "role": "STUDENT",
+      "method": "GET",
+      "path": "/repairer-stats",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "维修统计",
+      "role": "REPAIRER",
+      "method": "GET",
+      "path": "/repairer-stats",
+      "status": 200,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "维修统计",
+      "role": "DORM_MANAGER",
+      "method": "GET",
+      "path": "/repairer-stats",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "维修统计",
+      "role": "ADMIN",
+      "method": "GET",
+      "path": "/repairer-stats",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "留宿申请列表",
+      "role": "STUDENT",
+      "method": "GET",
+      "path": "/stay/applications?page=1&pageSize=5",
+      "status": 200,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "留宿申请列表",
+      "role": "REPAIRER",
+      "method": "GET",
+      "path": "/stay/applications?page=1&pageSize=5",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "留宿申请列表",
+      "role": "DORM_MANAGER",
+      "method": "GET",
+      "path": "/stay/applications?page=1&pageSize=5",
+      "status": 200,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "留宿申请列表",
+      "role": "ADMIN",
+      "method": "GET",
+      "path": "/stay/applications?page=1&pageSize=5",
+      "status": 200,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "新建留宿批次",
+      "role": "STUDENT",
+      "method": "POST",
+      "path": "/stay/batches",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "新建留宿批次",
+      "role": "REPAIRER",
+      "method": "POST",
+      "path": "/stay/batches",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "新建留宿批次",
+      "role": "DORM_MANAGER",
+      "method": "POST",
+      "path": "/stay/batches",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "新建留宿批次",
+      "role": "ADMIN",
+      "method": "POST",
+      "path": "/stay/batches",
+      "status": 409,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "删除留宿批次",
+      "role": "STUDENT",
+      "method": "DELETE",
+      "path": "/stay/batches/999999",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "删除留宿批次",
+      "role": "REPAIRER",
+      "method": "DELETE",
+      "path": "/stay/batches/999999",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "删除留宿批次",
+      "role": "DORM_MANAGER",
+      "method": "DELETE",
+      "path": "/stay/batches/999999",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "删除留宿批次",
+      "role": "ADMIN",
+      "method": "DELETE",
+      "path": "/stay/batches/999999",
+      "status": 404,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "审核留宿申请",
+      "role": "STUDENT",
+      "method": "POST",
+      "path": "/stay/applications/544/review",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "审核留宿申请",
+      "role": "REPAIRER",
+      "method": "POST",
+      "path": "/stay/applications/544/review",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "审核留宿申请",
+      "role": "DORM_MANAGER",
+      "method": "POST",
+      "path": "/stay/applications/544/review",
+      "status": 400,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "审核留宿申请",
+      "role": "ADMIN",
+      "method": "POST",
+      "path": "/stay/applications/544/review",
+      "status": 400,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "当前住宿信息",
+      "role": "STUDENT",
+      "method": "GET",
+      "path": "/accommodations/current",
+      "status": 200,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "当前住宿信息",
+      "role": "REPAIRER",
+      "method": "GET",
+      "path": "/accommodations/current",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "当前住宿信息",
+      "role": "DORM_MANAGER",
+      "method": "GET",
+      "path": "/accommodations/current",
+      "status": 200,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "当前住宿信息",
+      "role": "ADMIN",
+      "method": "GET",
+      "path": "/accommodations/current",
+      "status": 200,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "发布通知",
+      "role": "STUDENT",
+      "method": "POST",
+      "path": "/messages",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "发布通知",
+      "role": "REPAIRER",
+      "method": "POST",
+      "path": "/messages",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "发布通知",
+      "role": "DORM_MANAGER",
+      "method": "POST",
+      "path": "/messages",
+      "status": 400,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "发布通知",
+      "role": "ADMIN",
+      "method": "POST",
+      "path": "/messages",
+      "status": 200,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "用户管理",
+      "role": "STUDENT",
+      "method": "GET",
+      "path": "/admin/users?page=1&pageSize=5",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "用户管理",
+      "role": "REPAIRER",
+      "method": "GET",
+      "path": "/admin/users?page=1&pageSize=5",
+      "status": 403,
+      "expect": "拒绝",
+      "actual": "拒绝",
+      "result": "PASS"
+    },
+    {
+      "case": "用户管理",
+      "role": "DORM_MANAGER",
+      "method": "GET",
+      "path": "/admin/users?page=1&pageSize=5",
+      "status": 200,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "用户管理",
+      "role": "ADMIN",
+      "method": "GET",
+      "path": "/admin/users?page=1&pageSize=5",
+      "status": 200,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "工作台统计",
+      "role": "STUDENT",
+      "method": "GET",
+      "path": "/dashboard",
+      "status": 200,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "工作台统计",
+      "role": "REPAIRER",
+      "method": "GET",
+      "path": "/dashboard",
+      "status": 200,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "工作台统计",
+      "role": "DORM_MANAGER",
+      "method": "GET",
+      "path": "/dashboard",
+      "status": 200,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    },
+    {
+      "case": "工作台统计",
+      "role": "ADMIN",
+      "method": "GET",
+      "path": "/dashboard",
+      "status": 200,
+      "expect": "允许",
+      "actual": "允许",
+      "result": "PASS"
+    }
+  ]
+}

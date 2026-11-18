@@ -1,6 +1,7 @@
 const { request, upload, getSession, showError } = require('../../utils/request');
 const { statusText, statusTone, dispatchText, resultText, formatDateTime, orDash } = require('../../utils/format');
 const { baseUrl } = require('../../utils/config');
+const { overlay } = require('../../utils/overlay');
 
 const PURPOSE_LABELS = { FAULT: '故障照片', RESULT: '完工照片', DELAY: '延期现场照片', REWORK: '重修照片' };
 
@@ -57,6 +58,7 @@ Page({
       resultModal: false,
       delayModal: false
     });
+    overlay(this, false);
   },
   async load() {
     this.setData({ loading: true });
@@ -85,7 +87,7 @@ Page({
           canAccept: role === 'REPAIRER' && status === 'PENDING_ACCEPT',
           canSubmitResult: role === 'REPAIRER' && ['ACCEPTED', 'DELAYED'].includes(status),
           canDelay: role === 'REPAIRER' && status === 'ACCEPTED',
-          canReview: ['DORM_MANAGER', 'ADMIN'].includes(role) && status === 'PENDING_REVIEW',
+          canReview: role === 'DORM_MANAGER' && status === 'PENDING_REVIEW',
           canDispatch: ['DORM_MANAGER', 'ADMIN'].includes(role) && ['PENDING_ASSIGN', 'PENDING_MANUAL'].includes(status),
           canRetry: ['DORM_MANAGER', 'ADMIN'].includes(role) && status === 'PENDING_MANUAL' && !detail.urgent && !detail.abnormal && !detail.parent_order_id && !(detail.reworkRequests || []).some(row => ['PENDING', 'APPROVED'].includes(row.request_status)),
           canDelayReview: role === 'DORM_MANAGER' && status === 'DELAYED'
@@ -174,9 +176,11 @@ Page({
   openScore(event) {
     const mode = event.currentTarget.dataset.mode || 'confirm';
     this.setData({ scoreModal: mode, scoreForm: { score: 5, comment: '' } });
+    overlay(this, true);
   },
   closeScore() {
     this.setData({ scoreModal: '', scoreForm: { score: 5, comment: '' } });
+    overlay(this, false);
   },
   setScore(event) {
     this.setData({ 'scoreForm.score': Number(event.currentTarget.dataset.score) });
@@ -200,6 +204,7 @@ Page({
       await request(`/repair-orders/${this.data.id}/${path}`, { method: 'POST', data: { score, comment } });
       wx.showToast({ title: '评价已提交' });
       this.setData({ scoreModal: '' });
+      overlay(this, false);
       await this.load();
     } catch (error) {
       showError(error);
@@ -209,9 +214,11 @@ Page({
   },
   openRework() {
     this.setData({ reworkModal: true, reworkReason: '' });
+    overlay(this, true);
   },
   closeRework() {
     this.setData({ reworkModal: false, reworkReason: '' });
+    overlay(this, false);
   },
   reworkInput(event) {
     this.setData({ reworkReason: event.detail.value });
@@ -225,6 +232,7 @@ Page({
       await request(`/repair-orders/${this.data.id}/rework`, { method: 'POST', data: { reason, fileIds: [] } });
       wx.showToast({ title: '重修已提交，沿用原工单' });
       this.setData({ reworkModal: false });
+      overlay(this, false);
       await this.load();
     } catch (error) {
       showError(error);
@@ -240,9 +248,11 @@ Page({
   },
   openReject() {
     this.setData({ rejectModal: true, rejectReason: '' });
+    overlay(this, true);
   },
   closeReject() {
     this.setData({ rejectModal: false, rejectReason: '' });
+    overlay(this, false);
   },
   rejectInput(event) {
     this.setData({ rejectReason: event.detail.value });
@@ -253,13 +263,16 @@ Page({
     const confirmed = await this.modal('拒绝接单', '拒单后工单将重新派单或转人工处理，确定拒单吗？');
     if (!confirmed) return;
     this.setData({ rejectModal: false });
+    overlay(this, false);
     await this.run(`/repair-orders/${this.data.id}/decision`, { method: 'POST', data: { accept: false, reason } }, '已提交拒单');
   },
   openResult() {
     this.setData({ resultModal: true, resultText: '', resultFiles: [] });
+    overlay(this, true);
   },
   closeResult() {
     this.setData({ resultModal: false, resultText: '', resultFiles: [] });
+    overlay(this, false);
   },
   resultInput(event) {
     this.setData({ resultText: event.detail.value });
@@ -289,6 +302,7 @@ Page({
       await request(`/repair-orders/${this.data.id}/result`, { method: 'POST', data: { result: text, fileIds } });
       wx.showToast({ title: '维修结果已提交' });
       this.setData({ resultModal: false });
+      overlay(this, false);
       await this.load();
     } catch (error) {
       showError(error);
@@ -299,9 +313,11 @@ Page({
   },
   openDelay() {
     this.setData({ delayModal: true, delayForm: { reason: '', date: '', time: '' }, delayFiles: [] });
+    overlay(this, true);
   },
   closeDelay() {
     this.setData({ delayModal: false, delayForm: { reason: '', date: '', time: '' }, delayFiles: [] });
+    overlay(this, false);
   },
   delayInput(event) {
     this.setData({ [`delayForm.${event.currentTarget.dataset.key}`]: event.detail.value });
@@ -335,6 +351,7 @@ Page({
       });
       wx.showToast({ title: '延期申请已提交' });
       this.setData({ delayModal: false });
+      overlay(this, false);
       await this.load();
     } catch (error) {
       showError(error);
