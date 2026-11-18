@@ -129,7 +129,8 @@ Page({
       canWithdraw: role === 'STUDENT' && status === 'PENDING_REVIEW',
       canDetail: true,
       canLock: role === 'DORM_MANAGER' && status === 'PENDING_REVIEW',
-      canReview: ['DORM_MANAGER', 'ADMIN'].includes(role) && status === 'UNDER_REVIEW',
+      canReview: (role === 'DORM_MANAGER' && status === 'UNDER_REVIEW')
+        || (role === 'ADMIN' && ['PENDING_REVIEW', 'UNDER_REVIEW'].includes(status)),
       deadlines: item.student_deadline ? formatDate(item.student_deadline) : ''
     };
   },
