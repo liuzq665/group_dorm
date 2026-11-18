@@ -195,7 +195,23 @@ Page({
   parseIds(value, validIds) { return value.split(',').map(item => item.trim()).filter(Boolean).map(item => { if (!validIds.includes(item)) throw new Error(`无效编号：${item}`); return Number(item); }); },
   ruleInput(e) { this.setData({ [`config.rule.${e.currentTarget.dataset.key}`]: e.detail.value }); },
   async saveRule() {
-    try { await request('/admin/repair-rules', { method: 'POST', data: this.data.config.rule }); wx.showToast({ title: '维修规则已保存' }); this.load(); } catch (error) { showError(error); }
+    const rule = (this.data.config && this.data.config.rule) || {};
+    const fields = [
+      { key: 'accept_minutes', label: '接单时限', min: 5, max: 240 },
+      { key: 'normal_minutes', label: '普通维修时限', min: 30, max: 10080 },
+      { key: 'urgent_minutes', label: '紧急维修时限', min: 5, max: 1440 },
+      { key: 'confirm_days', label: '完工确认时限', min: 1, max: 30 },
+      { key: 'edit_days', label: '待修改改单时限', min: 1, max: 30 }
+    ];
+    const payload = {};
+    for (const field of fields) {
+      const raw = String(rule[field.key] === undefined || rule[field.key] === null ? '' : rule[field.key]).trim();
+      if (!/^\d+$/.test(raw)) { wx.showToast({ title: `请填写${field.label}（整数）`, icon: 'none' }); return; }
+      const value = Number(raw);
+      if (value < field.min || value > field.max) { wx.showToast({ title: `${field.label}需在 ${field.min}~${field.max} 之间`, icon: 'none' }); return; }
+      payload[field.key] = value;
+    }
+    try { await request('/admin/repair-rules', { method: 'POST', data: payload }); wx.showToast({ title: '维修规则已保存' }); this.load(); } catch (error) { showError(error); }
   },
   async deleteUser(e) {
     const id = e.currentTarget.dataset.id;

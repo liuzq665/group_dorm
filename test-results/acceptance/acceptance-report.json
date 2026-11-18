@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-18T12:34:56.226Z",
+  "generatedAt": "2026-11-18T12:42:51.641Z",
   "total": 38,
   "failed": 0,
   "results": [
@@ -99,7 +99,7 @@
       "matchPath": "pages/repairs",
       "openMethod": "page.chooseTab({ currentTarget: { dataset: { tab: 'history' } } })",
       "beforeIds": [
-        "045D187B52618C6E96E64D8D1A97D3DC"
+        "177D04D4BC401FCDA5B8246ABBAA2279"
       ],
       "issues": [],
       "metrics": {
@@ -185,7 +185,7 @@
       "closeTap": "取消",
       "shot": true,
       "beforeIds": [
-        "05B5E80944EA3019939492D2A54B26BC"
+        "77BFE41CD806F7C8156D943D5B065FFE"
       ],
       "issues": [],
       "metrics": {
@@ -249,7 +249,7 @@
       "closeTap": "取消",
       "shot": true,
       "beforeIds": [
-        "9CFE3233B0064877F70605933556AE40"
+        "F9C78F2BA043B8572F4E03A93C7E7D10"
       ],
       "issues": [],
       "metrics": {
@@ -423,7 +423,7 @@
       "openMethod": "const item = page.data.items[0]; page.open({ currentTarget: { dataset: { item } } })",
       "closeTap": "返回列表",
       "beforeIds": [
-        "E916EF628A317B65877911AF797F6D5B"
+        "14E53D87B05B3F9647BFD640B8A2B40A"
       ],
       "issues": [],
       "metrics": {
@@ -711,7 +711,7 @@
       "closeTap": "取消",
       "shot": true,
       "beforeIds": [
-        "9CFAC864C65FFA6A2FDF65530D672669"
+        "0269D4BBFCE95C82CED3D272A3351211"
       ],
       "issues": [],
       "metrics": {
@@ -816,7 +816,7 @@
       "matchPath": "pages/repairer-stats",
       "openMethod": "page.selectTab({ currentTarget: { dataset: { tab: 'rating' } } })",
       "beforeIds": [
-        "6CE1D7453F5787ACCD3F2E65E943332C"
+        "E2361A41CC4342E40F712DD33ECADE2B"
       ],
       "issues": [],
       "metrics": {
@@ -1107,7 +1107,7 @@
       "closeMethod": "closeSupplement",
       "shot": true,
       "beforeIds": [
-        "91B518CD2B5B7F46D58864454D243166"
+        "68AC3CE2210714038E727386D17D406A"
       ],
       "issues": [],
       "metrics": {
@@ -1203,7 +1203,7 @@
       "closeMethod": "closePublish",
       "shot": true,
       "beforeIds": [
-        "D0C47336A6C7FA00FFE39EF8FE436998"
+        "65045BB118DD3392CC33D62E50B5B375"
       ],
       "issues": [],
       "metrics": {
@@ -1500,7 +1500,7 @@
       "closeTap": "取消",
       "closeMethod": "closeBatchForm",
       "beforeIds": [
-        "CF33070A17FE6F1BB6A6EA9A323AEC8E"
+        "F478E66DE019445BFA02BA1E803732B3"
       ],
       "issues": [],
       "metrics": {
@@ -1627,9 +1627,9 @@
         "vw": 390,
         "vh": 753,
         "docOverflow": 0,
-        "scrollHeight": 3977,
-        "scrollable": 3224,
-        "scrolledTop": 3224,
+        "scrollHeight": 3961,
+        "scrollable": 3208,
+        "scrolledTop": 3208,
         "empty": false,
         "beyond": [],
         "fixed": [],
@@ -1763,7 +1763,7 @@
         "heads": [],
         "misaligned": [],
         "tabBar": null,
-        "text": "系统管理 人员、维修规则与操作记录 人员角色 维修规则 操作日志 数据备份 学生⌄ 姓名或账号 查询 新增 共 381 人，已显示 30 人 张一 启用 student1 · 2024000001 · 男 · 13800000001 工程学院 软件工程 软件工程2024级1班 · 明德二号楼 102 B 调整宿舍 编辑 禁用 删除 张二 禁用 student2 · 2024000002 · 男 · 13800000002 工程学院 软件"
+        "text": "系统管理 人员、维修规则与操作记录 人员角色 维修规则 操作日志 数据备份 学生⌄ 姓名或账号 查询 新增 共 381 人，已显示 30 人 张一 启用 student1 · 2024000001 · 男 · 13800000001 软件工程2024级1班 · 明德二号楼 102 B 调整宿舍 编辑 禁用 删除 张二 启用 student2 · 2024000002 · 男 · 13800000002 软件工程2024级1班 · 知行一"
       }
     },
     {
