@@ -52,6 +52,7 @@ Page({
     batchEmptyView: { title: '当前没有可申请或管理的留宿批次', tip: '批次开放后可在本页提交申请' },
     batchForm: null,
     ruleForm: null,
+    reviewForm: null,
     supplementForm: null,
     students: [],
     actionBusy: false
@@ -63,13 +64,13 @@ Page({
       this.load();
     }
     this.refreshTabBar();
-    if (this.data.batchForm || this.data.ruleForm || this.data.supplementForm) overlay(this, true);
+    if (this.data.batchForm || this.data.ruleForm || this.data.reviewForm || this.data.supplementForm) overlay(this, true);
   },
   onHide() {
     // 选择材料文件时页面会短暂隐藏，不要清空正在填写的弹层
     if (this._pickingMedia) return;
     // 离开留宿页时关闭批次/补录弹层，并恢复底部导航
-    this.setData({ batchForm: null, ruleForm: null, supplementForm: null });
+    this.setData({ batchForm: null, ruleForm: null, reviewForm: null, supplementForm: null });
     overlay(this, false);
   },
   /** 刷新自定义 tabBar 选中态，确保当前页高亮与角色一致 */
@@ -129,8 +130,8 @@ Page({
       canWithdraw: role === 'STUDENT' && status === 'PENDING_REVIEW',
       canDetail: true,
       canLock: role === 'DORM_MANAGER' && status === 'PENDING_REVIEW',
-      canReview: (role === 'DORM_MANAGER' && status === 'UNDER_REVIEW')
-        || (role === 'ADMIN' && ['PENDING_REVIEW', 'UNDER_REVIEW'].includes(status)),
+      // 审核只给宿管：管理员与宿管职责重叠会让职能模糊，管理员端不出现审核入口
+      canReview: role === 'DORM_MANAGER' && status === 'UNDER_REVIEW',
       deadlines: item.student_deadline ? formatDate(item.student_deadline) : ''
     };
   },
@@ -200,31 +201,66 @@ Page({
       fail: () => resolve(null)
     }));
     if (pass === null) return;
-    const reason = await this.prompt(pass ? '审核通过' : '退回修改', pass ? '审核意见（可留空）' : '请填写退回原因');
-    if (reason === null || (!pass && !reason.trim())) return;
-    let resubmitDeadline;
-    if (!pass) {
-      resubmitDeadline = await this.prompt('设置重交截止时间', '格式：YYYY-MM-DD HH:mm:ss');
-      if (resubmitDeadline === null || !resubmitDeadline.trim()) return;
+    // 默认重交截止：7 天后 23:59，可再通过日期/时间选择器调整
+    const base = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    this.setData({
+      reviewForm: {
+        applicationId: id,
+        pass,
+        title: pass ? '审核通过' : '退回修改',
+        reason: '',
+        deadlineDate: `${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, '0')}-${String(base.getDate()).padStart(2, '0')}`,
+        deadlineTime: '23:59'
+      }
+    });
+    overlay(this, true);
+  },
+  closeReview() {
+    this.setData({ reviewForm: null });
+    overlay(this, false);
+  },
+  reviewInput(event) {
+    this.setData({ [`reviewForm.${event.currentTarget.dataset.key}`]: event.detail.value });
+  },
+  reviewDate(event) {
+    this.setData({ [`reviewForm.${event.currentTarget.dataset.key}`]: event.detail.value });
+  },
+  async saveReview() {
+    const form = this.data.reviewForm;
+    if (!form) return;
+    const reason = (form.reason || '').trim();
+    if (!form.pass && !reason) {
+      wx.showToast({ title: '请填写退回原因', icon: 'none' });
+      return;
+    }
+    let deadline = '';
+    if (!form.pass) {
+      if (!form.deadlineDate || !form.deadlineTime) {
+        wx.showToast({ title: '请选择重交截止日期与时间', icon: 'none' });
+        return;
+      }
+      const due = new Date(`${form.deadlineDate}T${form.deadlineTime}:00`);
+      if (isNaN(due.getTime()) || due.getTime() <= Date.now()) {
+        wx.showToast({ title: '重交截止时间需晚于当前时间', icon: 'none' });
+        return;
+      }
+      deadline = `${form.deadlineDate}T${form.deadlineTime}:00`;
     }
     try {
-      await request(`/stay/applications/${id}/review`, {
+      this.setData({ actionBusy: true });
+      await request(`/stay/applications/${form.applicationId}/review`, {
         method: 'POST',
-        data: { pass, reason: reason.trim(), ...(resubmitDeadline ? { resubmitDeadline: resubmitDeadline.trim().replace(' ', 'T') } : {}) }
+        data: { pass: !!form.pass, reason, ...(deadline ? { resubmitDeadline: deadline } : {}) }
       });
-      wx.showToast({ title: pass ? '申请已通过' : '已退回修改' });
+      this.setData({ reviewForm: null });
+      overlay(this, false);
+      wx.showToast({ title: form.pass ? '申请已通过' : '已退回修改' });
       this.load();
     } catch (error) {
       showError(error);
+    } finally {
+      this.setData({ actionBusy: false });
     }
-  },
-  prompt(title, placeholder) {
-    return new Promise(resolve => wx.showModal({
-      title,
-      editable: true,
-      placeholderText: placeholder,
-      success: result => resolve(result.confirm ? result.content || '' : null)
-    }));
   },
   openBatchForm(event) {
     const id = event && event.currentTarget ? event.currentTarget.dataset.id : '';

@@ -161,6 +161,36 @@
     </view>
   </view>
 
+  <!-- 审核申请 -->
+  <view wx:if="{{reviewForm}}" class="modal-mask">
+    <view class="modal-panel">
+      <view class="modal-head"><text class="section-title">{{reviewForm.title}}</text><text class="modal-close" bindtap="closeReview">关闭</text></view>
+      <view class="field">
+        <text class="field-label">{{reviewForm.pass ? '审核意见（可留空）' : '退回原因（必填）'}}</text>
+        <textarea class="textarea" data-key="reason" value="{{reviewForm.reason}}" bindinput="reviewInput" placeholder="{{reviewForm.pass ? '例如：材料齐全，同意留宿' : '说明需要学生补充或修改的内容'}}"/>
+      </view>
+      <block wx:if="{{!reviewForm.pass}}">
+        <view class="field">
+          <text class="field-label">重交截止日期</text>
+          <picker mode="date" data-key="deadlineDate" value="{{reviewForm.deadlineDate}}" bindchange="reviewDate">
+            <view class="field-picker">{{reviewForm.deadlineDate || '选择日期'}}</view>
+          </picker>
+        </view>
+        <view class="field">
+          <text class="field-label">重交截止时间</text>
+          <picker mode="time" data-key="deadlineTime" value="{{reviewForm.deadlineTime}}" bindchange="reviewDate">
+            <view class="field-picker">{{reviewForm.deadlineTime || '选择时间'}}</view>
+          </picker>
+        </view>
+        <text class="field-hint">学生需在截止时间前重新提交，超期未提交的申请会自动归档。</text>
+      </block>
+      <view class="action-bar">
+        <button class="outline" bindtap="closeReview">取消</button>
+        <button class="primary" bindtap="saveReview" loading="{{actionBusy}}" disabled="{{actionBusy}}">{{reviewForm.pass ? '确认通过' : '确认退回'}}</button>
+      </view>
+    </view>
+  </view>
+
   <!-- 人工补录 -->
   <view wx:if="{{supplementForm}}" class="modal-mask">
     <view class="modal-panel">
