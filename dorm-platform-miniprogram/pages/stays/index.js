@@ -225,18 +225,31 @@ Page({
       success: result => resolve(result.confirm ? result.content || '' : null)
     }));
   },
-  openBatchForm() {
+  openBatchForm(event) {
+    const id = event && event.currentTarget ? event.currentTarget.dataset.id : '';
+    const batch = id ? this.data.batches.find(item => String(item.batch_id) === String(id)) : null;
     this.setData({
-      batchForm: {
-        batchCode: '',
-        batchName: '',
-        academicYear: String(new Date().getFullYear()),
-        vacationType: 'SUMMER',
-        openStartDate: '',
-        openEndDate: '',
-        applicationDeadline: '',
-        instructions: ''
-      }
+      batchForm: batch
+        ? {
+            batchId: batch.batch_id,
+            batchCode: batch.batch_code || '',
+            batchName: batch.batch_name || '',
+            academicYear: String(batch.academic_year || new Date().getFullYear()),
+            vacationType: batch.vacation_type || 'SUMMER',
+            openStartDate: String(batch.open_start_date || '').slice(0, 10),
+            openEndDate: String(batch.open_end_date || '').slice(0, 10),
+            instructions: batch.instructions || ''
+          }
+        : {
+            batchId: '',
+            batchCode: '',
+            batchName: '',
+            academicYear: String(new Date().getFullYear()),
+            vacationType: 'SUMMER',
+            openStartDate: '',
+            openEndDate: '',
+            instructions: ''
+          }
     });
     overlay(this, true);
   },
@@ -255,16 +268,27 @@ Page({
   },
   async saveBatch() {
     const form = this.data.batchForm;
-    if (!form.batchCode || !form.batchName || !form.academicYear || !form.openStartDate || !form.openEndDate || !form.applicationDeadline || !form.instructions) {
+    if (!form.batchCode || !form.batchName || !form.academicYear || !form.openStartDate || !form.openEndDate || !form.instructions) {
       wx.showToast({ title: '请填写完整批次信息', icon: 'none' });
       return;
     }
+    if (form.openEndDate < form.openStartDate) {
+      wx.showToast({ title: '开放结束不能早于开放开始', icon: 'none' });
+      return;
+    }
     try {
-      await request('/stay/batches', {
-        method: 'POST',
-        data: { ...form, academicYear: Number(form.academicYear), applicationDeadline: `${form.applicationDeadline}T23:00:00` }
-      });
-      wx.showToast({ title: '留宿批次已保存' });
+      const payload = {
+        batchCode: form.batchCode,
+        batchName: form.batchName,
+        academicYear: Number(form.academicYear),
+        vacationType: form.vacationType,
+        openStartDate: form.openStartDate,
+        openEndDate: form.openEndDate,
+        instructions: form.instructions
+      };
+      if (form.batchId) await request(`/stay/batches/${form.batchId}`, { method: 'PUT', data: payload });
+      else await request('/stay/batches', { method: 'POST', data: payload });
+      wx.showToast({ title: form.batchId ? '批次已更新' : '留宿批次已保存' });
       this.setData({ batchForm: null });
       overlay(this, false);
       this.load();
@@ -272,15 +296,28 @@ Page({
       showError(error);
     }
   },
-  async publishBatch(event) {
+  async deleteBatch(event) {
     const id = event.currentTarget.dataset.id;
     const batch = this.data.batches.find(item => String(item.batch_id) === String(id));
+    const ok = await new Promise(resolve => wx.showModal({
+      title: '删除批次',
+      content: `删除「${batch ? batch.batch_name : id}」？只有草稿批次、且没有申请记录和楼栋规则时才能删除。`,
+      success: result => resolve(result.confirm)
+    }));
+    if (!ok) return;
     try {
-      await request(`/stay/batches/${id}/publish`, {
-        method: 'POST',
-        data: { applicationDeadline: `${batch.application_deadline}T23:00:00`.slice(0, 19), autoLock: true }
-      });
-      wx.showToast({ title: '批次已开放，宿管可设置本楼截止' });
+      await request(`/stay/batches/${id}`, { method: 'DELETE' });
+      wx.showToast({ title: '批次已删除' });
+      this.load();
+    } catch (error) {
+      showError(error);
+    }
+  },
+  async publishBatch(event) {
+    const id = event.currentTarget.dataset.id;
+    try {
+      await request(`/stay/batches/${id}/publish`, { method: 'POST', data: {} });
+      wx.showToast({ title: '批次已开放，请宿管设置本楼截止' });
       this.load();
     } catch (error) {
       showError(error);

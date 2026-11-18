@@ -2,7 +2,7 @@ const { request, showError, getSession } = require('../../utils/request');
 
 const roleOptions = [['STUDENT', '学生'], ['DORM_MANAGER', '宿管'], ['REPAIRER', '维修人员'], ['ADMIN', '系统管理员']];
 Page({
-  data: { loading: true, tab: 'people', roleFilter: 'STUDENT', roleIndex: 0, roleLabels: ['学生', '宿管', '维修人员', '系统管理员'], keyword: '', users: [], buildings: [], config: null, logs: [], backups: [], modules: ['auth', 'dorm', 'repair', 'stay', 'notice', 'system'] },
+  data: { loading: true, tab: 'people', roleFilter: 'STUDENT', roleIndex: 0, roleLabels: ['学生', '宿管', '维修人员', '系统管理员'], keyword: '', users: [], visibleUsers: [], pageSize: 30, assign: null, buildings: [], config: null, logs: [], backups: [], modules: ['auth', 'dorm', 'repair', 'stay', 'notice', 'system'] },
   onLoad(query) { if (['people', 'repair', 'logs', 'backup'].includes(query.tab)) this.setData({ tab: query.tab }); },
   onShow() { if (getApp().requireRole(['ADMIN'])) { this.setData({ selfUserId: getSession().user.id }); this.load(); } },
   async load() {
@@ -13,7 +13,7 @@ Page({
         const keyword = this.data.keyword.trim();
         const userRequest = keyword ? Promise.all([request(`/admin/users?${base}&realName=${encodeURIComponent(keyword)}`), request(`/admin/users?${base}&account=${encodeURIComponent(keyword)}`)]).then(([byName, byAccount]) => [...new Map([...byName, ...byAccount].map(user => [user.user_id, user])).values()]) : request(`/admin/users?${base}`);
         const [users, buildings] = await Promise.all([userRequest, request('/buildings')]);
-        this.setData({ users, buildings });
+        this.setData({ users, buildings, visibleUsers: users.slice(0, this.data.pageSize) });
       } else if (this.data.tab === 'repair') {
         const [config, buildings] = await Promise.all([request('/admin/repair-config'), request('/buildings')]);
         this.setData({ config, buildings });
@@ -57,6 +57,70 @@ Page({
   roleChange(e) { const roleIndex = Number(e.detail.value); this.setData({ roleIndex, roleFilter: roleOptions[roleIndex][0] }); this.load(); },
   keyword(e) { this.setData({ keyword: e.detail.value }); },
   search() { this.load(); },
+  loadMoreUsers() {
+    const next = this.data.visibleUsers.length + this.data.pageSize;
+    this.setData({ visibleUsers: this.data.users.slice(0, next) });
+  },
+  async openAssign(e) {
+    const { id, name, gender } = e.currentTarget.dataset;
+    if (!gender) {
+      wx.showModal({ title: '缺少性别信息', content: '该学生还没有填写性别，分配宿舍会因性别校验失败。请先点「编辑」补充性别（男/女）后再分配。', showCancel: false });
+      return;
+    }
+    try {
+      const buildings = this.data.buildings.length ? this.data.buildings : await request('/buildings');
+      const buildingIndex = 0;
+      const assign = { studentId: Number(id), studentName: name, gender, buildings, buildingIndex, rooms: [], roomLabels: [], roomIndex: 0, beds: [], bedLabels: [], bedIndex: 0 };
+      this.setData({ assign });
+      if (buildings.length) await this.loadAssignRooms(buildings[buildingIndex].building_id);
+    } catch (error) {
+      showError(error);
+    }
+  },
+  async loadAssignRooms(buildingId) {
+    const assign = this.data.assign;
+    if (!assign) return;
+    const want = assign.gender === 'MALE' ? '男生' : '女生';
+    const rooms = (await request(`/rooms?buildingId=${buildingId}`)).filter(room => Number(room.available_bed_count) > 0 && room.gender_limit === want);
+    const roomLabels = rooms.map(room => `${room.room_no}（可用 ${room.available_bed_count}）`);
+    this.setData({ assign: { ...assign, rooms, roomLabels, roomIndex: 0, beds: [], bedLabels: [], bedIndex: 0 } });
+    if (rooms.length) await this.loadAssignBeds(rooms[0].room_id);
+  },
+  async loadAssignBeds(roomId) {
+    const assign = this.data.assign;
+    if (!assign) return;
+    const beds = (await request(`/beds?roomId=${roomId}`)).filter(bed => bed.management_status === 'AVAILABLE' && !bed.student_id);
+    const bedLabels = beds.map(bed => `${bed.bed_no} 号床`);
+    this.setData({ assign: { ...assign, beds, bedLabels, bedIndex: 0 } });
+  },
+  async assignBuilding(e) {
+    const assign = this.data.assign;
+    if (!assign) return;
+    const buildingIndex = Number(e.detail.value);
+    this.setData({ assign: { ...assign, buildingIndex } });
+    try { await this.loadAssignRooms(assign.buildings[buildingIndex].building_id); } catch (error) { showError(error); }
+  },
+  async assignRoom(e) {
+    const assign = this.data.assign;
+    if (!assign) return;
+    const roomIndex = Number(e.detail.value);
+    this.setData({ assign: { ...assign, roomIndex } });
+    try { await this.loadAssignBeds(assign.rooms[roomIndex].room_id); } catch (error) { showError(error); }
+  },
+  assignBed(e) { this.setData({ 'assign.bedIndex': Number(e.detail.value) }); },
+  closeAssign() { this.setData({ assign: null }); },
+  async saveAssign() {
+    const assign = this.data.assign;
+    if (!assign) return;
+    const bed = assign.beds[assign.bedIndex];
+    if (!bed) { wx.showToast({ title: '请选择床位', icon: 'none' }); return; }
+    try {
+      await request('/admin/assignments', { method: 'POST', data: { studentId: assign.studentId, bedId: bed.bed_id } });
+      wx.showToast({ title: '宿舍已分配' });
+      this.setData({ assign: null });
+      this.load();
+    } catch (error) { showError(error); }
+  },
   async userDetail(e) {
     const id = e.currentTarget.dataset.id;
     try {
@@ -137,6 +201,6 @@ Page({
     const id = e.currentTarget.dataset.id;
     const ok = await new Promise(resolve => wx.showModal({ title: '删除人员', content: '有关联业务记录时系统会保留记录并禁用账号。确定继续吗？', success: result => resolve(result.confirm) }));
     if (!ok) return;
-    try { await request(`/admin/users/${id}`, { method: 'DELETE' }); wx.showToast({ title: '处理完成' }); this.load(); } catch (error) { showError(error); }
+    try { const result = await request(`/admin/users/${id}`, { method: 'DELETE' }); wx.showToast({ title: result === false ? '已禁用（保留业务记录）' : '人员已删除', icon: 'none' }); this.load(); } catch (error) { showError(error); }
   }
 });

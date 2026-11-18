@@ -59,8 +59,8 @@ public class ManagementController {
  @GetMapping("/accommodations/history") public ApiResponse<?> history(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(management.homes(currentUser,true));}
  @GetMapping("/accommodations/roommates") public ApiResponse<?> roommates(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(management.roommates(currentUser));}
  @GetMapping("/buildings") public ApiResponse<?> buildings(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(management.buildings(currentUser));}
- @GetMapping("/rooms") public ApiResponse<?> rooms(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(management.rooms(currentUser));}
- @GetMapping("/beds") public ApiResponse<?> beds(@RequestAttribute CurrentUser currentUser){return ApiResponse.ok(management.beds(currentUser));}
+ @GetMapping("/rooms") public ApiResponse<?> rooms(@RequestAttribute CurrentUser currentUser,@RequestParam(required=false) Long buildingId){return ApiResponse.ok(management.rooms(currentUser,buildingId));}
+ @GetMapping("/beds") public ApiResponse<?> beds(@RequestAttribute CurrentUser currentUser,@RequestParam(required=false) Long roomId){return ApiResponse.ok(management.beds(currentUser,roomId));}
  @PostMapping("/admin/resources/{type}") public ApiResponse<?> resource(@RequestAttribute CurrentUser currentUser,@PathVariable String type,@RequestBody Map<String,Object>b){return ApiResponse.ok(management.resource(currentUser,type,null,b));}
  @PutMapping("/admin/resources/{type}/{id}") public ApiResponse<?> resource(@RequestAttribute CurrentUser currentUser,@PathVariable String type,@PathVariable long id,@RequestBody Map<String,Object>b){return ApiResponse.ok(management.resource(currentUser,type,id,b));}
  @DeleteMapping("/admin/resources/{type}") public ApiResponse<?> deleteResources(@RequestAttribute CurrentUser currentUser,@PathVariable String type,@RequestBody Map<String,Object>b){Object raw=b.get("ids");if(!(raw instanceof List<?> ids))throw new BizException(400,"请选择要删除的记录");management.deleteResources(currentUser,type,ids.stream().map(Input::id).toList());return ApiResponse.ok();}

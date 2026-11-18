@@ -18,7 +18,8 @@
         <text class="tag {{item.current_status==='OPEN'?'tag-done':'tag-muted'}}">{{item.vacation_type==='WINTER'?'寒假':'暑假'}} · {{item.current_status==='OPEN'?'开放中':'草稿'}}</text>
       </view>
       <text class="record-meta">开放区间：{{item.open_start_date}} 至 {{item.open_end_date}}</text>
-      <text class="record-meta">申请截止：{{item.deadlineText}}</text>
+      <text wx:if="{{role!=='ADMIN'}}" class="record-meta">申请截止：{{item.deadlineText}}</text>
+      <text wx:else class="record-meta">申请截止：由各楼宿管设置（管理员不设全校截止）</text>
       <text wx:if="{{item.auto_lock}}" class="record-meta">截止后自动锁定进入审核</text>
       <text wx:if="{{role==='ADMIN'&&item.current_status==='DRAFT'}}" class="record-note">草稿状态：点「发布开放」后宿管才能看到该批次并设置本楼截止时间</text>
       <text wx:if="{{role==='DORM_MANAGER'&&item.current_status==='OPEN'&&!item.application_deadline}}" class="record-note">本楼尚未设置申请截止时间，学生暂时看不到该批次</text>
@@ -43,6 +44,8 @@
       <block wx:if="{{role==='ADMIN'||role==='DORM_MANAGER'}}">
         <view class="action-bar">
           <button wx:if="{{role==='ADMIN'&&item.current_status==='DRAFT'}}" class="primary" data-id="{{item.batch_id}}" bindtap="publishBatch">发布开放</button>
+          <button wx:if="{{role==='ADMIN'&&item.current_status==='DRAFT'}}" class="outline" data-id="{{item.batch_id}}" bindtap="openBatchForm">编辑</button>
+          <button wx:if="{{role==='ADMIN'&&item.current_status==='DRAFT'}}" class="danger" data-id="{{item.batch_id}}" bindtap="deleteBatch">删除</button>
           <button wx:if="{{role==='ADMIN'}}" class="outline" data-id="{{item.batch_id}}" bindtap="uploadMaterial">上传材料示例</button>
           <button wx:if="{{role==='DORM_MANAGER'&&item.current_status==='OPEN'}}" class="outline" data-id="{{item.batch_id}}" bindtap="openRuleForm">设置本楼截止</button>
           <button wx:if="{{role==='DORM_MANAGER'&&item.current_status==='OPEN'}}" class="secondary" data-id="{{item.batch_id}}" bindtap="publishBuilding">发布本楼通知</button>
@@ -91,7 +94,7 @@
   <!-- 批次配置 -->
   <view wx:if="{{batchForm}}" class="modal-mask">
     <view class="modal-panel">
-      <view class="modal-head"><text class="section-title">配置留宿批次</text><text class="modal-close" bindtap="closeBatchForm">关闭</text></view>
+      <view class="modal-head"><text class="section-title">{{batchForm.batchId ? '编辑留宿批次' : '配置留宿批次'}}</text><text class="modal-close" bindtap="closeBatchForm">关闭</text></view>
       <view class="field"><text class="field-label">批次编号</text><input class="input" data-key="batchCode" value="{{batchForm.batchCode}}" bindinput="batchInput"/></view>
       <view class="field"><text class="field-label">批次名称</text><input class="input" data-key="batchName" value="{{batchForm.batchName}}" bindinput="batchInput"/></view>
       <view class="field"><text class="field-label">学年</text><input class="input" type="number" data-key="academicYear" value="{{batchForm.academicYear}}" bindinput="batchInput"/></view>
@@ -115,12 +118,10 @@
         </picker>
       </view>
       <view class="field">
-        <text class="field-label">申请截止</text>
-        <picker mode="date" data-key="applicationDeadline" value="{{batchForm.applicationDeadline}}" bindchange="batchDate">
-          <view class="field-picker">{{batchForm.applicationDeadline || '选择日期'}}</view>
-        </picker>
+        <text class="field-label">留宿注意事项</text>
+        <textarea class="textarea" data-key="instructions" value="{{batchForm.instructions}}" bindinput="batchInput"/>
       </view>
-      <view class="field"><text class="field-label">留宿注意事项</text><textarea class="textarea" data-key="instructions" value="{{batchForm.instructions}}" bindinput="batchInput"/></view>
+      <text class="record-note">申请截止时间由各楼宿管设置，学生看到该批次的前提是：批次已发布开放 + 本楼宿管已设置截止时间。</text>
       <view class="action-bar">
         <button class="outline" bindtap="closeBatchForm">取消</button>
         <button class="primary" bindtap="saveBatch">保存批次</button>

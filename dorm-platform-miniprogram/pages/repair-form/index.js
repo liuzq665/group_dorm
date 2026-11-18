@@ -18,7 +18,26 @@ Page({
   onLoad(query) {
     if (!getApp().requireStudent()) return;
     this.setData({ orderId: query.id || '', editing: !!query.id });
+    this.checkAccommodation();
     this.load();
+  },
+  /** 未分配宿舍的学生创建工单会失败，进页面前先拦下并给出可执行提示 */
+  async checkAccommodation() {
+    if (this.data.editing) return;
+    try {
+      const home = await request('/accommodations/current');
+      const assigned = home && (home.room_id || home.building_id);
+      if (!assigned) {
+        wx.showModal({
+          title: '尚未分配宿舍',
+          content: '你还没有宿舍床位，报修工单无法定位房间。请先联系宿管或管理员分配床位后再报修。',
+          showCancel: false,
+          success: () => wx.navigateBack()
+        });
+      }
+    } catch (error) {
+      showError(error);
+    }
   },
   async load() {
     this.setData({ loading: true });

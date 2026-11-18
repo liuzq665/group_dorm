@@ -167,7 +167,7 @@ public class RepairService {
         return "WX"+date+String.format(Locale.ROOT,"%04d",next);
     }
     @Transactional public Map<String,Object> create(CurrentUser u,Map<String,Object>b){
-        role(u,"STUDENT");content(b);var home=scope.accommodation(u.id());
+        role(u,"STUDENT");content(b);var home=scope.accommodation(u.id());require(home!=null&&home.get("room_id")!=null,"你尚未分配宿舍，无法报修，请联系宿管或管理员分配床位");
         long rule=db.count("SELECT MAX(rule_id) FROM repair_rule");
         String no=nextOrderNo();
         long order=db.insert("INSERT INTO repair_order(order_no,student_id,room_id,category_id,title,description,current_status,rule_id) VALUES(?,?,?,?,?,?,'DRAFT',?)",no,u.id(),home.get("room_id"),id(b.get("categoryId")),text(b,"title"),text(b,"description"),rule);
