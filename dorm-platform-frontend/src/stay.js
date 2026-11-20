@@ -1,6 +1,7 @@
 ﻿import {API,api,post,put,role,state,esc,button,field,select,check,table,modal,render,notify,download,selectedRows,selectableRowsTable} from './app.js';
 
 import {normalizeImageUpload} from './app.js';
+import {checkboxChoices,bindChoiceDropdown} from './management.js';
 
 export async function stayPage(){
  const [batches,rows]=await Promise.all([api('/stay/current'),api('/stay/applications')]);state.data.batches=batches;state.data.stays=rows;
@@ -9,10 +10,12 @@ export async function stayPage(){
  const visibleRows=role()==='STUDENT'?rows.filter(row=>(!studentFilters.batchId||String(row.batch_id)===String(studentFilters.batchId))&&(!studentFilters.status||row.current_status===studentFilters.status)):rows;
  const batchActions=batch=>role()==='STUDENT'?button('填写申请','stay-apply',batch.batch_id)+button('留宿通知','stay-batch-notice',batch.batch_id):role()==='ADMIN'?button('编辑开放区间','stay-batch-edit',batch.batch_id):button('设置本楼申请截止','stay-configure-deadline',batch.batch_id);
  const applicationFilters=role()==='STUDENT'?`<form id="stay-student-filter-form" class="filter-grid">${select('batchId','留宿批次',[['','全部批次'],...batches.map(x=>[x.batch_id,x.batch_name])],studentFilters.batchId||'',false,false)}${select('status','状态',[['','全部状态'],...uniqueValues(rows.map(x=>x.current_status)).map(x=>[x,x])],studentFilters.status||'',false,false)}<div class="filter-actions"><button class="primary">查询</button><button type="reset" class="secondary" data-filter-clear="stay-student-filter-form">清空</button></div></form>`:'<label class="field search"><span>搜索申请</span><input id="list-search" type="search"></label>';
- const applicationColumns=role()==='STUDENT'?[['batch_name','留宿批次'],['dates','留宿日期'],['current_status','状态'],['source','来源'],['review_reason','审核意见']]:[['student_name','学生'],['batch_name','批次'],['building_name','楼栋'],['dates','日期'],['current_status','状态'],['source','来源'],['review_reason','审核意见'],['resubmit_deadline','重交截止'],['archive_reason','归档原因']];
+ const applicationColumns=role()==='STUDENT'?[['batch_name','留宿批次'],['dates','留宿日期'],['status_label','状态'],['source','来源'],['review_reason','审核意见']]:[['student_name','学生'],['batch_name','批次'],['building_name','楼栋'],['dates','日期'],['status_label','状态'],['source','来源'],['review_reason','审核意见'],['resubmit_deadline','重交截止'],['archive_reason','归档原因']];
+ visibleRows.forEach(row=>row.status_label=stayStatusLabel(row.current_status));
  return `<section class="panel"><div class="toolbar"><h3>留宿批次</h3>${role()==='ADMIN'?button('新增开放区间','stay-batch-new'):''}</div>${table(batchRows(batches),[['batch_name','批次'],['academic_year','年份'],['vacation_label','假期'],['open_start_date','开放开始'],['open_end_date','开放结束'],[role()==='STUDENT'?'student_deadline':'application_deadline','申请截止']],batchActions,'batch_id')}</section><section class="panel"><div class="toolbar"><h3>留宿申请</h3>${button('批量导出','stay-export')}</div>${applicationFilters}${selectableRowsTable(visibleRows,applicationColumns,actions,'application_id','stays')}${role()==='DORM_MANAGER'?`<div class="stay-history-footer">${button('留宿历史','stay-history-open')}</div>`:''}</section>`;
 }
 const uniqueValues=values=>[...new Set(values.filter(value=>value!=null&&String(value).trim()!=='').map(String))].sort((a,b)=>a.localeCompare(b,'zh-CN'));
+const stayStatusLabel=value=>({DRAFT:'草稿',PENDING_REVIEW:'待审核',UNDER_REVIEW:'已锁定',APPROVED:'审核通过',PENDING_EDIT:'审核不通过，待修改',COMPLETED:'已完成',ARCHIVED:'已归档'}[value]||value||'-');
 async function supplementDialog(batchId){
  const homes=await api('/accommodations/current');
  let chosen=null;
@@ -64,7 +67,7 @@ export async function stayManagerPage(){
  const [batches,applications]=await Promise.all([api('/stay/current'),api('/stay/applications')]);state.data.batches=batches;state.data.stays=applications;
  const selected=batches.find(x=>String(x.batch_id)===String(state.data.selectedStayBatchId)&&String(x.building_id)===String(state.data.selectedStayBuildingId))||batches.find(x=>x.current_status==='OPEN')||batches[0];state.data.selectedStayBatchId=selected?.batch_id||'';state.data.selectedStayBuildingId=selected?.building_id||'';
  const filters=state.data.stayManagerFilters||{};const rows=applications.filter(x=>selected&&String(x.batch_id)===String(selected.batch_id)&&['PENDING_REVIEW','UNDER_REVIEW','APPROVED'].includes(x.current_status)&&(!filters.status||x.current_status===filters.status)&&(!filters.lockStatus||((filters.lockStatus==='LOCKED')===(x.current_status==='UNDER_REVIEW')))&&(!filters.studentNo||String(x.student_no||'').includes(filters.studentNo))&&(!filters.studentName||String(x.student_name||'').includes(filters.studentName))&&(!filters.major||String(x.major_name||'').includes(filters.major))).map(x=>({...x,dates:stayDates(x)}));state.data.stayManagerRows=rows;
- const tabs=[['','全部'],['PENDING_REVIEW','待审核'],['APPROVED','审核通过']];
+ const tabs=[['','全部'],['PENDING_REVIEW','待审核'],['APPROVED','审核通过'],['PENDING_EDIT','审核不通过']];
  const selectedBatchId=selected?.batch_id||'';
  const selectedBuildingId=selected?.building_id||'';
  const deadlineSettings=batches.filter(item=>item.current_status==='OPEN').map(item=>{const value=String(item.application_deadline||'').replace(' ','T').slice(0,16);return `<section class="stay-manager-settings"><div><h4>${esc(item.batch_name)} · ${esc(item.building_name||'负责楼栋')}</h4><p class="muted">开放期间批次申请截止与自动锁定；截止时间由宿管设置。</p></div><form class="stay-manager-deadline-form" data-batch-id="${esc(item.batch_id)}" data-building-id="${esc(item.building_id)}"><label class="field"><span>申请截止时间</span><input name="applicationDeadline" type="datetime-local" value="${esc(value)}" required></label>${check('autoLock','截止后自动锁定未审核申请',Boolean(Number(item.auto_lock)))}<div class="actions"><button class="primary" type="submit">保存设置</button>${button('发布学生通知','stay-publish',item.batch_id,`data-building-id="${esc(item.building_id)}"`)}</div></form></section>`;}).join('');
@@ -134,8 +137,27 @@ export async function stayAction(action,id,b){
   bindMaterialDownloads(dialog);return;
  }
  if(action==='stay-publish'){
-  if(role()==='ADMIN'){await post(`/stay/batches/${id}/publish`,{});await render();notify('已向宿管和学生发布留宿准备通知');return;}
-  const chosen=state.data.batches.find(x=>String(x.batch_id)===String(id)&&String(x.building_id)===String(b?.dataset.buildingId||state.data.selectedStayBuildingId))||state.data.batches.find(x=>String(x.batch_id)===String(id));if(!chosen?.building_id)throw new Error('未找到该批次的负责楼栋规则');await post(`/stay/batches/${id}/publish`,{buildingId:chosen.building_id});await render();notify('已向本楼学生发布留宿申请通知');return;
+  const chosen=state.data.batches.find(x=>String(x.batch_id)===String(id)&&String(x.building_id)===String(b?.dataset.buildingId||state.data.selectedStayBuildingId))||state.data.batches.find(x=>String(x.batch_id)===String(id));
+  if(!chosen)throw new Error('未找到该留宿批次');
+  const buildings=role()==='ADMIN'?await api('/buildings'):[{building_id:chosen.building_id,building_name:chosen.building_name||'负责楼栋'}];
+  if(!buildings.length)throw new Error('暂无可通知的楼栋');
+  const deadline=chosen.application_deadline||chosen.student_deadline||'-';
+  const content=role()==='ADMIN'
+   ?`留宿开放时间：${chosen.open_start_date||'-'} 至 ${chosen.open_end_date||'-'}\n注意事项：${chosen.instructions||'请宿管设置负责楼栋的申请截止时间并发布申请通知。'}`
+   :`留宿开放时间：${chosen.open_start_date||'-'} 至 ${chosen.open_end_date||'-'}\n申请截止：${deadline}\n注意事项：${chosen.instructions||'请按要求提交留宿申请及所需材料。'}`;
+  const buildingChecks=checkboxChoices('buildingIds',buildings.map(x=>[x.building_id,x.building_name]),buildings.map(x=>x.building_id),'楼栋范围（默认全部楼栋）');
+  const materials=(chosen.materials||[]).map(file=>`<label class="check"><input type="checkbox" name="keepAttachmentIds" value="${esc(file.file_id)}" checked><span>${esc(file.original_name)}（保留附件）</span></label>`).join('');
+  const recipient=role()==='ADMIN'?'<p class="muted">接收对象：宿管</p>':'<p class="muted">接收对象：所选楼栋学生</p>';
+  const dialog=modal('发布消息',recipient+field('title','标题','text',chosen.batch_name||'')+field('content','内容','textarea',content)+buildingChecks+materials+`<label class="field"><span>追加附件（单个不超过5MB）</span><input type="file" name="messageFiles" multiple></label>`,async(d,form)=>{
+   const attachmentIds=[...form.querySelectorAll('[name="keepAttachmentIds"]:checked')].map(x=>Number(x.value));
+   for(const selectedFile of form.elements.messageFiles.files){const file=await normalizeImageUpload(selectedFile),body=new FormData();body.set('file',file);attachmentIds.push((await api('/messages/files',{method:'POST',body})).fileId);}
+   const buildingIds=[...form.querySelectorAll('[name="buildingIds"]:checked')].map(x=>Number(x.value));
+   if(!buildingIds.length)throw new Error('至少选择一个楼栋');
+   await post('/messages',{title:d.title,content:d.content,targetRole:role()==='ADMIN'?'DORM_MANAGER':'STUDENT',buildingIds,attachmentIds,...(role()==='ADMIN'?{stayBatchId:chosen.batch_id}:{})});
+   return role()==='ADMIN'?'已向宿管发布消息':'已向所选楼栋学生发布消息';
+  });
+  bindChoiceDropdown(dialog);
+  return;
  }
  if(action==='stay-configure-deadline'){const chosen=state.data.batches.find(x=>String(x.batch_id)===String(id)&&String(x.building_id)===String(state.data.selectedStayBuildingId))||state.data.batches.find(x=>String(x.batch_id)===String(id));if(!chosen?.building_id)throw new Error('未找到该批次的负责楼栋规则');modal(`设置${esc(chosen.building_name||'本楼')}申请截止`,field('applicationDeadline','申请截止时间','datetime-local',String(chosen.application_deadline||'').replace(' ','T').slice(0,16))+check('autoLock','截止后自动锁定未审核申请',Boolean(Number(chosen.auto_lock))),d=>put(`/stay/batches/${id}/building-rule`,{buildingId:chosen.building_id,applicationDeadline:d.applicationDeadline.replace('T',' '),autoLock:d.autoLock==='on'}));return;}
  if(action==='stay-supplement'){await supplementDialog(id);return;}

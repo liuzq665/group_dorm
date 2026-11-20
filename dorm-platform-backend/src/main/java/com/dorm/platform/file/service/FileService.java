@@ -7,9 +7,13 @@ import javax.imageio.ImageIO;
 import java.nio.file.*;
 import java.io.*;
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 public class FileService {
- private final SqlStore db; private final Path root=Path.of("uploads").toAbsolutePath().normalize();
+ private static final Logger log=LoggerFactory.getLogger(FileService.class);
+ private final SqlStore db;
+ private final Path root=Path.of(System.getProperty("file.storage-root","uploads")).toAbsolutePath().normalize();
  public FileService(SqlStore db){this.db=db;}
  public long data(CurrentUser u,String name,String type,byte[] bytes)throws IOException{Input.role(u,"ADMIN");Files.createDirectories(root);String stored=UUID.randomUUID().toString();Files.write(root.resolve(stored),bytes);return db.insert("INSERT INTO file_resource(uploader_user_id,original_name,storage_name,content_type,size_bytes) VALUES(?,?,?,?,?)",u.id(),name,stored,type,bytes.length);}
  public Map<String,Object> upload(CurrentUser u,MultipartFile f)throws IOException{BizException.require(!f.isEmpty()&&f.getSize()<=5*1024*1024,"图片不能为空且不能超过5MB");String original=safeName(f,"photo"),type=typeFor(original,Map.of("png","image/png","jpg","image/jpeg","jpeg","image/jpeg"));byte[] bytes=f.getBytes();verifyContent(original,type,bytes);return save(u,original,type,bytes);}
@@ -63,6 +67,16 @@ public class FileService {
   }
   return file;
  }
- public byte[] bytes(Map<String,Object> file)throws IOException{return Files.readAllBytes(root.resolve(file.get("storage_name").toString()));}
+ private Path storagePath(String storageName){
+  Path relative=Path.of(storageName).getFileName();
+  List<Path> candidates=List.of(root,Path.of("uploads").toAbsolutePath().normalize(),Path.of("..","uploads").toAbsolutePath().normalize());
+  for(Path base:candidates){Path candidate=base.resolve(relative).normalize();if(candidate.startsWith(base)&&Files.isRegularFile(candidate))return candidate;}
+  return root.resolve(relative).normalize();
+ }
+ public byte[] bytes(Map<String,Object> file)throws IOException{
+  String storageName=file.get("storage_name").toString();Path path=storagePath(storageName);
+  if(!Files.isRegularFile(path)){log.error("附件文件不存在: fileId={}, storageName={}, storageRoot={}",file.get("file_id"),storageName,root);throw new FileNotFoundException("附件文件不存在: "+storageName);}
+  return Files.readAllBytes(path);
+ }
  public void deleteBackupOutput(CurrentUser u,long fileId)throws IOException{Input.role(u,"ADMIN");var file=db.one("SELECT storage_name FROM file_resource WHERE file_id=?",fileId);BizException.require(db.count("SELECT COUNT(*) FROM backup_task_file WHERE file_id=?",fileId)==0,"备份文件仍被任务引用，不能删除");db.update("DELETE FROM file_resource WHERE file_id=?",fileId);Files.deleteIfExists(root.resolve(file.get("storage_name").toString()));}
 }

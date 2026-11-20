@@ -33,7 +33,14 @@ function upload(filePath, path = '/files') {
       url: `${baseUrl}${path}`, name: 'file', filePath,
       header: session?.token ? { Authorization: `Bearer ${session.token}` } : {},
       success(res) {
-        try { const body = JSON.parse(res.data); if (res.statusCode === 401 || body.code === 401) { redirectLogin(); reject(new Error('登录已失效')); return; } if (body.code !== 0) throw new Error(body.message); resolve(body.data.fileId); } catch (error) { reject(error instanceof Error ? error : new Error('上传失败')); }
+        try {
+          const body = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+          if (res.statusCode === 401 || body?.code === 401) { redirectLogin(); reject(new Error('登录已失效')); return; }
+          if (res.statusCode < 200 || res.statusCode >= 300 || body?.code !== 0) throw new Error(body?.message || `文件上传失败（${res.statusCode}）`);
+          const fileId = Number(body?.data?.fileId);
+          if (!Number.isSafeInteger(fileId) || fileId <= 0) throw new Error('文件上传成功但未获取到有效附件编号，请重试');
+          resolve(fileId);
+        } catch (error) { reject(error instanceof Error ? error : new Error('服务器返回了无法识别的上传结果，请重试')); }
       },
       fail() { reject(new Error('文件上传失败')); }
     });

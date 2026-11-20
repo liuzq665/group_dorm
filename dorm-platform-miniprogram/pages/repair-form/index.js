@@ -25,8 +25,11 @@ Page({
   async checkAccommodation() {
     if (this.data.editing) return;
     try {
-      const home = await request('/accommodations/current');
-      const assigned = home && (home.room_id || home.building_id);
+      const homes = await request('/accommodations/current');
+      // The API returns the current accommodation as a list, even for a student.
+      // Accept a single object as well to remain compatible with older responses.
+      const home = Array.isArray(homes) ? homes[0] : homes;
+      const assigned = home && home.room_id;
       if (!assigned) {
         wx.showModal({
           title: '尚未分配宿舍',
@@ -81,10 +84,27 @@ Page({
       count: Math.max(1, 6 - this.data.files.length),
       mediaType: ['image'],
       sourceType: ['album', 'camera'],
-      success: result => {
-        this.setData({ files: [...this.data.files, ...result.tempFiles.map(file => file.tempFilePath)].slice(0, 6) });
+      success: async result => {
+        try {
+          const paths = await Promise.all(result.tempFiles.map(file => this.normalizeImage(file.tempFilePath)));
+          this.setData({ files: [...this.data.files, ...paths].slice(0, 6) });
+        } catch (error) {
+          wx.showToast({ title: '图片处理失败，请重新选择', icon: 'none' });
+        }
       }
     });
+  },
+  normalizeImage(filePath) {
+    return new Promise((resolve, reject) => wx.compressImage({
+      src: filePath,
+      quality: 85,
+      success: result => {
+        const fs = wx.getFileSystemManager();
+        const normalizedPath = `${wx.env.USER_DATA_PATH}/repair-${Date.now()}-${Math.random().toString(16).slice(2)}.jpg`;
+        fs.copyFile({ srcPath: result.tempFilePath, destPath: normalizedPath, success: () => resolve(normalizedPath), fail: reject });
+      },
+      fail: reject
+    }));
   },
   removeFile(event) {
     const files = this.data.files.filter((item, index) => index !== Number(event.currentTarget.dataset.index));

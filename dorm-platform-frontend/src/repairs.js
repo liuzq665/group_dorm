@@ -1,7 +1,7 @@
 ﻿import { api,post,put,role,state,esc,button,field,select,check,table,modal,photoField,upload,photos,render,notify,download,selectedRows,selectableRowsTable } from './app.js';
 
 const repairStateLabels={DRAFT:'草稿',PENDING_REVIEW:'待审核',PENDING_EDIT:'待修改',PENDING_ASSIGN:'待派单',PENDING_ACCEPT:'待接单',ACCEPTED:'已接单',DELAYED:'维修延期',REPAIRED:'已维修',CONFIRMED:'已确认',ARCHIVED:'已归档',PENDING_MANUAL:'待人工处理',CLOSED:'已关闭',CANCELLED:'已撤销'};
-const manualReasonLabels={NO_MATCH:'无匹配维修人员',OVERLOAD:'维修人员负荷已满',NO_CANDIDATE:'无可派维修人员',MANUAL_ONLY:'紧急/异常/重修需手动派单',REPAIR_TIMEOUT:'维修超时'};
+const manualReasonLabels={NO_MATCH:'无匹配维修人员',OVERLOAD:'维修人员负荷已满',NO_CANDIDATE:'无可派维修人员',MANUAL_ONLY:'紧急/异常/重修需手动派单',REPAIR_TIMEOUT:'维修超时',DELAY_EXPIRED_UNREVIEWED:'延期预计完成时间已过且仍未审核'};
 const terminalStatuses=['ARCHIVED','CLOSED','CANCELLED'];
 const manualReason=value=>manualReasonLabels[value]||value||'-';
 
@@ -9,7 +9,7 @@ export async function repairPage(){
  const filters=state.data.repairFilters||{};if(role()==='ADMIN'&&!Object.hasOwn(filters,'status'))filters.status='PENDING_MANUAL';if(['ADMIN','DORM_MANAGER'].includes(role())&&filters.status==='COMPLETED')filters.status='PENDING_CONFIRM';
  const query=new URLSearchParams(Object.entries(filters).filter(([key,value])=>value&&(key!=='status'||value!=='ALL')));
  const [rows,catalog,buildings]=await Promise.all([api('/repair-orders'+(query.size?'?'+query:'')),api('/repair-catalog'),api('/buildings').catch(()=>[])]);state.data.repairs=rows;state.data.catalog=catalog;state.data.repairBuildings=buildings;
- const states=role()==='ADMIN'?[['ALL','全部'],['PENDING_REVIEW','待审核'],['PENDING_MANUAL','待人工处理'],['PENDING_ACCEPT','待接单'],['IN_REPAIR','维修中'],['PENDING_CONFIRM','待确认']]:role()==='REPAIRER'?[['PENDING_ACCEPT','待接单'],['IN_REPAIR','维修中'],['DELAYED','维修延期'],['PENDING_CONFIRM','待确认'],['ALL','全部']]:role()==='DORM_MANAGER'?[['ALL','全部'],['PENDING_REVIEW','待审核'],['PENDING_MANUAL','待人工处理'],['PENDING_ASSIGN','待派单'],['PENDING_ACCEPT','待接单'],['IN_REPAIR','维修中'],['PENDING_CONFIRM','待确认']]:[['PENDING_REVIEW','待审核'],['PENDING_ACCEPT','待接单'],['ACCEPTED','已接单'],['PENDING_CONFIRM','待确认'],['PENDING_MANUAL','待人工处理'],['ALL','全部']];
+ const states=role()==='ADMIN'?[['ALL','全部'],['PENDING_REVIEW','待审核'],['PENDING_MANUAL','待人工处理'],['PENDING_ACCEPT','待接单'],['IN_REPAIR','维修中'],['PENDING_CONFIRM','待确认']]:role()==='REPAIRER'?[['PENDING_ACCEPT','待接单'],['IN_REPAIR','维修中'],['DELAYED','维修延期'],['PENDING_CONFIRM','待确认'],['ALL','全部']]:role()==='DORM_MANAGER'?[['ALL','全部'],['PENDING_REVIEW','待审核'],['DELAY_PENDING','延期工单'],['PENDING_MANUAL','待人工处理'],['PENDING_ASSIGN','待派单'],['PENDING_ACCEPT','待接单'],['IN_REPAIR','维修中'],['PENDING_CONFIRM','待确认']]:[['PENDING_REVIEW','待审核'],['PENDING_ACCEPT','待接单'],['ACCEPTED','已接单'],['PENDING_CONFIRM','待确认'],['PENDING_MANUAL','待人工处理'],['ALL','全部']];
  const tabs=`<nav class="repair-status-tabs" aria-label="工单状态">${states.map(([key,label])=>`<button type="button" class="secondary ${filters.status===key||key==='ALL'&&!filters.status?'active':''}" data-action="repair-status" data-id="${key}">${label}</button>`).join('')}</nav>`;
  const columns=[['order_no','工单号'],['title','标题'],['student_name','学生'],['building_name','楼栋'],['room_no','房间'],['category_name','分类'],['current_status','状态'],...(role()==='REPAIRER'?[]:[[role()==='STUDENT'?'repairer_name':'display_repairer_name','维修人员'],...(role()==='STUDENT'?[['score','评分']]:[])])];
  const tableRows=rows;
@@ -39,7 +39,7 @@ function actions(r){
  if(role()==='DORM_MANAGER'){
   if(r.current_status==='PENDING_REVIEW')add('审核','review');
   if(r.current_status==='PENDING_ASSIGN'){add('强制派单','dispatch');add('退回修改','return');}
-  if(r.current_status==='DELAYED')add('延期审核','delay-review');
+  if(role()==='DORM_MANAGER'&&r.delay_pending)add('延期审核','delay-review');
  }
  if(role()==='ADMIN'&&['PENDING_ASSIGN','PENDING_MANUAL'].includes(r.current_status))add('强制派单','dispatch');
  if(role()==='DORM_MANAGER'&&r.current_status==='PENDING_MANUAL'){if(r.dispatch_available)add('强制派单','dispatch');if(!r.rework)add('退回修改','return');}

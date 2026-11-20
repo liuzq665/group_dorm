@@ -6,7 +6,8 @@ export const API = '/api/v1';
 const roles = { STUDENT:'学生端', DORM_MANAGER:'宿管端', REPAIRER:'维修人员端', ADMIN:'系统管理员端' };
 const dashboardCharts=[];
 export const statuses = { DRAFT:'草稿', PENDING_REVIEW:'待审核', PENDING_EDIT:'待修改', UNDER_REVIEW:'审核中', PENDING_ASSIGN:'待派单', PENDING_ACCEPT:'待接单', ACCEPTED:'已接单', DELAYED:'维修延期', REPAIRED:'已维修', CONFIRMED:'已确认', ARCHIVED:'已归档', PENDING_MANUAL:'待人工处理', APPROVED:'已通过', COMPLETED:'已完成', CANCELLED:'已撤销', CLOSED:'已关闭', REJECTED:'已拒单', TIMEOUT:'接单超时', REPAIR_TIMEOUT:'维修超时', RETURNED:'退回修改', PENDING:'待处理' };
-export const state = { token:sessionStorage.getItem('dorm_token'), user:JSON.parse(sessionStorage.getItem('dorm_user') || 'null'), page:'dashboard', data:{} };
+function readStoredUser(){try{return JSON.parse(sessionStorage.getItem('dorm_user')||'null');}catch{try{sessionStorage.removeItem('dorm_user');}catch{}return null;}}
+export const state = { token:sessionStorage.getItem('dorm_token'), user:readStoredUser(), page:'dashboard', data:{} };
 export const role = () => state.user?.role;
 export const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const assistantMarkup = value => {
@@ -196,7 +197,7 @@ const pages={...adminPages,repairs:repairPage,repairHistory:repairHistoryPage,re
   const sourceTabs=`<nav class="message-filter-tabs" aria-label="通知来源">${sourceOptions.map(([key,label])=>`<button type="button" class="secondary ${f.sender===key?'active':''}" data-action="message-source" data-id="${key}">${label}</button>`).join('')}</nav>`;
   const showRead=!(f.sender==='MINE'||(admin&&f.sender==='DORM_MANAGER'));
   const columns=[['source_label','通知来源'],['publisher_name','发布人'],['building_names','楼栋'],['title','标题'],['attachment_names','附件'],['created_at','时间'],['read_label','阅读状态']];
-  let messageTable=table(rows,columns,r=>`${button('查看详情','message-detail',r.message_id)}${r.is_recipient&&!r.read_at&&(!admin||r.source_label==='系统通知')?button('标为已读','read-message',r.message_id):''}${String(r.publisher_user_id)===String(state.user.id)?button('撤回','message-withdraw',r.message_id):''}${button('删除','message-delete',r.message_id)}`,'message_id',8);
+  let messageTable=table(rows,columns,r=>`${button('查看详情','message-detail',r.message_id)}${r.is_recipient&&!r.read_at&&(!admin||r.source_label==='系统通知')?button('标为已读','read-message',r.message_id):''}${String(r.publisher_user_id)===String(state.user.id)&&(r.delivered_at==null)?button('编辑并重新发布','message-republish',r.message_id):''}${String(r.publisher_user_id)===String(state.user.id)&&r.delivered_at!=null?button('撤回','message-withdraw',r.message_id):''}${button('删除','message-delete',r.message_id)}`,'message_id',8);
   if(rows.length)messageTable=messageTable.replace('<div class="table-wrap table-component"','<div class="table-wrap table-component message-table"').replace('<thead><tr>','<thead><tr><th class="select-col"><input type="checkbox" data-message-select-all aria-label="全选消息"></th>').replace(/(<tr data-row-id="([^"]*)"[^>]*>)/g,(_,row,id)=>`${row}<td class="select-col"><input type="checkbox" data-message-select-row value="${esc(id)}" aria-label="选择消息"></td>`);
   return `<section class="panel"><div class="toolbar"><h3>站内消息</h3><div class="actions">${button('批量标为已读','message-mark-selected')}${button('批量删除','message-delete-selected')}${['ADMIN','DORM_MANAGER'].includes(role())?button('发布消息','publish-message'):''}</div></div>${sourceTabs}<form id="message-filter-form" class="filter-grid">${showRead?select('read','阅读状态',[['unread','未读'],['read','已读'],['','全部']],f.read,false,false):''}${admin&&f.sender==='DORM_MANAGER'?field('publisher','宿管姓名','search',f.publisher||'',false):''}${role()==='REPAIRER'?select('building','楼栋',[['','全部楼栋'],...buildings.map(b=>[b.building_id,b.building_name])],f.building||'',false,false):''}${field('from','开始日期','date',f.from||'',false)}${field('to','结束日期','date',f.to||'',false)}${admin?select('building','楼栋',[['','全部楼栋'],...buildings.map(b=>[b.building_id,b.building_name])],f.building||'',false,false):''}<div class="filter-actions"><button class="primary">查询</button><button type="reset" class="secondary" data-filter-clear="message-filter-form">清空</button></div></form>${messageTable}</section>`;
  }
@@ -247,12 +248,12 @@ function alignTableOperations(root=document){
   }
   const width=Math.ceil(Math.max(...groups.map(group=>group.getBoundingClientRect().width)));
   const operationColumnWidth=width+16;
-  const repairerSelection=component.classList.contains('repair-orders-repairer')?headerCells.findIndex(cell=>cell.classList.contains('select-col')):-1;
-  const selectionColumnWidth=repairerSelection>=0?36:0;
+  const selectionColumn=headerCells.findIndex(cell=>cell.classList.contains('select-col'));
+  const selectionColumnWidth=selectionColumn>=0?36:0;
   const availableWidth=Math.max(0,tableWidth-operationColumnWidth-selectionColumnWidth);
-  const otherColumnWidthTotal=initialWidths.reduce((total,value,index)=>index===headerCells.length-1||index===repairerSelection?total:total+value,0);
+  const otherColumnWidthTotal=initialWidths.reduce((total,value,index)=>index===headerCells.length-1||index===selectionColumn?total:total+value,0);
   headerCells.forEach((cell,index)=>{
-   const nextWidth=index===headerCells.length-1?operationColumnWidth:index===repairerSelection?selectionColumnWidth:availableWidth*initialWidths[index]/otherColumnWidthTotal;
+   const nextWidth=index===headerCells.length-1?operationColumnWidth:index===selectionColumn?selectionColumnWidth:availableWidth*initialWidths[index]/otherColumnWidthTotal;
    cell.style.setProperty('width',`${nextWidth}px`,'important');
    if(index===headerCells.length-1){cell.style.setProperty('padding-left','8px','important');cell.style.setProperty('padding-right','8px','important');}
    for(const row of table.tBodies[0]?.rows||[])row.cells[index]?.style.setProperty('width',`${nextWidth}px`,'important');
@@ -300,6 +301,7 @@ export async function render(){
     else if(a==='message-delete-selected'){const ids=[...document.querySelectorAll('.message-table [data-message-select-row]:checked')].map(input=>Number(input.value));if(!ids.length)throw new Error('请先勾选要删除的消息');modal('批量删除消息',`将选中的 ${ids.length} 条消息从当前账号的消息列表移除。`,async()=>{const result=await api('/messages',{method:'DELETE',body:JSON.stringify({ids})});return `已删除 ${result.deletedCount} 条消息`;},'确认删除');}
     else if(a==='message-delete'){modal('删除消息','将此消息从当前账号的消息列表移除。',async()=>{await api(`/messages/${id}`,{method:'DELETE'});return '消息已删除';},'确认删除');}
     else if(a==='message-withdraw'){modal('撤回消息','撤回后，所有接收人的消息中心都不再显示此消息。',async()=>{await post(`/messages/${id}/withdraw`);return '消息已撤回';},'确认撤回');}
+    else if(a==='message-republish'){const row=state.data.messageRowsById?.[id];if(!row)throw new Error('消息不存在');modal('编辑并重新发布消息',field('title','标题','text',row.title||'')+field('content','内容','textarea',row.content||''),async d=>{await put(`/messages/${id}/republish`,d);await render();return '消息已重新发布';},'确认发布');}
     else if(a==='message-source'){state.data.messageFilters={...(state.data.messageFilters||{}),sender:id};await render();}
     else if(a==='message-read-filter'){state.data.messageFilters={...(state.data.messageFilters||{}),read:id};await render();}
     else if(a==='message-detail'){

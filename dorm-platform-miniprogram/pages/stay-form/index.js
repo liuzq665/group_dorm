@@ -114,17 +114,47 @@ Page({
           wx.chooseMedia({
             count: 8,
             mediaType: ['image'],
-            success: result => this.setData({ files: [...this.data.files, ...result.tempFiles.map(file => file.tempFilePath)].slice(0, 8) })
+            success: async result => {
+              try {
+                const paths = await Promise.all(result.tempFiles.map(file => this.normalizeImage(file.tempFilePath)));
+                this.setData({ files: [...this.data.files, ...paths].slice(0, 8) });
+              } catch (error) {
+                wx.showToast({ title: '图片处理失败，请重新选择', icon: 'none' });
+              }
+            }
           });
         } else {
           wx.chooseMessageFile({
             count: 8,
             type: 'file',
-            success: result => this.setData({ files: [...this.data.files, ...result.tempFiles.map(file => file.path)].slice(0, 8) })
+            success: async result => {
+              try {
+                const paths = await Promise.all(result.tempFiles.map(file =>
+                  /\.(png|jpe?g|gif|webp|bmp|avif|heic|heif)$/i.test(file.name)
+                    ? this.normalizeImage(file.path)
+                    : file.path
+                ));
+                this.setData({ files: [...this.data.files, ...paths].slice(0, 8) });
+              } catch (error) {
+                wx.showToast({ title: '图片处理失败，请重新选择', icon: 'none' });
+              }
+            }
           });
         }
       }
     });
+  },
+  normalizeImage(filePath) {
+    return new Promise((resolve, reject) => wx.compressImage({
+      src: filePath,
+      quality: 85,
+      success: result => {
+        const fs = wx.getFileSystemManager();
+        const normalizedPath = `${wx.env.USER_DATA_PATH}/stay-${Date.now()}-${Math.random().toString(16).slice(2)}.jpg`;
+        fs.copyFile({ srcPath: result.tempFilePath, destPath: normalizedPath, success: () => resolve(normalizedPath), fail: reject });
+      },
+      fail: reject
+    }));
   },
   async save(event) {
     const submit = event.currentTarget.dataset.submit === 'true';
