@@ -1,6 +1,6 @@
 const { request, upload, getSession, showError } = require('../../utils/request');
 const { statusText, statusTone, dispatchText, resultText, formatDateTime, orDash } = require('../../utils/format');
-const { baseUrl } = require('../../utils/config');
+const { previewAttachment } = require('../../utils/files');
 const { overlay } = require('../../utils/overlay');
 
 const PURPOSE_LABELS = { FAULT: '故障照片', RESULT: '完工照片', DELAY: '延期现场照片', REWORK: '重修照片' };
@@ -510,20 +510,7 @@ Page({
     }));
   },
   previewFile(event) {
-    const file = event.currentTarget.dataset.file;
-    if (!file) return;
-    wx.downloadFile({
-      url: `${baseUrl}/files/${file.file_id}`,
-      header: { Authorization: `Bearer ${getSession().token}` },
-      success: result => {
-        if (file.content_type && file.content_type.startsWith('image/')) {
-          wx.previewImage({ urls: [result.tempFilePath] });
-        } else {
-          wx.openDocument({ filePath: result.tempFilePath, showMenu: true, fail: () => wx.showToast({ title: '附件暂时无法预览', icon: 'none' }) });
-        }
-      },
-      fail: () => wx.showToast({ title: '附件暂时无法预览', icon: 'none' })
-    });
+    previewAttachment(event.currentTarget.dataset.file, getSession().token);
   },
   toggleSection(event) {
     const key = event.currentTarget.dataset.key;
@@ -534,3 +521,4 @@ Page({
     wx.setClipboardData({ data: this.data.detail.order_no });
   }
 });
+

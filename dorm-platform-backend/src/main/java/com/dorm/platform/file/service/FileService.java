@@ -1,6 +1,7 @@
 package com.dorm.platform.file.service;
 import com.dorm.platform.common.*;
 import com.dorm.platform.security.CurrentUser;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
@@ -9,8 +10,17 @@ import java.io.*;
 import java.util.*;
 @Service
 public class FileService {
- private final SqlStore db; private final Path root=Path.of("uploads").toAbsolutePath().normalize();
- public FileService(SqlStore db){this.db=db;}
+ private final SqlStore db; private final Path root; private final List<Path> readable;
+ public FileService(SqlStore db,@Value("${dorm.file.storage-dir:uploads}")String dir){
+  this.db=db;
+  this.root=Path.of(dir).toAbsolutePath().normalize();
+  // 历史文件可能落在不同启动目录（IDE 从后端模块启动 / jar 从仓库根启动），读取时按顺序回退查找
+  LinkedHashSet<Path> dirs=new LinkedHashSet<>();
+  dirs.add(root);
+  dirs.add(Path.of("dorm-platform-backend","uploads").toAbsolutePath().normalize());
+  if(root.getParent()!=null)dirs.add(root.getParent().resolve("uploads").normalize());
+  this.readable=List.copyOf(dirs);
+ }
  public long data(CurrentUser u,String name,String type,byte[] bytes)throws IOException{Input.role(u,"ADMIN");Files.createDirectories(root);String stored=UUID.randomUUID().toString();Files.write(root.resolve(stored),bytes);return db.insert("INSERT INTO file_resource(uploader_user_id,original_name,storage_name,content_type,size_bytes) VALUES(?,?,?,?,?)",u.id(),name,stored,type,bytes.length);}
  public Map<String,Object> upload(CurrentUser u,MultipartFile f)throws IOException{BizException.require(!f.isEmpty()&&f.getSize()<=5*1024*1024,"图片不能为空且不能超过5MB");String original=safeName(f,"photo"),type=typeFor(original,Map.of("png","image/png","jpg","image/jpeg","jpeg","image/jpeg"));byte[] bytes=f.getBytes();verifyContent(original,type,bytes);return save(u,original,type,bytes);}
  public Map<String,Object> uploadStayMaterial(CurrentUser u,MultipartFile f)throws IOException{
@@ -63,6 +73,10 @@ public class FileService {
   }
   return file;
  }
- public byte[] bytes(Map<String,Object> file)throws IOException{return Files.readAllBytes(root.resolve(file.get("storage_name").toString()));}
- public void deleteBackupOutput(CurrentUser u,long fileId)throws IOException{Input.role(u,"ADMIN");var file=db.one("SELECT storage_name FROM file_resource WHERE file_id=?",fileId);BizException.require(db.count("SELECT COUNT(*) FROM backup_task_file WHERE file_id=?",fileId)==0,"备份文件仍被任务引用，不能删除");db.update("DELETE FROM file_resource WHERE file_id=?",fileId);Files.deleteIfExists(root.resolve(file.get("storage_name").toString()));}
+ public byte[] bytes(Map<String,Object> file)throws IOException{return Files.readAllBytes(locate(file.get("storage_name").toString()));}
+ private Path locate(String stored){
+  for(Path dir:readable){Path path=dir.resolve(stored).normalize();if(Files.isRegularFile(path))return path;}
+  throw new BizException(404,"附件文件已不在服务器磁盘上，请重新上传");
+ }
+ public void deleteBackupOutput(CurrentUser u,long fileId)throws IOException{Input.role(u,"ADMIN");var file=db.one("SELECT storage_name FROM file_resource WHERE file_id=?",fileId);BizException.require(db.count("SELECT COUNT(*) FROM backup_task_file WHERE file_id=?",fileId)==0,"备份文件仍被任务引用，不能删除");db.update("DELETE FROM file_resource WHERE file_id=?",fileId);try{Files.deleteIfExists(locate(file.get("storage_name").toString()));}catch(BizException ignored){}}
 }

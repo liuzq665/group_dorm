@@ -29,4 +29,9 @@ assistant:
   model: ${ASSISTANT_MODEL:claude-opus-4-8}
   max-tokens: ${ASSISTANT_MAX_TOKENS:1200}
   actor-authorization: ${ASSISTANT_ACTOR_AUTHORIZATION:local-image-extension}
+# 附件落盘目录：相对路径按进程工作目录解析，可用环境变量 FILE_STORAGE_DIR 指定绝对路径
+dorm:
+  file:
+    storage-dir: ${FILE_STORAGE_DIR:uploads}
+
 

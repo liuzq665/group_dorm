@@ -1,6 +1,6 @@
 const { request, showError, getSession } = require('../../utils/request');
 const { statusText, statusTone, ranges, orDash, formatDate, formatDateTime } = require('../../utils/format');
-const { baseUrl } = require('../../utils/config');
+const { previewAttachment } = require('../../utils/files');
 
 Page({
   data: {
@@ -112,19 +112,6 @@ Page({
     }
   },
   previewFile(event) {
-    const file = event.currentTarget.dataset.file;
-    if (!file) return;
-    wx.downloadFile({
-      url: `${baseUrl}/files/${file.file_id}`,
-      header: { Authorization: `Bearer ${getSession().token}` },
-      success: result => {
-        if (file.content_type && file.content_type.startsWith('image/')) {
-          wx.previewImage({ urls: [result.tempFilePath] });
-        } else {
-          wx.openDocument({ filePath: result.tempFilePath, showMenu: true, fail: () => wx.showToast({ title: '附件暂时无法预览', icon: 'none' }) });
-        }
-      },
-      fail: () => wx.showToast({ title: '附件暂时无法预览', icon: 'none' })
-    });
+    previewAttachment(event.currentTarget.dataset.file, getSession().token);
   }
 });
