@@ -12,8 +12,11 @@ test('saving a repair uploads every photo to /files and submits their IDs', asyn
     getStorageSync: () => ({ token: 'test-session' }),
     showLoading() {}, hideLoading() {},
     showToast(value) { assert.notEqual(value.icon, 'none', value.title); },
-    compressImage(options) { options.success({ tempFilePath: `${options.src}.jpg` }); },
-    getFileSystemManager() { return { copyFile(options) { options.success(); } }; },
+    compressImage(options) { options.success({ tempFilePath: `${options.src}.compressed` }); },
+    getFileSystemManager() { return {
+      readFile(options) { assert.equal(options.encoding, 'base64'); options.success({ data: '/9j/4AAQSkZJRg==' }); },
+      copyFile(options) { assert.ok(options.destPath.endsWith('.jpg')); options.success(); }
+    }; },
     uploadFile(options) {
       uploads.push(options);
       options.success({ statusCode: 200, data: JSON.stringify({ code: 0, data: { fileId: uploads.length } }) });

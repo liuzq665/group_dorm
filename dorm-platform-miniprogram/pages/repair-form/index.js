@@ -1,5 +1,6 @@
 const { request, upload, showError } = require('../../utils/request');
 const { orDash } = require('../../utils/format');
+const { normalizeImage } = require('../../utils/image');
 
 Page({
   data: {
@@ -89,22 +90,13 @@ Page({
           const paths = await Promise.all(result.tempFiles.map(file => this.normalizeImage(file.tempFilePath)));
           this.setData({ files: [...this.data.files, ...paths].slice(0, 6) });
         } catch (error) {
-          wx.showToast({ title: '图片处理失败，请重新选择', icon: 'none' });
+          wx.showToast({ title: error?.errMsg || error?.message || '图片处理失败，请重新选择', icon: 'none' });
         }
       }
     });
   },
   normalizeImage(filePath) {
-    return new Promise((resolve, reject) => wx.compressImage({
-      src: filePath,
-      quality: 85,
-      success: result => {
-        const fs = wx.getFileSystemManager();
-        const normalizedPath = `${wx.env.USER_DATA_PATH}/repair-${Date.now()}-${Math.random().toString(16).slice(2)}.jpg`;
-        fs.copyFile({ srcPath: result.tempFilePath, destPath: normalizedPath, success: () => resolve(normalizedPath), fail: reject });
-      },
-      fail: reject
-    }));
+    return normalizeImage(filePath, 'repair');
   },
   removeFile(event) {
     const files = this.data.files.filter((item, index) => index !== Number(event.currentTarget.dataset.index));

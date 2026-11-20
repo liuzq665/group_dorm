@@ -12,8 +12,11 @@ test('saving a stay application normalizes selected images and submits uploaded 
     getStorageSync: () => ({ token: 'test-session' }),
     showLoading() {}, hideLoading() {},
     showToast(value) { assert.notEqual(value.icon, 'none', value.title); },
-    compressImage(options) { options.success({ tempFilePath: `${options.src}.jpg` }); },
-    getFileSystemManager() { return { copyFile(options) { options.success(); } }; },
+    compressImage(options) { options.success({ tempFilePath: `${options.src}.compressed` }); },
+    getFileSystemManager() { return {
+      readFile(options) { assert.equal(options.encoding, 'base64'); options.success({ data: 'iVBORw0KGgoAAAANSUhEUg==' }); },
+      copyFile(options) { assert.ok(options.destPath.endsWith('.png')); options.success(); }
+    }; },
     uploadFile(options) {
       uploads.push(options);
       options.success({ statusCode: 200, data: JSON.stringify({ code: 0, data: { fileId: 31 } }) });
@@ -32,7 +35,7 @@ test('saving a stay application normalizes selected images and submits uploaded 
       files: ['photo.heic'], existing: []
     };
     page.setData = function setData(values) { Object.assign(this.data, values); };
-    assert.match(await page.normalizeImage('photo.heic'), /^\/user-data\/stay-\d+-[\da-f]+\.jpg$/);
+    assert.match(await page.normalizeImage('photo.heic'), /^\/user-data\/stay-\d+-[\da-f]+\.png$/);
     await page.save({ currentTarget: { dataset: { submit: 'true' } } });
     assert.equal(uploads.length, 1);
     assert.ok(uploads[0].url.endsWith('/api/v1/stay/applications/files'));

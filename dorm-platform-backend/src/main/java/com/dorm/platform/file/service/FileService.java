@@ -13,8 +13,24 @@ import org.slf4j.LoggerFactory;
 public class FileService {
  private static final Logger log=LoggerFactory.getLogger(FileService.class);
  private final SqlStore db;
- private final Path root=Path.of(System.getProperty("file.storage-root","uploads")).toAbsolutePath().normalize();
+ private final Path root=storageRoot();
  public FileService(SqlStore db){this.db=db;}
+ private static Path storageRoot(){
+  try{
+   Path location=Path.of(FileService.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toAbsolutePath().normalize();String configured=System.getProperty("file.storage-root");if(configured==null||configured.isBlank())configured=System.getenv("FILE_STORAGE_ROOT");
+   return resolveStorageRoot(location,configured,Path.of(System.getProperty("user.dir")));
+  }catch(Exception e){log.warn("Cannot determine backend module directory; using process working directory",e);return Path.of(System.getProperty("user.dir"),"uploads").toAbsolutePath().normalize();}
+ }
+ static Path resolveStorageRoot(Path codeLocation,String configured,Path workingDirectory){
+  Path current=Files.isDirectory(codeLocation)?codeLocation:codeLocation.getParent();Path module=moduleRoot(current,workingDirectory);
+  Path path=configured==null||configured.isBlank()?module.resolve("uploads"):Path.of(configured);
+  return (path.isAbsolute()?path:module.resolve(path)).toAbsolutePath().normalize();
+ }
+ private static Path moduleRoot(Path current,Path workingDirectory){
+  Path module=workingDirectory.toAbsolutePath().normalize();
+  for(Path path=current;path!=null;path=path.getParent())if(Files.isRegularFile(path.resolve("pom.xml"))){module=path;break;}
+  return module;
+ }
  public long data(CurrentUser u,String name,String type,byte[] bytes)throws IOException{Input.role(u,"ADMIN");Files.createDirectories(root);String stored=UUID.randomUUID().toString();Files.write(root.resolve(stored),bytes);return db.insert("INSERT INTO file_resource(uploader_user_id,original_name,storage_name,content_type,size_bytes) VALUES(?,?,?,?,?)",u.id(),name,stored,type,bytes.length);}
  public Map<String,Object> upload(CurrentUser u,MultipartFile f)throws IOException{BizException.require(!f.isEmpty()&&f.getSize()<=5*1024*1024,"图片不能为空且不能超过5MB");String original=safeName(f,"photo"),type=typeFor(original,Map.of("png","image/png","jpg","image/jpeg","jpeg","image/jpeg"));byte[] bytes=f.getBytes();verifyContent(original,type,bytes);return save(u,original,type,bytes);}
  public Map<String,Object> uploadStayMaterial(CurrentUser u,MultipartFile f)throws IOException{
@@ -69,7 +85,8 @@ public class FileService {
  }
  private Path storagePath(String storageName){
   Path relative=Path.of(storageName).getFileName();
-  List<Path> candidates=List.of(root,Path.of("uploads").toAbsolutePath().normalize(),Path.of("..","uploads").toAbsolutePath().normalize());
+  Path project=root.getParent()==null?null:root.getParent().getParent();
+  List<Path> candidates=project==null?List.of(root,Path.of("uploads").toAbsolutePath().normalize(),Path.of("..","uploads").toAbsolutePath().normalize()):List.of(root,Path.of("uploads").toAbsolutePath().normalize(),Path.of("..","uploads").toAbsolutePath().normalize(),project.resolve("uploads").toAbsolutePath().normalize());
   for(Path base:candidates){Path candidate=base.resolve(relative).normalize();if(candidate.startsWith(base)&&Files.isRegularFile(candidate))return candidate;}
   return root.resolve(relative).normalize();
  }
