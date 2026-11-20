@@ -25,7 +25,10 @@ Page({
   async checkAccommodation() {
     if (this.data.editing) return;
     try {
-      const home = await request('/accommodations/current');
+      // 该接口返回“当前住宿列表”，不是单个对象；直接取 .room_id 会永远判定为未分配
+      const homes = await request('/accommodations/current');
+      const list = Array.isArray(homes) ? homes : homes ? [homes] : [];
+      const home = list[0] || null;
       const assigned = home && (home.room_id || home.building_id);
       if (!assigned) {
         wx.showModal({
