@@ -1,5 +1,6 @@
 const { request, upload, showError } = require('../../utils/request');
 const { orDash } = require('../../utils/format');
+const { normalizeImage } = require('../../utils/image');
 
 Page({
   data: {
@@ -25,11 +26,11 @@ Page({
   async checkAccommodation() {
     if (this.data.editing) return;
     try {
-      // 该接口返回“当前住宿列表”，不是单个对象；直接取 .room_id 会永远判定为未分配
       const homes = await request('/accommodations/current');
-      const list = Array.isArray(homes) ? homes : homes ? [homes] : [];
-      const home = list[0] || null;
-      const assigned = home && (home.room_id || home.building_id);
+      // The API returns the current accommodation as a list, even for a student.
+      // Accept a single object as well to remain compatible with older responses.
+      const home = Array.isArray(homes) ? homes[0] : homes;
+      const assigned = home && home.room_id;
       if (!assigned) {
         wx.showModal({
           title: '尚未分配宿舍',
@@ -84,10 +85,18 @@ Page({
       count: Math.max(1, 6 - this.data.files.length),
       mediaType: ['image'],
       sourceType: ['album', 'camera'],
-      success: result => {
-        this.setData({ files: [...this.data.files, ...result.tempFiles.map(file => file.tempFilePath)].slice(0, 6) });
+      success: async result => {
+        try {
+          const paths = await Promise.all(result.tempFiles.map(file => this.normalizeImage(file.tempFilePath)));
+          this.setData({ files: [...this.data.files, ...paths].slice(0, 6) });
+        } catch (error) {
+          wx.showToast({ title: error?.errMsg || error?.message || '图片处理失败，请重新选择', icon: 'none' });
+        }
       }
     });
+  },
+  normalizeImage(filePath) {
+    return normalizeImage(filePath, 'repair');
   },
   removeFile(event) {
     const files = this.data.files.filter((item, index) => index !== Number(event.currentTarget.dataset.index));

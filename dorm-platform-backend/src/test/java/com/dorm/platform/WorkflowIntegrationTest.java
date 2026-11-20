@@ -34,6 +34,13 @@ class WorkflowIntegrationTest {
  final CurrentUser manager=new CurrentUser(2,"manager1","Manager","DORM_MANAGER");
  final CurrentUser worker=new CurrentUser(3,"repair1","Worker","REPAIRER");
  final CurrentUser admin=new CurrentUser(4,"admin","Admin","ADMIN");
+ @Test void messageQueriesWorkForEveryRoleAndRespectRecipients(){
+  String title="Private notice "+UUID.randomUUID();
+  notice.sendFrom(admin,List.of(student.id()),title,"Student only");
+  for(var user:List.of(admin,manager,worker,student))for(String sender:List.of("ALL","SYSTEM","ADMIN","DORM_MANAGER","MINE"))for(String read:List.of("","read","unread"))assertDoesNotThrow(()->notice.list(user,Map.of("sender",sender,"read",read)));
+  assertTrue(notice.list(student,Map.of()).stream().anyMatch(row->title.equals(row.get("title"))));
+  for(var user:List.of(manager,worker))assertFalse(notice.list(user,Map.of()).stream().anyMatch(row->title.equals(row.get("title"))));
+ }
  @Test void editingStudentCanKeepOrChangeAccommodationBed(){
   String account="bed-edit-"+UUID.randomUUID(),studentNo="B"+UUID.randomUUID().toString().substring(0,20);long id=management.saveUser(admin,null,Map.of("account",account,"studentNo",studentNo,"realName","Bed Edit","gender","MALE","roleCode","STUDENT","password","123456"));
   var beds=db.rows("SELECT bd.bed_id FROM bed bd JOIN dorm_room r ON r.room_id=bd.room_id JOIN building b ON b.building_id=r.building_id WHERE bd.management_status='AVAILABLE' AND b.gender_limit IN ('男生','混合') AND bd.bed_id NOT IN (SELECT bed_id FROM v_accommodation_current) ORDER BY bd.bed_id");

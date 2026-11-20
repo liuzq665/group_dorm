@@ -17,19 +17,24 @@
   ],
   "window": {
     "navigationBarTitleText": "宿舍事务",
-    "navigationBarBackgroundColor": "#3E6B62",
+    "navigationBarBackgroundColor": "#101010",
     "navigationBarTextStyle": "white",
-    "backgroundColor": "#F3F7F6",
+    "backgroundColor": "#FFFEEF",
     "backgroundTextStyle": "light"
   },
-  "tabBar": { "custom": true, "color": "#657579", "selectedColor": "#117c74", "backgroundColor": "#ffffff", "list": [
-    { "pagePath": "pages/home/index", "text": "工作台" },
-    { "pagePath": "pages/repairs/index", "text": "业务" },
-    { "pagePath": "pages/stays/index", "text": "留宿" },
-    { "pagePath": "pages/messages/index", "text": "消息" },
-    { "pagePath": "pages/mine/index", "text": "我的" }
-  ] },
+  "tabBar": {
+    "custom": true,
+    "color": "#6B6656",
+    "selectedColor": "#FFCB18",
+    "backgroundColor": "#FFFEF0",
+    "list": [
+      { "pagePath": "pages/home/index", "text": "工作台" },
+      { "pagePath": "pages/repairs/index", "text": "业务" },
+      { "pagePath": "pages/stays/index", "text": "留宿" },
+      { "pagePath": "pages/messages/index", "text": "消息" },
+      { "pagePath": "pages/mine/index", "text": "我的" }
+    ]
+  },
   "style": "v2",
   "sitemapLocation": "sitemap.json"
 }
-

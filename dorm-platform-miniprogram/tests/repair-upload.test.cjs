@@ -8,9 +8,15 @@ test('saving a repair uploads every photo to /files and submits their IDs', asyn
   global.Page = value => { page = value; };
   global.setTimeout = () => 0;
   global.wx = {
+    env: { USER_DATA_PATH: '/user-data' },
     getStorageSync: () => ({ token: 'test-session' }),
     showLoading() {}, hideLoading() {},
     showToast(value) { assert.notEqual(value.icon, 'none', value.title); },
+    compressImage(options) { options.success({ tempFilePath: `${options.src}.compressed` }); },
+    getFileSystemManager() { return {
+      readFile(options) { assert.equal(options.encoding, 'base64'); options.success({ data: '/9j/4AAQSkZJRg==' }); },
+      copyFile(options) { assert.ok(options.destPath.endsWith('.jpg')); options.success(); }
+    }; },
     uploadFile(options) {
       uploads.push(options);
       options.success({ statusCode: 200, data: JSON.stringify({ code: 0, data: { fileId: uploads.length } }) });
@@ -32,6 +38,7 @@ test('saving a repair uploads every photo to /files and submits their IDs', asyn
       form: { title: '漏水', description: '水龙头漏水' }
     };
     page.setData = function setData(values) { Object.assign(this.data, values); };
+    assert.match(await page.normalizeImage('camera.heic'), /^\/user-data\/repair-\d+-[\da-f]+\.jpg$/);
     await page.save({ currentTarget: { dataset: { submit: 'true' } } });
     assert.equal(uploads.length, 2);
     for (const upload of uploads) {

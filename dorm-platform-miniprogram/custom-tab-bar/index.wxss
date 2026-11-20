@@ -8,9 +8,9 @@
   height: calc(106rpx + env(safe-area-inset-bottom));
   padding: 6rpx 8rpx env(safe-area-inset-bottom);
   box-sizing: border-box;
-  background: #fff;
-  border-top: 1rpx solid #eef2f0;
-  box-shadow: 0 -2rpx 10rpx rgba(43, 58, 56, .05);
+  background: #fffef0;
+  border-top: 1rpx solid #eee5bd;
+  box-shadow: 0 -2rpx 10rpx rgba(40, 32, 12, .08);
 }
 .tab-item {
   position: relative;
@@ -20,10 +20,10 @@
   align-items: center;
   justify-content: center;
   gap: 3rpx;
-  color: #8a9793;
+  color: #6b6656;
 }
 /* 当前页高亮：顶部短指示条 + 图标浅色底 + 文字加粗变色 */
-.tab-item.selected { color: #3e6b62; font-weight: 650; }
+.tab-item.selected { color: #ffcb18; font-weight: 650; }
 .tab-item.selected::before {
   content: '';
   position: absolute;
@@ -32,7 +32,7 @@
   transform: translateX(-50%);
   width: 44rpx;
   height: 5rpx;
-  background: #3e6b62;
+  background: #ffcb18;
   border-radius: 3rpx;
 }
 .tab-icon {
@@ -44,9 +44,9 @@
   padding: 3rpx 8rpx;
   box-sizing: content-box;
 }
-.tab-item.selected .tab-icon { color: #3e6b62; background: #eef3f1; }
+.tab-item.selected .tab-icon { color: #ffcb18; background: #fff4a8; }
 .tab-label { font-size: 20rpx; }
-.tab-item.selected .tab-label { color: #3e6b62; }
+.tab-item.selected .tab-label { color: #ffcb18; }
 .tab-badge {
   position: absolute;
   top: 2rpx;
@@ -57,7 +57,14 @@
   line-height: 26rpx;
   text-align: center;
   color: #fff;
-  background: #9a5a55;
+  background: #e87939;
   border-radius: 14rpx;
   font-size: 17rpx;
 }
+/* Shared editorial coral palette */
+.tabbar { background: #fffdfb; border-top-color: #eaded8; box-shadow: 0 -8rpx 24rpx rgba(77,35,20,.07); }
+.tab-item.selected { color: #ffcb18; }
+.tab-item.selected::before { background: #ffcb18; }
+.tab-item.selected .tab-icon { color: #ffcb18; background: #fff4a8; }
+.tab-item.selected .tab-label { color: #ffcb18; }
+.tab-badge { background: #e87939; }

@@ -1,25 +1,35 @@
 package com.dorm.platform.file.service;
 import com.dorm.platform.common.*;
 import com.dorm.platform.security.CurrentUser;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import java.nio.file.*;
 import java.io.*;
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 public class FileService {
- private final SqlStore db; private final Path root; private final List<Path> readable;
- public FileService(SqlStore db,@Value("${dorm.file.storage-dir:uploads}")String dir){
-  this.db=db;
-  this.root=Path.of(dir).toAbsolutePath().normalize();
-  // 历史文件可能落在不同启动目录（IDE 从后端模块启动 / jar 从仓库根启动），读取时按顺序回退查找
-  LinkedHashSet<Path> dirs=new LinkedHashSet<>();
-  dirs.add(root);
-  dirs.add(Path.of("dorm-platform-backend","uploads").toAbsolutePath().normalize());
-  if(root.getParent()!=null)dirs.add(root.getParent().resolve("uploads").normalize());
-  this.readable=List.copyOf(dirs);
+ private static final Logger log=LoggerFactory.getLogger(FileService.class);
+ private final SqlStore db;
+ private final Path root=storageRoot();
+ public FileService(SqlStore db){this.db=db;}
+ private static Path storageRoot(){
+  try{
+   Path location=Path.of(FileService.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toAbsolutePath().normalize();String configured=System.getProperty("file.storage-root");if(configured==null||configured.isBlank())configured=System.getenv("FILE_STORAGE_ROOT");
+   return resolveStorageRoot(location,configured,Path.of(System.getProperty("user.dir")));
+  }catch(Exception e){log.warn("Cannot determine backend module directory; using process working directory",e);return Path.of(System.getProperty("user.dir"),"uploads").toAbsolutePath().normalize();}
+ }
+ static Path resolveStorageRoot(Path codeLocation,String configured,Path workingDirectory){
+  Path current=Files.isDirectory(codeLocation)?codeLocation:codeLocation.getParent();Path module=moduleRoot(current,workingDirectory);
+  Path path=configured==null||configured.isBlank()?module.resolve("uploads"):Path.of(configured);
+  return (path.isAbsolute()?path:module.resolve(path)).toAbsolutePath().normalize();
+ }
+ private static Path moduleRoot(Path current,Path workingDirectory){
+  Path module=workingDirectory.toAbsolutePath().normalize();
+  for(Path path=current;path!=null;path=path.getParent())if(Files.isRegularFile(path.resolve("pom.xml"))){module=path;break;}
+  return module;
  }
  public long data(CurrentUser u,String name,String type,byte[] bytes)throws IOException{Input.role(u,"ADMIN");Files.createDirectories(root);String stored=UUID.randomUUID().toString();Files.write(root.resolve(stored),bytes);return db.insert("INSERT INTO file_resource(uploader_user_id,original_name,storage_name,content_type,size_bytes) VALUES(?,?,?,?,?)",u.id(),name,stored,type,bytes.length);}
  public Map<String,Object> upload(CurrentUser u,MultipartFile f)throws IOException{BizException.require(!f.isEmpty()&&f.getSize()<=5*1024*1024,"图片不能为空且不能超过5MB");String original=safeName(f,"photo"),type=typeFor(original,Map.of("png","image/png","jpg","image/jpeg","jpeg","image/jpeg"));byte[] bytes=f.getBytes();verifyContent(original,type,bytes);return save(u,original,type,bytes);}
@@ -73,10 +83,17 @@ public class FileService {
   }
   return file;
  }
- public byte[] bytes(Map<String,Object> file)throws IOException{return Files.readAllBytes(locate(file.get("storage_name").toString()));}
- private Path locate(String stored){
-  for(Path dir:readable){Path path=dir.resolve(stored).normalize();if(Files.isRegularFile(path))return path;}
-  throw new BizException(404,"附件文件已不在服务器磁盘上，请重新上传");
+ private Path storagePath(String storageName){
+  Path relative=Path.of(storageName).getFileName();
+  Path project=root.getParent()==null?null:root.getParent().getParent();
+  List<Path> candidates=project==null?List.of(root,Path.of("uploads").toAbsolutePath().normalize(),Path.of("..","uploads").toAbsolutePath().normalize()):List.of(root,Path.of("uploads").toAbsolutePath().normalize(),Path.of("..","uploads").toAbsolutePath().normalize(),project.resolve("uploads").toAbsolutePath().normalize());
+  for(Path base:candidates){Path candidate=base.resolve(relative).normalize();if(candidate.startsWith(base)&&Files.isRegularFile(candidate))return candidate;}
+  return root.resolve(relative).normalize();
  }
- public void deleteBackupOutput(CurrentUser u,long fileId)throws IOException{Input.role(u,"ADMIN");var file=db.one("SELECT storage_name FROM file_resource WHERE file_id=?",fileId);BizException.require(db.count("SELECT COUNT(*) FROM backup_task_file WHERE file_id=?",fileId)==0,"备份文件仍被任务引用，不能删除");db.update("DELETE FROM file_resource WHERE file_id=?",fileId);try{Files.deleteIfExists(locate(file.get("storage_name").toString()));}catch(BizException ignored){}}
+ public byte[] bytes(Map<String,Object> file)throws IOException{
+  String storageName=file.get("storage_name").toString();Path path=storagePath(storageName);
+  if(!Files.isRegularFile(path)){log.error("附件文件不存在: fileId={}, storageName={}, storageRoot={}",file.get("file_id"),storageName,root);throw new FileNotFoundException("附件文件不存在: "+storageName);}
+  return Files.readAllBytes(path);
+ }
+ public void deleteBackupOutput(CurrentUser u,long fileId)throws IOException{Input.role(u,"ADMIN");var file=db.one("SELECT storage_name FROM file_resource WHERE file_id=?",fileId);BizException.require(db.count("SELECT COUNT(*) FROM backup_task_file WHERE file_id=?",fileId)==0,"备份文件仍被任务引用，不能删除");db.update("DELETE FROM file_resource WHERE file_id=?",fileId);Files.deleteIfExists(root.resolve(file.get("storage_name").toString()));}
 }

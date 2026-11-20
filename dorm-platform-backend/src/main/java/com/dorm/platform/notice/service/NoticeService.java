@@ -29,18 +29,20 @@ public class NoticeService {
   long message=db.insert("INSERT INTO site_message(target_role,title,content,publisher_user_id,delivered_at) VALUES('DIRECT',?,?,?,NOW())",title,content,publisher.id());
   for(long user:new HashSet<>(users)){
    db.update("INSERT IGNORE INTO message_target(message_id,user_id) VALUES(?,?)",message,user);
-   db.update("INSERT IGNORE INTO message_receipt(message_id,user_id,read_at) VALUES(?,?,NOW())",message,user);
+   db.update("INSERT IGNORE INTO message_receipt(message_id,user_id) VALUES(?,?)",message,user);
   }
  }
 
  @Transactional public void sendFrom(CurrentUser publisher,Collection<Long> users,String title,String content,Collection<Long> buildings,Collection<Long> attachments){
+  title=content.replaceFirst("[\\u5df2\\uFF1B].*$","");
   if(users.isEmpty())return;
+  BizException.require(db.count("SELECT COUNT(*) FROM site_message m WHERE m.publisher_user_id=? AND m.title=? AND m.content=? AND m.delivered_at IS NOT NULL",publisher.id(),title,content)==0,"该版本消息已经发布过");
   long message=db.insert("INSERT INTO site_message(target_role,title,content,publisher_user_id,delivered_at) VALUES('DIRECT',?,?,?,NOW())",title,content,publisher.id());
   for(long building:new LinkedHashSet<>(buildings))db.update("INSERT IGNORE INTO message_building_target(message_id,building_id) VALUES(?,?)",message,building);
   for(long file:new LinkedHashSet<>(attachments))db.update("INSERT IGNORE INTO message_attachment(message_id,file_id) VALUES(?,?)",message,file);
   for(long user:new HashSet<>(users)){
    db.update("INSERT IGNORE INTO message_target(message_id,user_id) VALUES(?,?)",message,user);
-   db.update("INSERT IGNORE INTO message_receipt(message_id,user_id,read_at) VALUES(?,?,NOW())",message,user);
+   db.update("INSERT IGNORE INTO message_receipt(message_id,user_id) VALUES(?,?)",message,user);
   }
  }
 
@@ -75,13 +77,13 @@ public class NoticeService {
  public List<Map<String,Object>> list(CurrentUser u,Map<String,String> filters){
   boolean admin=u.role().equals("ADMIN");
   String readLabel=admin?"IF(p.role_code='DORM_MANAGER' OR m.publisher_user_id IS NOT NULL,'已读',IF(r.message_id IS NULL,'已读',IF(r.read_at IS NULL,'未读','已读')))":"IF(r.message_id IS NULL,'发送给他人',IF(r.read_at IS NULL,'未读','已读'))";
-  StringBuilder sql=new StringBuilder("SELECT m.message_id,m.title,m.content,m.created_at,r.read_at,"+readLabel+" read_label,IF(r.message_id IS NULL,0,1) is_recipient,m.publisher_user_id,COALESCE(p.real_name,'系统') publisher_name,p.role_code publisher_role,CASE WHEN m.publisher_user_id=? THEN '我发布的' WHEN p.role_code='DORM_MANAGER' THEN '宿管发布' WHEN p.role_code='ADMIN' THEN '系统管理员发布' WHEN m.publisher_user_id IS NULL AND EXISTS(SELECT 1 FROM message_target smt JOIN v_user_identity su ON su.user_id=smt.user_id WHERE smt.message_id=m.message_id AND su.role_code='ADMIN') THEN '系统通知' ELSE '系统通知' END source_label,(SELECT GROUP_CONCAT(DISTINCT CASE i.role_code WHEN 'STUDENT' THEN '学生' WHEN 'DORM_MANAGER' THEN '宿管' WHEN 'REPAIRER' THEN '维修人员' WHEN 'ADMIN' THEN '系统管理员' END ORDER BY i.role_code SEPARATOR '、') FROM message_target mt2 JOIN v_user_identity i ON i.user_id=mt2.user_id WHERE mt2.message_id=m.message_id) recipient_roles");
+  StringBuilder sql=new StringBuilder("SELECT m.message_id,m.title,m.content,m.created_at,m.delivered_at,r.read_at,"+readLabel+" read_label,IF(r.message_id IS NULL,0,1) is_recipient,m.publisher_user_id,COALESCE(p.real_name,'系统') publisher_name,p.role_code publisher_role,CASE WHEN m.publisher_user_id=? THEN '我发布的' WHEN p.role_code='DORM_MANAGER' THEN '宿管发布' WHEN p.role_code='ADMIN' THEN '系统管理员发布' WHEN m.publisher_user_id IS NULL AND EXISTS(SELECT 1 FROM message_target smt JOIN v_user_identity su ON su.user_id=smt.user_id WHERE smt.message_id=m.message_id AND su.role_code='ADMIN') THEN '系统通知' ELSE '系统通知' END source_label,(SELECT GROUP_CONCAT(DISTINCT CASE i.role_code WHEN 'STUDENT' THEN '学生' WHEN 'DORM_MANAGER' THEN '宿管' WHEN 'REPAIRER' THEN '维修人员' WHEN 'ADMIN' THEN '系统管理员' END ORDER BY i.role_code SEPARATOR '、') FROM message_target mt2 JOIN v_user_identity i ON i.user_id=mt2.user_id WHERE mt2.message_id=m.message_id) recipient_roles");
   sql.append(" FROM site_message m ");
   if(admin)sql.append("LEFT JOIN message_receipt r ON r.message_id=m.message_id AND r.user_id=? LEFT JOIN v_user_identity p ON p.user_id=m.publisher_user_id");
-  else sql.append("JOIN message_receipt r ON r.message_id=m.message_id AND r.user_id=? LEFT JOIN v_user_identity p ON p.user_id=m.publisher_user_id");
-  if(admin)sql.append(" WHERE (p.role_code='DORM_MANAGER' OR m.publisher_user_id=? OR (m.publisher_user_id IS NULL AND EXISTS(SELECT 1 FROM message_target smt JOIN v_user_identity su ON su.user_id=smt.user_id WHERE smt.message_id=m.message_id AND su.role_code='ADMIN'))) AND r.deleted_at IS NULL");
-  else sql.append(" WHERE m.delivered_at IS NOT NULL AND r.deleted_at IS NULL");
-  List<Object> args=new ArrayList<>();args.add(u.id());args.add(u.id());if(admin)args.add(u.id());
+  else sql.append("LEFT JOIN message_receipt r ON r.message_id=m.message_id AND r.user_id=? LEFT JOIN v_user_identity p ON p.user_id=m.publisher_user_id");
+  if(admin)sql.append(" WHERE (p.role_code='DORM_MANAGER' OR m.publisher_user_id=? OR (m.publisher_user_id IS NULL AND EXISTS(SELECT 1 FROM message_target smt JOIN v_user_identity su ON su.user_id=smt.user_id WHERE smt.message_id=m.message_id AND su.role_code='ADMIN'))) AND (r.deleted_at IS NULL OR (m.publisher_user_id=? AND m.delivered_at IS NULL))");
+  else sql.append(" WHERE ((m.delivered_at IS NOT NULL AND r.message_id IS NOT NULL) OR m.publisher_user_id=?) AND (r.deleted_at IS NULL OR (m.publisher_user_id=? AND m.delivered_at IS NULL))");
+  List<Object> args=new ArrayList<>();args.add(u.id());args.add(u.id());args.add(u.id());args.add(u.id());
   String sender=Objects.toString(filters.get("sender"),"").trim();
   String read=Objects.toString(filters.get("read"),"").trim();
   if(!(admin&&Set.of("DORM_MANAGER","MINE").contains(sender))){
@@ -149,6 +151,20 @@ public class NoticeService {
   if(db.update("UPDATE message_receipt SET read_at=COALESCE(read_at,NOW()) WHERE message_id=? AND user_id=? AND deleted_at IS NULL",message,u.id())==0&&db.count("SELECT COUNT(*) FROM message_receipt WHERE message_id=? AND user_id=? AND deleted_at IS NULL",message,u.id())==0)throw BizException.forbidden();
  }
 
+ @Transactional public void withdraw(CurrentUser u,long message){
+  BizException.require(db.count("SELECT COUNT(*) FROM site_message WHERE message_id=? AND publisher_user_id=?",message,u.id())>0,"只能撤回自己发布的消息");
+  db.update("UPDATE message_receipt SET deleted_at=NOW() WHERE message_id=? AND deleted_at IS NULL",message);
+  db.update("UPDATE site_message SET delivered_at=NULL WHERE message_id=?",message);
+  db.log(u.id(),"notice","withdraw",message);
+ }
+
+ @Transactional public void republish(CurrentUser u,long message,String title,String content){
+  BizException.require(db.count("SELECT COUNT(*) FROM site_message WHERE message_id=? AND publisher_user_id=? AND delivered_at IS NULL",message,u.id())>0,"只能编辑自己已撤回的消息");
+  db.update("UPDATE site_message SET title=?,content=?,delivered_at=NOW(),publish_at=NOW() WHERE message_id=?",required(Map.of("title",title),"title"),required(Map.of("content",content),"content"),message);
+  db.update("UPDATE message_receipt SET deleted_at=NULL,read_at=NULL WHERE message_id=?",message);
+  db.log(u.id(),"notice","republish",message);
+ }
+
  @Transactional public void readSelected(CurrentUser u,List<Long> messageIds){
   List<Long> ids=messageIds.stream().distinct().toList();BizException.require(!ids.isEmpty()&&ids.size()<=500,"请选择要标为已读的消息");
   String placeholders=String.join(",",Collections.nCopies(ids.size(),"?"));List<Object> args=new ArrayList<>();args.add(u.id());args.addAll(ids);
@@ -202,8 +218,17 @@ public class NoticeService {
   Object filesRaw=b.get("attachmentIds");
   List<?> attachmentIds=filesRaw instanceof List<?> files?files:List.of();
   BizException.require(attachmentIds.size()<=8,"最多添加8个附件");
-  for(Object value:attachmentIds){long file=id(value);if(db.count("SELECT COUNT(*) FROM file_resource WHERE file_id=? AND uploader_user_id=?",file,u.id())==0)throw BizException.forbidden();db.update("INSERT INTO message_attachment(message_id,file_id) VALUES(?,?)",message,file);}
+  for(Object value:attachmentIds){long file=id(value);boolean own=db.count("SELECT COUNT(*) FROM file_resource WHERE file_id=? AND uploader_user_id=?",file,u.id())>0;
+   boolean batchMaterial=u.role().equals("DORM_MANAGER")&&db.count("SELECT COUNT(*) FROM stay_batch_material m JOIN stay_batch b ON b.batch_id=m.batch_id WHERE m.file_id=? AND b.current_status='OPEN' AND EXISTS(SELECT 1 FROM manager_building_scope WHERE manager_user_id=?)",file,u.id())>0;
+   if(!own&&!batchMaterial)throw BizException.forbidden();db.update("INSERT INTO message_attachment(message_id,file_id) VALUES(?,?)",message,file);}
   deliver();
+  if(b.get("stayBatchId")!=null){
+   role(u,"ADMIN");long batchId=id(b.get("stayBatchId"));
+   var batch=db.one("SELECT current_status FROM stay_batch WHERE batch_id=? FOR UPDATE",batchId);
+   BizException.require(Set.of("DRAFT","OPEN").contains(batch.get("current_status")),"当前批次不能发布留宿通知");
+   db.update("UPDATE stay_batch SET current_status='OPEN' WHERE batch_id=?",batchId);
+   db.log(u.id(),"stay","publish_schoolwide",batchId);
+  }
   db.log(u.id(),"notice","publish",message);
  }
 
