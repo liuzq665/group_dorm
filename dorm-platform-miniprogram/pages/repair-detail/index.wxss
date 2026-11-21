@@ -20,3 +20,9 @@
 .photo-row { display: flex; align-items: center; justify-content: space-between; gap: 12rpx; padding-top: 8rpx; }
 .photo-name { flex: 1; min-width: 0; color: var(--text-2); font-size: 22rpx; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+/* 手动派单：维修工候选卡片（工单统计 + 评分） */
+.dispatch-list { display: flex; flex-direction: column; gap: 12rpx; margin-top: 16rpx; }
+.dispatch-card { padding: 20rpx; background: #fbfdfc; border: 1rpx solid var(--border); border-radius: var(--radius-l); }
+.dispatch-card .record-head { align-items: center; }
+.dispatch-card .record-foot { margin-top: 8rpx; }
+

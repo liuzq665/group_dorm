@@ -116,7 +116,19 @@ export function modal(title,html,onSubmit,submitLabel='保存',stack=false){
 }
 export const photoField=(required=false)=>`<label class="field"><span>现场照片</span><input name="photos" type="file" accept="image/png,image/jpeg" multiple ${required?'required':''}></label>`;
 export async function upload(form){const ids=[];for(const selectedFile of form.elements.photos?.files||[]){const file=await normalizeImageUpload(selectedFile),body=new FormData();body.set('file',file);ids.push((await api('/files',{method:'POST',body})).fileId);}return ids;}
-export async function normalizeImageUpload(file){if(!file.type.startsWith('image/')&&!/\.(png|jpe?g|gif|webp|bmp|avif|heic|heif|svg)$/i.test(file.name))return file;let bitmap;try{bitmap=await createImageBitmap(file);}catch{throw new Error(`无法解码图片：${file.name}`);}const canvas=document.createElement('canvas');canvas.width=bitmap.width;canvas.height=bitmap.height;canvas.getContext('2d').drawImage(bitmap,0,0);bitmap.close();const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(!blob)throw new Error(`图片转换失败：${file.name}`);if(blob.size>5*1024*1024)throw new Error(`图片转换后超过5MB：${file.name}`);const stem=file.name.replace(/\.[^.]+$/,'');return new File([blob],`${stem}.png`,{type:'image/png'});}
+export async function normalizeImageUpload(file){
+ if(!file.type.startsWith('image/')&&!/\.(png|jpe?g|gif|webp|bmp|avif|heic|heif|svg)$/i.test(file.name))return file;
+ let bitmap;try{bitmap=await createImageBitmap(file);}catch{throw new Error(`无法解码图片：${file.name}`);}
+ const scale=Math.min(1,1920/Math.max(bitmap.width,bitmap.height)),canvas=document.createElement('canvas');
+ canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));
+ const context=canvas.getContext('2d');context.fillStyle='#ffffff';context.fillRect(0,0,canvas.width,canvas.height);context.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();
+ const limit=5*1024*1024;let type=/(\.png$|\.gif$|\.webp$|\.bmp$|\.avif$|\.svg$)/i.test(file.name)?'image/png':'image/jpeg';
+ let blob=await new Promise(resolve=>canvas.toBlob(resolve,type,0.85));
+ if(!blob)throw new Error(`图片转换失败：${file.name}`);
+ if(blob.size>limit){const jpeg=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.8));if(jpeg&&jpeg.size<blob.size){blob=jpeg;type='image/jpeg';}}
+ if(blob.size>limit)throw new Error(`图片压缩后仍超过5MB，请重新选择：${file.name}（${(blob.size/1048576).toFixed(1)}MB）`);
+ const stem=file.name.replace(/\.[^.]+$/,'');return new File([blob],`${stem}.${type==='image/png'?'png':'jpg'}`,{type});
+}
 export async function photos(dialog,items){const target=dialog.querySelector('.photo-list');if(!target||!items.length)return;for(const file of items){const response=await fetch(`${API}/files/${file.file_id}`,{headers:{Authorization:`Bearer ${state.token}`}});if(!response.ok){const error=document.createElement('p');error.className='error';error.textContent=`图片 ${file.original_name||file.file_id} 加载失败（${response.status}）`;target.append(error);continue;}const image=new Image();image.alt=file.original_name;image.src=URL.createObjectURL(await response.blob());target.append(image);}}
 export function download(name,data,type='application/json'){const url=URL.createObjectURL(new Blob([typeof data==='string'?data:JSON.stringify(data,null,2)],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 export function selectedRows(type,rows,idKey){const ids=state.data.bulkSelections?.[type]||[],resources=[...document.querySelectorAll(`.resource-table[data-resource-type="${CSS.escape(type)}"] [data-resource-select-row]:checked`)].map(input=>input.value),selected=ids.length?ids:resources;return selected.length?rows.filter(row=>selected.includes(String(row[idKey]))):rows;}

@@ -139,7 +139,7 @@ public class RepairService {
         o.put("audits",db.rows("SELECT * FROM repair_audit WHERE order_id=? ORDER BY audit_id",order));
         o.put("delays",db.rows("SELECT * FROM repair_delay_request WHERE order_id=? ORDER BY request_id",order));
         o.put("exceptions",db.rows("SELECT * FROM repair_exception WHERE order_id=? ORDER BY exception_id",order));
-        o.put("files",db.rows("SELECT f.file_id,f.original_name,a.purpose FROM repair_attachment a JOIN file_resource f ON f.file_id=a.file_id WHERE a.order_id=?",order));
+        o.put("files",db.rows("SELECT f.file_id,f.original_name,f.content_type,f.size_bytes,a.purpose FROM repair_attachment a JOIN file_resource f ON f.file_id=a.file_id WHERE a.order_id=?",order));
         o.put("versions",db.rows("SELECT * FROM repair_submission_version WHERE order_id=? ORDER BY version_id",order));
         o.put("reworkRequests",db.rows("SELECT request_id,reason,request_status,review_reason,created_at,reviewed_at FROM repair_rework_request WHERE order_id=? ORDER BY request_id",order));
         o.put("resultHistory",db.rows("SELECT rr.result_id,ROW_NUMBER() OVER (ORDER BY rr.result_id) round_no,rp.repairer_name,rr.result_text,rr.created_at FROM repair_result rr JOIN repairer_profile rp ON rp.repairer_user_id=rr.repairer_user_id WHERE rr.order_id=? ORDER BY rr.result_id",order));
@@ -189,7 +189,27 @@ public class RepairService {
         db.update("INSERT INTO repair_audit(order_id,reviewer_user_id,result,reason) VALUES(?,?,?,?)",order,u.id(),pass?"APPROVED":"RETURNED",reason);
         studentNotice(o,pass?(rework?"重修审核通过，等待人工派单":"审核通过"):(rework?"重修未通过："+reason:"请修改："+reason));if(pass&&!rework)autoDispatch(order);db.log(u.id(),"repair",rework?"rework_review":"review",order);
     }
-    public List<Map<String,Object>> candidates(CurrentUser u,long order){role(u,"DORM_MANAGER","ADMIN");var o=db.one("SELECT * FROM v_repair_order_dashboard WHERE order_id=?",order);scope.building(u,id(o.get("building_id")));return eligible(o);}
+    public List<Map<String,Object>> candidates(CurrentUser u,long order){role(u,"DORM_MANAGER","ADMIN");var o=db.one("SELECT * FROM v_repair_order_dashboard WHERE order_id=?",order);scope.building(u,id(o.get("building_id")));return candidateStats(eligible(o));}
+    /** 手动派单选人参考：在候选资格结果上补充维修中/待确认/延期工单数与历史评分。统计口径与维修端 repairerStats 一致，仅本接口计算，不影响自动派单与列表可用性判断。 */
+    private List<Map<String,Object>> candidateStats(List<Map<String,Object>> rows){
+        if(rows.isEmpty())return rows;
+        StringBuilder ids=new StringBuilder();
+        for(var row:rows){if(ids.length()>0)ids.append(',');ids.append(id(row.get("repairer_user_id")));}
+        var workloads=db.rows("SELECT d.repairer_user_id,COUNT(DISTINCT CASE WHEN o.current_status='ACCEPTED' THEN o.order_id END) in_repair_orders,COUNT(DISTINCT CASE WHEN o.current_status='REPAIRED' THEN o.order_id END) pending_confirm_orders,COUNT(DISTINCT CASE WHEN o.current_status='DELAYED' THEN o.order_id END) delayed_orders FROM repair_dispatch d JOIN repair_order o ON o.order_id=d.order_id WHERE d.repairer_user_id IN ("+ids+") GROUP BY d.repairer_user_id");
+        var ratings=db.rows("SELECT rr.repairer_user_id,COUNT(*) evaluation_count,ROUND(AVG(e.score),2) average_score FROM repair_evaluation e JOIN repair_result rr ON rr.result_id=(SELECT MAX(r.result_id) FROM repair_result r WHERE r.order_id=e.order_id) WHERE rr.repairer_user_id IN ("+ids+") GROUP BY rr.repairer_user_id");
+        Map<Long,Map<String,Object>> workloadById=new HashMap<>(),ratingById=new HashMap<>();
+        for(var row:workloads)workloadById.put(id(row.get("repairer_user_id")),row);
+        for(var row:ratings)ratingById.put(id(row.get("repairer_user_id")),row);
+        for(var row:rows){
+            long worker=id(row.get("repairer_user_id"));var workload=workloadById.get(worker);var rating=ratingById.get(worker);
+            row.put("in_repair_orders",workload==null?0:id(workload.get("in_repair_orders")));
+            row.put("pending_confirm_orders",workload==null?0:id(workload.get("pending_confirm_orders")));
+            row.put("delayed_orders",workload==null?0:id(workload.get("delayed_orders")));
+            row.put("evaluation_count",rating==null?0:id(rating.get("evaluation_count")));
+            row.put("average_score",rating==null?null:rating.get("average_score"));
+        }
+        return rows;
+    }
     private List<Map<String,Object>> eligible(Map<String,Object>o){return db.rows("SELECT p.repairer_user_id,p.repairer_name real_name,p.max_active_orders,(SELECT COUNT(*) FROM repair_dispatch d JOIN repair_order x ON x.order_id=d.order_id WHERE d.repairer_user_id=p.repairer_user_id AND d.dispatch_status IN ('PENDING','ACCEPTED') AND x.current_status IN ('PENDING_ACCEPT','ACCEPTED','DELAYED')) active_orders FROM repairer_profile p WHERE p.on_duty=1 AND p.enabled=1 AND EXISTS(SELECT 1 FROM repairer_work_type q WHERE q.repairer_user_id=p.repairer_user_id AND q.work_type_id=?) AND EXISTS(SELECT 1 FROM repairer_building_scope s WHERE s.repairer_user_id=p.repairer_user_id AND s.building_id=?) ORDER BY active_orders,p.repairer_user_id",o.get("work_type_id"),o.get("building_id"));}
     private void autoDispatch(long order){
         var o=locked(order);state(o,"PENDING_ASSIGN");

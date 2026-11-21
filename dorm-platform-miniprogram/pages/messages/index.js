@@ -239,13 +239,13 @@ Page({
   async chooseFiles() {
     try {
       this._pickingMedia = true;
-      const paths = await new Promise((resolve, reject) => wx.chooseMessageFile({
+      const picked = await new Promise((resolve, reject) => wx.chooseMessageFile({
         count: 8 - this.data.files.length,
         type: 'file',
-        success: result => { this._pickingMedia = false; resolve(result.tempFiles.map(item => item.path)); },
+        success: result => { this._pickingMedia = false; resolve(result.tempFiles.map(item => ({ path: item.path, name: item.name || '附件' }))); },
         fail: error => { this._pickingMedia = false; reject(error); }
       }));
-      this.setData({ publishing: true, files: [...this.data.files, ...paths].slice(0, 8) });
+      this.setData({ publishing: true, files: [...this.data.files, ...picked].slice(0, 8) });
       overlay(this, true);
     } catch (error) {
       if (!error.errMsg?.includes('cancel')) showError(error);
@@ -261,7 +261,7 @@ Page({
     this.setData({ actionBusy: true });
     wx.showLoading({ title: '正在发布' });
     try {
-      const attachmentIds = await Promise.all(files.map(path => uploadMessage(path)));
+      const attachmentIds = await Promise.all(files.map(file => uploadMessage(typeof file === 'string' ? file : file.path, file.name)));
       await request('/messages', {
         method: 'POST',
         data: {

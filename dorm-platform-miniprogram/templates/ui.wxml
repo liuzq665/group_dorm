@@ -51,5 +51,5 @@
       <text class="attachment-action">预览</text>
     </view>
   </view>
-  <text wx:else class="detail-value">-</text>
+  <text wx:else class="detail-value">暂无附件</text>
 </template>

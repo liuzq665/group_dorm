@@ -104,7 +104,7 @@
       <view class="field">
         <text class="field-label">附件（最多 8 个，可选）</text>
         <button class="outline compact-button" bindtap="chooseFiles">添加附件（{{files.length}}）</button>
-        <text wx:for="{{files}}" wx:key="*this" class="file-row-text">{{item}}</text>
+        <text wx:for="{{files}}" wx:key="path" class="file-row-text">{{item.name}}</text>
       </view>
       <view class="action-bar">
         <button class="outline" bindtap="closePublish">取消</button>

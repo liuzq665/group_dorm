@@ -1,5 +1,5 @@
 const { request, upload, showError } = require('../../utils/request');
-const { orDash, formatDate } = require('../../utils/format');
+const { orDash, formatDate, statusText } = require('../../utils/format');
 const { normalizeImage } = require('../../utils/image');
 
 const stayUploadPath = '/stay/applications/files';
@@ -42,6 +42,9 @@ Page({
     existing: [],
     batchInfo: {},
     deadlineLabel: '',
+    locked: false,
+    lockedHint: '',
+    lockedApplicationId: '',
     actionBusy: false
   },
   onLoad(query) {
@@ -58,10 +61,16 @@ Page({
         : applications.find(row => String(row.batch_id) === String(this.data.batchId) && ['DRAFT', 'PENDING_EDIT'].includes(row.current_status));
       const batchId = String(this.data.batchId || (application || {}).batch_id || '');
       const batch = batches.find(row => String(row.batch_id) === batchId) || null;
+      // 同一批次已经提交/审核的申请不能再修改：先拦在页面上，避免用户选图上传后才被服务端拒绝（附件会变成无人引用的孤儿）
+      const sameBatch = batchId ? applications.find(row => String(row.batch_id) === batchId) : null;
+      const locked = !!sameBatch && !['DRAFT', 'PENDING_EDIT'].includes(sameBatch.current_status);
       this.setData({
         batchId,
         application: application || null,
         batch,
+        locked,
+        lockedApplicationId: locked ? sameBatch.application_id : '',
+        lockedHint: locked ? `本批次已有申请（状态：${statusText(sameBatch.current_status)}），不能再修改或新增。请到留宿详情查看进度。` : '',
         reason: application?.reason || '',
         ranges: application?.dateRanges?.length
           ? application.dateRanges.map(item => ({ startDate: item.startDate || item.start_date, endDate: item.endDate || item.end_date }))
@@ -116,39 +125,59 @@ Page({
             count: 8,
             mediaType: ['image'],
             success: async result => {
+              const picked = Array.isArray(result.tempFiles) ? result.tempFiles : [];
+              if (!picked.length) { this.photoError('没有获取到图片，请重新选择'); return; }
               try {
-                const paths = await Promise.all(result.tempFiles.map(file => this.normalizeImage(file.tempFilePath)));
-                this.setData({ files: [...this.data.files, ...paths].slice(0, 8) });
+                const paths = await Promise.all(picked.map(file => this.normalizeImage(file.tempFilePath)));
+                const base = this.data.files;
+                const added = paths.map((path, index) => ({ path, name: `照片${base.length + index + 1}` }));
+                this.setData({ files: [...base, ...added].slice(0, 8) });
               } catch (error) {
-                wx.showToast({ title: error?.errMsg || error?.message || '图片处理失败，请重新选择', icon: 'none' });
+                this.photoError(error?.errMsg || error?.message || '图片处理失败');
               }
-            }
+            },
+            fail: error => { if (!/cancel/i.test(error?.errMsg || '')) this.photoError(error?.errMsg || '选择图片失败'); }
           });
         } else {
           wx.chooseMessageFile({
             count: 8,
             type: 'file',
             success: async result => {
+              const picked = Array.isArray(result.tempFiles) ? result.tempFiles : [];
+              if (!picked.length) { this.photoError('没有获取到文件，请重新选择'); return; }
               try {
-                const paths = await Promise.all(result.tempFiles.map(file =>
-                  /\.(png|jpe?g|gif|webp|bmp|avif|heic|heif)$/i.test(file.name)
-                    ? this.normalizeImage(file.path)
-                    : file.path
-                ));
-                this.setData({ files: [...this.data.files, ...paths].slice(0, 8) });
+                const base = this.data.files;
+                const added = await Promise.all(picked.map(async (file, index) => {
+                  const isImage = /\.(png|jpe?g|gif|webp|bmp|avif|heic|heif)$/i.test(file.name);
+                  return {
+                    path: isImage ? await this.normalizeImage(file.path) : file.path,
+                    name: isImage ? `照片${base.length + index + 1}` : (file.name || `附件${base.length + index + 1}`)
+                  };
+                }));
+                this.setData({ files: [...base, ...added].slice(0, 8) });
               } catch (error) {
-                wx.showToast({ title: error?.errMsg || error?.message || '图片处理失败，请重新选择', icon: 'none' });
+                this.photoError(error?.errMsg || error?.message || '文件处理失败');
               }
-            }
+            },
+            fail: error => { if (!/cancel/i.test(error?.errMsg || '')) this.photoError(error?.errMsg || '选择文件失败'); }
           });
         }
       }
     });
   },
+  /** 选文件失败必须让用户确认，否则材料没选上却以为已上传，提交后两端都看不到附件 */
+  photoError(message) {
+    wx.showModal({ title: '材料未能加入', content: `${message}。请重新选择后再保存。`, showCancel: false });
+  },
+  backToDetail() {
+    if (this.data.lockedApplicationId) { wx.redirectTo({ url: `/pages/stay-detail/index?id=${this.data.lockedApplicationId}` }); return; }
+    wx.navigateBack();
+  },
   normalizeImage(filePath) {
     return normalizeImage(filePath, 'stay');
   },
   async save(event) {
+    if (this.data.locked) { wx.showToast({ title: '本批次已有申请，不能再修改', icon: 'none' }); return; }
     const submit = event.currentTarget.dataset.submit === 'true';
     const message = validRanges(this.data.ranges, this.data.batch);
     if (message) { wx.showToast({ title: message, icon: 'none' }); return; }
@@ -161,7 +190,7 @@ Page({
     this.setData({ actionBusy: true });
     wx.showLoading({ title: '正在保存' });
     try {
-      const uploaded = await Promise.all(this.data.files.map(filePath => upload(filePath, stayUploadPath)));
+      const uploaded = await Promise.all(this.data.files.map(file => (typeof file === 'string' ? upload(file, stayUploadPath) : upload(file.path, stayUploadPath, file.name))));
       const fileIds = [...this.data.existing.map(file => Number(file.file_id)), ...uploaded];
       const saved = await request('/stay/applications', {
         method: 'POST',

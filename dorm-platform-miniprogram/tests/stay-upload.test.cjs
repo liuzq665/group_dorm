@@ -32,7 +32,7 @@ test('saving a stay application normalizes selected images and submits uploaded 
       ...page.data,
       batchId: '2', reason: '家庭原因', ranges: [{ startDate: '2026-12-01', endDate: '2026-12-02' }],
       batch: { open_start_date: '2026-11-01', open_end_date: '2026-12-31' },
-      files: ['photo.heic'], existing: []
+      files: [{ path: 'photo.heic', name: '照片1' }], existing: []
     };
     page.setData = function setData(values) { Object.assign(this.data, values); };
     assert.match(await page.normalizeImage('photo.heic'), /^\/user-data\/stay-\d+-[\da-f]+\.png$/);

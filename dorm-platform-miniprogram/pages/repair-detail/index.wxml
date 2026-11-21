@@ -222,8 +222,8 @@
       <view class="field">
         <text class="field-label">完工现场照片（必传，至少 1 张）</text>
         <button class="outline compact-button" bindtap="chooseResultPhotos">选择照片（{{resultFiles.length}}）</button>
-        <view class="photo-row" wx:for="{{resultFiles}}" wx:key="*this">
-          <text class="photo-name">{{item}}</text>
+        <view class="photo-row" wx:for="{{resultFiles}}" wx:key="path">
+          <text class="photo-name">{{item.name}}</text>
           <text class="file-remove" data-index="{{index}}" bindtap="removeResultPhoto">移除</text>
         </view>
       </view>
@@ -260,14 +260,41 @@
       <view class="field">
         <text class="field-label">维修现场照片（必传，至少 1 张）</text>
         <button class="outline compact-button" bindtap="chooseDelayPhotos">选择照片（{{delayFiles.length}}）</button>
-        <view class="photo-row" wx:for="{{delayFiles}}" wx:key="*this">
-          <text class="photo-name">{{item}}</text>
+        <view class="photo-row" wx:for="{{delayFiles}}" wx:key="path">
+          <text class="photo-name">{{item.name}}</text>
           <text class="file-remove" data-index="{{index}}" bindtap="removeDelayPhoto">移除</text>
         </view>
       </view>
       <view class="action-bar">
         <button class="outline" bindtap="closeDelay">取消</button>
         <button class="primary" loading="{{actionBusy}}" disabled="{{actionBusy}}" bindtap="submitDelay">提交延期</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 手动派单：选择维修工（展示工单统计与评分） -->
+  <view wx:if="{{dispatchModal}}" class="modal-mask">
+    <view class="modal-panel">
+      <view class="modal-head">
+        <text class="section-title">选择维修工</text>
+        <text class="modal-close" bindtap="closeDispatch">关闭</text>
+      </view>
+      <text class="field-hint">已按在办工单从少到多排列；在办为待接单、维修中与延期工单合计，评分取该维修人员历史学生评价平均分。</text>
+      <view class="dispatch-list">
+        <view class="dispatch-card" wx:for="{{dispatchCandidates}}" wx:key="repairer_user_id" data-id="{{item.repairer_user_id}}" bindtap="pickCandidate">
+          <view class="record-head">
+            <text class="record-title">{{item.real_name}}</text>
+            <text class="tag tag-muted">{{item.loadLabel}}</text>
+          </view>
+          <text class="record-meta">{{item.statsLabel}}</text>
+          <view class="record-foot">
+            <text class="record-time">评分 {{item.ratingLabel}}</text>
+            <text class="link">选择</text>
+          </view>
+        </view>
+      </view>
+      <view class="action-bar">
+        <button class="outline" bindtap="closeDispatch" disabled="{{actionBusy}}">取消</button>
       </view>
     </view>
   </view>

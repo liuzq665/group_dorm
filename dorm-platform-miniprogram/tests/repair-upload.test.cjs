@@ -30,7 +30,7 @@ test('saving a repair uploads every photo to /files and submits their IDs', asyn
     require('../pages/repair-form/index');
     page.data = {
       ...page.data,
-      files: ['first.jpg', 'second.jpg'],
+      files: [{ path: 'first.jpg', name: '现场照片1' }, { path: 'second.jpg', name: '现场照片2' }],
       categories: [{ id: 1, name: '水暖维修' }],
       categoryIndex: 0,
       categoryName: '水暖维修',
@@ -42,6 +42,7 @@ test('saving a repair uploads every photo to /files and submits their IDs', asyn
     await page.save({ currentTarget: { dataset: { submit: 'true' } } });
     assert.equal(uploads.length, 2);
     for (const upload of uploads) {
+      assert.ok(['first.jpg', 'second.jpg'].includes(upload.filePath), upload.filePath);
       assert.ok(upload.url.endsWith('/api/v1/files'), upload.url);
       assert.equal(upload.header.Authorization, 'Bearer test-session');
     }

@@ -1,6 +1,7 @@
 const { request, upload, getSession, showError } = require('../../utils/request');
-const { statusText, statusTone, dispatchText, resultText, formatDateTime, orDash } = require('../../utils/format');
+const { statusText, statusTone, dispatchText, resultText, formatDateTime, orDash, dispatchCandidate } = require('../../utils/format');
 const { previewAttachment } = require('../../utils/files');
+const { normalizeImage } = require('../../utils/image');
 const { overlay } = require('../../utils/overlay');
 
 const PURPOSE_LABELS = { FAULT: '故障照片', RESULT: '完工照片', DELAY: '延期现场照片', REWORK: '重修照片' };
@@ -37,7 +38,9 @@ Page({
     resultFiles: [],
     delayModal: false,
     delayForm: { reason: '', date: '', time: '' },
-    delayFiles: []
+    delayFiles: [],
+    dispatchModal: false,
+    dispatchCandidates: []
   },
   onLoad(query) {
     this.setData({ id: query.id || '' });
@@ -60,13 +63,15 @@ Page({
       rejectModal: false,
       reworkModal: false,
       resultModal: false,
-      delayModal: false
+      delayModal: false,
+      dispatchModal: false,
+      dispatchCandidates: []
     });
     overlay(this, false);
   },
   syncOverlay() {
     const d = this.data;
-    const open = !!(d.scoreModal || d.rejectModal || d.reworkModal || d.resultModal || d.delayModal);
+    const open = !!(d.scoreModal || d.rejectModal || d.reworkModal || d.resultModal || d.delayModal || d.dispatchModal);
     overlay(this, open);
   },
   async load() {
@@ -300,10 +305,11 @@ Page({
       const paths = await this.choosePhotos();
       // 兜底：若选图期间弹层被生命周期清掉，重新打开并恢复 tabBar 隐藏
       const base = this.data.resultModal ? this.data.resultFiles : [];
-      this.setData({ resultModal: true, resultFiles: [...base, ...paths].slice(0, 6) });
+      const added = paths.map((path, index) => ({ path, name: `现场照片${base.length + index + 1}` }));
+      this.setData({ resultModal: true, resultFiles: [...base, ...added].slice(0, 6) });
       overlay(this, true);
     } catch (error) {
-      if (!error.errMsg?.includes('cancel')) showError(error);
+      if (!error.errMsg?.includes('cancel')) this.photoError(error);
     }
   },
   removeResultPhoto(event) {
@@ -319,7 +325,7 @@ Page({
     this.setData({ actionBusy: true });
     wx.showLoading({ title: '正在提交' });
     try {
-      const fileIds = await Promise.all(this.data.resultFiles.map(path => upload(path)));
+      const fileIds = await Promise.all(this.data.resultFiles.map(file => upload(typeof file === 'string' ? file : file.path)));
       await request(`/repair-orders/${this.data.id}/result`, { method: 'POST', data: { result: text, fileIds } });
       wx.showToast({ title: '维修结果已提交' });
       this.setData({ resultModal: false });
@@ -347,10 +353,11 @@ Page({
     try {
       const paths = await this.choosePhotos();
       const base = this.data.delayModal ? this.data.delayFiles : [];
-      this.setData({ delayModal: true, delayFiles: [...base, ...paths].slice(0, 6) });
+      const added = paths.map((path, index) => ({ path, name: `现场照片${base.length + index + 1}` }));
+      this.setData({ delayModal: true, delayFiles: [...base, ...added].slice(0, 6) });
       overlay(this, true);
     } catch (error) {
-      if (!error.errMsg?.includes('cancel')) showError(error);
+      if (!error.errMsg?.includes('cancel')) this.photoError(error);
     }
   },
   removeDelayPhoto(event) {
@@ -367,7 +374,7 @@ Page({
     this.setData({ actionBusy: true });
     wx.showLoading({ title: '正在提交' });
     try {
-      const fileIds = await Promise.all(this.data.delayFiles.map(path => upload(path)));
+      const fileIds = await Promise.all(this.data.delayFiles.map(file => upload(typeof file === 'string' ? file : file.path)));
       await request(`/repair-orders/${this.data.id}/delay`, {
         method: 'POST',
         data: { reason: reason.trim(), expectedFinishAt: `${date}T${time}:00`, fileIds }
@@ -416,40 +423,35 @@ Page({
     }
   },
   async dispatch() {
+    if (this.data.actionBusy) return;
     try {
       const candidates = await request(`/repair-orders/${this.data.id}/candidates`);
       if (!candidates.length) {
         wx.showModal({ title: '暂无可派维修人员', content: '当前没有同时满足工种、楼栋范围和在岗条件的维修人员。', showCancel: false });
         return;
       }
-      const worker = await this.chooseCandidate(candidates);
-      if (!worker) return;
-      await request(`/repair-orders/${this.data.id}/dispatch`, { method: 'POST', data: { repairerUserId: worker.repairer_user_id } });
-      wx.showToast({ title: '已派单' });
-      this.load();
+      this.setData({ dispatchModal: true, dispatchCandidates: candidates.map(dispatchCandidate) }, () => overlay(this, true));
     } catch (error) {
       showError(error);
     }
   },
-  async chooseCandidate(candidates) {
-    let start = 0;
-    while (true) {
-      const end = Math.min(start + 5, candidates.length);
-      const options = candidates.slice(start, end).map(item => `${item.real_name}（在办 ${item.active_orders}${item.max_active_orders ? `/${item.max_active_orders}` : ''}）`);
-      const hasPrevious = start > 0;
-      const hasNext = end < candidates.length;
-      if (hasPrevious) options.unshift('上一页');
-      if (hasNext) options.push('下一页');
-      const selected = await new Promise(resolve => wx.showActionSheet({
-        itemList: options,
-        success: result => resolve(result.tapIndex),
-        fail: () => resolve(-1)
-      }));
-      if (selected < 0) return null;
-      if (hasPrevious && selected === 0) { start = Math.max(0, start - 5); continue; }
-      const candidateIndex = selected - (hasPrevious ? 1 : 0);
-      if (hasNext && candidateIndex === end - start) { start = end; continue; }
-      return candidates[start + candidateIndex];
+  closeDispatch() {
+    this.setData({ dispatchModal: false, dispatchCandidates: [] }, () => overlay(this, false));
+  },
+  async pickCandidate(event) {
+    if (this.data.actionBusy) return;
+    const repairerUserId = event.currentTarget.dataset.id;
+    try {
+      this.setData({ actionBusy: true });
+      await request(`/repair-orders/${this.data.id}/dispatch`, { method: 'POST', data: { repairerUserId } });
+      wx.showToast({ title: '已派单' });
+      this.setData({ dispatchModal: false, dispatchCandidates: [] });
+      overlay(this, false);
+      await this.load();
+    } catch (error) {
+      showError(error);
+    } finally {
+      this.setData({ actionBusy: false });
     }
   },
   async retry() {
@@ -505,9 +507,21 @@ Page({
       count: 6,
       mediaType: ['image'],
       sourceType: ['album', 'camera'],
-      success: result => { this._pickingMedia = false; resolve(result.tempFiles.map(file => file.tempFilePath)); },
+      success: result => {
+        this._pickingMedia = false;
+        const picked = Array.isArray(result.tempFiles) ? result.tempFiles : [];
+        if (!picked.length) { reject(new Error('没有获取到图片，请重新选择')); return; }
+        // 与报修/留宿表单保持一致：压缩后再上传，避免相机原图超过后端 5MB 上限
+        Promise.all(picked.map(file => normalizeImage(file.tempFilePath, 'repair')))
+          .then(paths => resolve(paths))
+          .catch(reject);
+      },
       fail: error => { this._pickingMedia = false; reject(error); }
     }));
+  },
+  /** 选图/压缩失败需要用户确认，否则照片没选上却以为已上传，提交后两端都看不到附件 */
+  photoError(error) {
+    wx.showModal({ title: '照片未能加入', content: `${error?.errMsg || error?.message || '图片处理失败'}。请重新选择照片后再提交。`, showCancel: false });
   },
   previewFile(event) {
     previewAttachment(event.currentTarget.dataset.file, getSession().token);

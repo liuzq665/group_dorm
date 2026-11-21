@@ -43,20 +43,24 @@
 
       <view class="field">
         <text class="field-label">申请材料（提交审核前至少 1 份，最多 8 份）</text>
-        <button class="outline compact-button" bindtap="choose">选择材料（新增 {{files.length}}）</button>
+        <text wx:if="{{locked}}" class="record-note">{{lockedHint}}</text>
+        <button class="outline compact-button" bindtap="choose" disabled="{{locked}}">选择材料（新增 {{files.length}}）</button>
         <view class="file-row" wx:for="{{existing}}" wx:key="file_id">
           <text>{{item.original_name}}</text>
-          <text class="file-remove" data-index="{{index}}" bindtap="removeExisting">移除</text>
+          <text wx:if="{{!locked}}" class="file-remove" data-index="{{index}}" bindtap="removeExisting">移除</text>
         </view>
-        <view class="file-row" wx:for="{{files}}" wx:key="*this">
-          <text>{{item}}</text>
-          <text class="file-remove" data-index="{{index}}" bindtap="removeFile">移除</text>
+        <view class="file-row" wx:for="{{files}}" wx:key="path">
+          <text>{{item.name}}</text>
+          <text wx:if="{{!locked}}" class="file-remove" data-index="{{index}}" bindtap="removeFile">移除</text>
         </view>
       </view>
 
-      <view class="action-bar">
+      <view wx:if="{{!locked}}" class="action-bar">
         <button class="secondary" data-submit="false" bindtap="save" loading="{{actionBusy}}" disabled="{{actionBusy}}">保存草稿</button>
         <button class="primary" data-submit="true" bindtap="save" loading="{{actionBusy}}" disabled="{{actionBusy}}">提交审核</button>
+      </view>
+      <view wx:else class="action-bar">
+        <button class="outline" bindtap="backToDetail">返回申请详情</button>
       </view>
     </view>
   </block>

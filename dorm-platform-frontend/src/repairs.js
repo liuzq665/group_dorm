@@ -82,7 +82,14 @@ export async function repairAction(action,id){
  if(action==='repair-confirm'){const formHtml=select('score','评分',[[5,'5 分'],[4,'4 分'],[3,'3 分'],[2,'2 分'],[1,'1 分']],5,false,false)+field('comment','评价','textarea','',true);modal('确认维修完成',`<p>${esc(row?.title||'')}</p>${formHtml}`,d=>post(`/repair-orders/${id}/confirm`,{score:Number(d.score),comment:d.comment}),'确认并评价');return;}
  if(action==='repair-cancel'){modal('撤销报修',`<p>${esc(row?.title||'')}</p>`,()=>post(`/repair-orders/${id}/cancel`),'确认');return;}
  if(action==='repair-review'||action==='repair-return'){const choices=action==='repair-return'?[['false','退回修改']]:[['true','通过'],['false','退回修改']];modal('报修审核',select('pass','审核结论',choices)+check('urgent','紧急工单',!!row?.urgent)+field('reason','退回原因','textarea','',false),d=>{const pass=d.pass==='true';if(!pass&&!d.reason.trim())throw new Error('请填写退回原因');return post(`/repair-orders/${id}/review`,{...d,reason:pass?'':d.reason.trim(),pass,urgent:!!d.urgent});});return;}
- if(action==='repair-dispatch'){const candidates=await api(`/repair-orders/${id}/candidates`);if(!candidates.length)throw new Error('无符合工种和楼栋资质的维修人员，请管理员调整人员资质与负责范围');modal('手动强制派单',select('repairerUserId','维修人员',candidates.map(w=>[w.repairer_user_id,`${w.real_name} · 在办 ${w.active_orders} 单`])),d=>post(`/repair-orders/${id}/dispatch`,d),'确认强制派单');return;}
+ if(action==='repair-dispatch'){
+  const candidates=await api(`/repair-orders/${id}/candidates`);if(!candidates.length)throw new Error('无符合工种和楼栋资质的维修人员，请管理员调整人员资质与负责范围');
+  const count=value=>Number(value)||0;
+  const candidateText=w=>{const load=`在办 ${count(w.active_orders)}${w.max_active_orders?`/${count(w.max_active_orders)}`:''}`,stats=`维修中 ${count(w.in_repair_orders)} · 待确认 ${count(w.pending_confirm_orders)} · 延期 ${count(w.delayed_orders)}`,rating=count(w.evaluation_count)?`${count(w.average_score).toFixed(1)} 分（${count(w.evaluation_count)} 条）`:'暂无评分';return `${load} · ${stats} · 评分 ${rating}`;};
+  const hint='<p class="muted">已按在办工单从少到多排列；在办为待接单、维修中与延期工单合计，评分取该维修人员历史学生评价平均分。</p>';
+  modal('手动强制派单',select('repairerUserId','维修人员',candidates.map(w=>[w.repairer_user_id,`${w.real_name} · ${candidateText(w)}`]))+hint,d=>post(`/repair-orders/${id}/dispatch`,d),'确认强制派单');
+  return;
+ }
  if(action==='repair-accept'){await post(`/repair-orders/${id}/decision`,{accept:true});await render();notify('已接单');return;}
  if(action==='repair-reject'){modal('拒绝维修任务',field('reason','拒单原因','textarea'),d=>{if(!d.reason.trim())throw new Error('请填写拒单原因');return post(`/repair-orders/${id}/decision`,{accept:false,reason:d.reason.trim()});},'确认拒单');return;}
  if(action==='repair-result'){modal('提交维修结果',field('result','维修结果','textarea')+photoField(true),async(d,f)=>post(`/repair-orders/${id}/result`,{...d,fileIds:await upload(f)}),'提交结果');return;}

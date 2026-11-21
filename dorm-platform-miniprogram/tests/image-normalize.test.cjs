@@ -44,3 +44,23 @@ test('binary image signatures remain supported when a platform returns ArrayBuff
   assert.equal(extensionFromImageData(Uint8Array.from([0xff, 0xd8, 0xff, 0]).buffer), 'jpg');
   assert.equal(extensionFromImageData('data:image/png;base64,iVBORw0KGgoAAAANSUhEUg=='), 'png');
 });
+
+test('compression failure falls back to the original JPG instead of dropping the photo', async () => {
+  const originalWx = global.wx;
+  let copied;
+  global.wx = {
+    env: { USER_DATA_PATH: '/user-data' },
+    compressImage(options) { options.fail({ errMsg: 'compressImage:fail' }); },
+    getFileSystemManager() { return {
+      readFile(options) { options.success({ data: '/9j/4AAQSkZJRg==' }); },
+      copyFile(options) { copied = options; options.success(); }
+    }; }
+  };
+  try {
+    const result = await normalizeImage('wxfile://tmp/camera-1.jpg', 'repair');
+    assert.match(result, /^\/user-data\/repair-\d+-[\da-f]+\.jpg$/);
+    assert.equal(copied.srcPath, 'wxfile://tmp/camera-1.jpg');
+  } finally {
+    global.wx = originalWx;
+  }
+});

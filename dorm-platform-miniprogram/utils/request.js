@@ -26,7 +26,23 @@ function request(path, options = {}) {
     });
   });
 }
-function upload(filePath, path = '/files') {
+// wx.chooseMessageFile 给的临时路径可能没有扩展名，服务端按扩展名判定文件类型会直接拒绝（400 文件格式不受支持）；
+// 上传前用原始文件名补一个带扩展名的副本，仍然上传同一份文件内容。
+const EXTENSION_PATTERN = /\.[A-Za-z0-9]{1,8}$/;
+function withUploadExtension(filePath, name) {
+  if (EXTENSION_PATTERN.test(filePath)) return Promise.resolve(filePath);
+  const matched = String(name || '').trim().match(EXTENSION_PATTERN);
+  const fs = typeof wx.getFileSystemManager === 'function' ? wx.getFileSystemManager() : null;
+  if (!matched || !fs || !wx.env?.USER_DATA_PATH) return Promise.resolve(filePath);
+  const destPath = `${wx.env.USER_DATA_PATH}/upload-${Date.now()}-${Math.floor(Math.random() * 1000000)}${matched[0].toLowerCase()}`;
+  return new Promise(resolve => {
+    fs.copyFile({ srcPath: filePath, destPath, success: () => resolve(destPath), fail: () => resolve(filePath) });
+  });
+}
+function upload(filePath, path = '/files', name = '') {
+  return withUploadExtension(filePath, name).then(targetPath => uploadFile(targetPath, path));
+}
+function uploadFile(filePath, path) {
   const session = getSession();
   return new Promise((resolve, reject) => {
     wx.uploadFile({
@@ -46,9 +62,9 @@ function upload(filePath, path = '/files') {
     });
   });
 }
-function uploadMessage(filePath) { return upload(filePath, '/messages/files'); }
-function uploadStayApplication(filePath) { return upload(filePath, '/stay/applications/files'); }
-function uploadStayMaterial(batchId, filePath) { return upload(filePath, `/stay/batches/${batchId}/materials`); }
+function uploadMessage(filePath, name = '') { return upload(filePath, '/messages/files', name); }
+function uploadStayApplication(filePath, name = '') { return upload(filePath, '/stay/applications/files', name); }
+function uploadStayMaterial(batchId, filePath, name = '') { return upload(filePath, `/stay/batches/${batchId}/materials`, name); }
 function showError(error) { wx.showToast({ title: error.message || '操作失败', icon: 'none', duration: 2600 }); }
 module.exports = { request, upload, uploadMessage, uploadStayApplication, uploadStayMaterial, getSession, setSession, clearSession, showError };
 

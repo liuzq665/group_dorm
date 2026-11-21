@@ -2,4 +2,5 @@
 .photo-row { display: flex; align-items: center; justify-content: space-between; gap: 12rpx; padding-top: 8rpx; }
 .photo-name { flex: 1; min-width: 0; color: var(--text-2); font-size: 22rpx; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .photo-tag { flex: none; color: var(--text-3); font-size: 21rpx; }
+.photo-thumb { flex: none; width: 72rpx; height: 72rpx; border-radius: var(--radius-s); background: var(--surface-2, #f2f6f4); }
 

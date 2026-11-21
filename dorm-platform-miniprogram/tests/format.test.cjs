@@ -57,3 +57,28 @@ test('留宿日期段格式统一', () => {
   );
   assert.equal(format.ranges([]), '');
 });
+
+test('手动派单候选维修工展示口径：在办/维修中/待确认/延期与评分', () => {
+  const candidate = format.dispatchCandidate({
+    repairer_user_id: 7,
+    real_name: '王师傅',
+    active_orders: 2,
+    max_active_orders: 5,
+    in_repair_orders: 1,
+    pending_confirm_orders: 1,
+    delayed_orders: 1,
+    evaluation_count: 12,
+    average_score: '4.75'
+  });
+  assert.equal(candidate.loadLabel, '在办 2/5');
+  assert.equal(candidate.statsLabel, '维修中 1 · 待确认 1 · 延期 1');
+  assert.equal(candidate.ratingLabel, '4.8 分（12 条）');
+  assert.equal(candidate.real_name, '王师傅');
+});
+
+test('手动派单候选维修工无评分与无负荷上限时口径稳定', () => {
+  const candidate = format.dispatchCandidate({ active_orders: 0, max_active_orders: null, evaluation_count: 0 });
+  assert.equal(candidate.loadLabel, '在办 0');
+  assert.equal(candidate.statsLabel, '维修中 0 · 待确认 0 · 延期 0');
+  assert.equal(candidate.ratingLabel, '暂无评分');
+});

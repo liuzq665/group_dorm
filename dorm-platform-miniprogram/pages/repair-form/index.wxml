@@ -42,10 +42,12 @@
           <text class="photo-name">{{item.original_name}}</text>
           <text class="photo-tag">已上传</text>
         </view>
-        <view class="photo-row" wx:for="{{files}}" wx:key="*this">
-          <text class="photo-name">{{item}}</text>
+        <view class="photo-row" wx:for="{{files}}" wx:key="path">
+          <image class="photo-thumb" src="{{item.path}}" mode="aspectFill"/>
+          <text class="photo-name">{{item.name}}</text>
           <text class="file-remove" data-index="{{index}}" bindtap="removeFile">移除</text>
         </view>
+        <text wx:if="{{!files.length && !existing.length}}" class="field-hint">尚未添加照片；如上传失败会弹窗提示，请重新选择。</text>
       </view>
 
       <view class="action-bar">

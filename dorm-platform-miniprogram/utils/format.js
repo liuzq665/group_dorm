@@ -142,6 +142,22 @@ function ranges(items = []) {
     .join('；');
 }
 
+/**
+ * 手动派单候选维修工的展示口径（与 Web 端“手动强制派单”下拉列表一致）：
+ * 在办工单/上限、维修中、待确认、延期工单数与历史评分，评分保留一位小数。
+ */
+function dispatchCandidate(item = {}) {
+  const count = value => Number(value) || 0;
+  const limit = count(item.max_active_orders);
+  const evaluations = count(item.evaluation_count);
+  return {
+    ...item,
+    loadLabel: `在办 ${count(item.active_orders)}${limit ? `/${limit}` : ''}`,
+    statsLabel: `维修中 ${count(item.in_repair_orders)} · 待确认 ${count(item.pending_confirm_orders)} · 延期 ${count(item.delayed_orders)}`,
+    ratingLabel: evaluations ? `${count(item.average_score).toFixed(1)} 分（${evaluations} 条）` : '暂无评分'
+  };
+}
+
 function sourceOptions(role) {
   return (sourceOptionsByRole[role] || sourceOptionsByRole.STUDENT).map(key => ({ key, label: sourceLabels[key] }));
 }
@@ -169,5 +185,6 @@ module.exports = {
   orDash,
   formatDateTime,
   formatDate,
-  ranges
+  ranges,
+  dispatchCandidate
 };
